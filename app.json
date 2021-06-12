@@ -19,6 +19,10 @@
     "ios": {
       "supportsTablet": true
     },
+    "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#860432"
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -27,6 +31,22 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "sentry-expo",
+      "expo-image-picker"
+    ],
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "sabba",
+            "project": "sabba",
+            "authToken": "b4f0a5d05f354b469095931f2127942c71c4ca98267e44838ea1a5277da4801c"
+          }
+        }
+      ]
     }
   }
 }

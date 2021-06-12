@@ -1,21 +1,21 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+
+import configureStore from "./src/store/configureStore";
+import {Provider} from "react-redux";
+import {NavigationContainer} from "@react-navigation/native";
+import MainNavigator from "./src/navigation/MainNavigator";
+import logger from "./src/utilities/logger";
+
+logger.start()
 
 export default function App() {
+  const store = configureStore()
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+        <Provider store={store}>
+          <NavigationContainer>
+            <MainNavigator/>
+          </NavigationContainer>
+        </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
