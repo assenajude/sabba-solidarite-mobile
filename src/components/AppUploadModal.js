@@ -15,8 +15,8 @@ function AppUploadModal({progress, uploadModalVisible, closeModal}) {
                 <View>
                     <Progress.Bar progress={progress} color={defaultStyles.colors.rougeBordeau} width={200}/>
                 </View>
-                <TouchableOpacity onPress={closeModal} style={styles.closeButton} name='close' size={24} color={defaultStyles.colors.rougeBordeau}>
-                    <MaterialCommunityIcons/>
+                <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+                    <MaterialCommunityIcons  name='close' size={24} color={defaultStyles.colors.rougeBordeau} />
                 </TouchableOpacity>
             </View>
         </Modal>

@@ -8,7 +8,6 @@ import FormImagePicker from "../form/FormImagePicker";
 import {AppForm, FormSubmitButton} from "../form";
 import AppText from "../AppText";
 import useUploadImage from "../../hooks/useUploadImage";
-import useEngagement from "../../hooks/useEngagement";
 import useAuth from "../../hooks/useAuth";
 import {useDispatch, useStore} from "react-redux";
 import {getImagesEdit} from "../../store/slices/memberSlice";
@@ -100,7 +99,7 @@ function EditImagesModal({editImagesModalVisible,closeModal, member}) {
                 </AppForm>
             </View>
         </Modal>
-            <AppUploadModal progress={progress} uploadModalVisible={uploadModal}/>
+            <AppUploadModal closeModal={() => setUploadModal(false)} progress={progress} uploadModalVisible={uploadModal}/>
             </>
     );
 }

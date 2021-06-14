@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, StyleSheet, ToastAndroid, View} from "react-native";
+import {Modal, StyleSheet, View} from "react-native";
 import * as Yup from 'yup'
 
 import {AppForm, AppFormField, FormSubmitButton} from "../form";

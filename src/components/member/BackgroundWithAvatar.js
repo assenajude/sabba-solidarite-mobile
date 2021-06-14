@@ -1,10 +1,7 @@
-import React, {useState} from 'react';
-import {Image, View, StyleSheet, TouchableWithoutFeedback} from "react-native";
+import React from 'react';
+import {Image, View, StyleSheet} from "react-native";
 import {LinearGradient} from "expo-linear-gradient";
-import {MaterialCommunityIcons} from "@expo/vector-icons";
-import defaultStyles from "../../utilities/styles";
 import MemberItem from "./MemberItem";
-import AppImagePicker from "../AppImagePicker";
 import AppCamera from "../AppCamera";
 
 function BackgroundWithAvatar({getCompteDetails, fondStyle, selectedMember,onChangeImages, avatarStyle, showCamera}) {
