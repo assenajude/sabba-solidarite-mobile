@@ -3,10 +3,11 @@ import {ScrollView,} from "react-native";
 import * as Yup from 'yup'
 import {AppForm, AppFormField, FormSubmitButton} from '../components/form'
 import {addNewAssociation, getAllAssociation} from "../store/slices/associationSlice";
-import {useDispatch, useStore} from "react-redux";
+import {useDispatch, useSelector, useStore} from "react-redux";
 import FormImagePicker from "../components/form/FormImagePicker";
 import AppUploadModal from "../components/AppUploadModal";
 import useUploadImage from "../hooks/useUploadImage";
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 const newAssociationValidSchema = Yup.object().shape({
     nom: Yup.string(),
@@ -25,6 +26,8 @@ function NewAssociationScreen({navigation, route}) {
     const {directUpload, dataTransformer} = useUploadImage()
     const store = useStore()
     const dispatch = useDispatch()
+
+    const isLoading = useSelector(state => state.entities.association.loading)
 
     const [progress, setProgresss] = useState(0)
     const [uploadModal, setUploadModal] = useState(false)
@@ -52,12 +55,12 @@ function NewAssociationScreen({navigation, route}) {
             nom:data.nom,
             avatar: avatarUrl,
             description: data.description,
-            cotisationMensuelle: data.cotisationMensuelle,
+            cotisationMensuelle: Number(data.cotisationMensuelle),
             frequenceCotisation: data.frequenceCotisation,
-            fondInitial: data.fondInitial,
-            seuilSecurite: data.seuilSecurite,
-            interetCredit: data.interetCredit,
-            validatorsNumber: data.validatorsNumber
+            fondInitial: Number(data.fondInitial),
+            seuilSecurite: Number(data.seuilSecurite),
+            interetCredit: Number(data.interetCredit),
+            validatorsNumber: data.validatorsNumber === ''?0:Number(data.validatorsNumber)
         }
         await dispatch(addNewAssociation(newData))
         const error = store.getState().entities.association.error
@@ -68,6 +71,7 @@ function NewAssociationScreen({navigation, route}) {
     }
     return (
         <>
+            <AppActivityIndicator visible={isLoading}/>
         <ScrollView
             contentContainerStyle={{
                 padding: 10
@@ -82,7 +86,7 @@ function NewAssociationScreen({navigation, route}) {
                     fondInitial: selectedParams?.selectedAssociation?String(selectedParams?.selectedAssociation.fondInitial) : '',
                     seuilSecurite: selectedParams?.selectedAssociation?String(selectedParams?.selectedAssociation.seuilSecurite) : '',
                     interetCredit: selectedParams?.selectedAssociation?String(selectedParams?.selectedAssociation.interetCredit) : '',
-                    validatorsNumber: selectedParams?.selectedAssociation?String(selectedParams?.selectedAssociation.validatorsNumber) : ''
+                    validatorsNumber: selectedParams?.selectedAssociation?String(selectedParams?.selectedAssociation.validationLenght) : ''
                 }}
                 validationSchema={newAssociationValidSchema}
                 onSubmit={handleNewAssociation}
@@ -94,7 +98,7 @@ function NewAssociationScreen({navigation, route}) {
                 <AppFormField name='frequenceCotisation' placeholder='frequence cotisation'/>
                 <AppFormField name='fondInitial' placeholder='fonds initial'/>
                 <AppFormField name='seuilSecurite' placeholder='Seuil de securité'/>
-                <AppFormField name='interetCredit' placeholder='taux de credi'/>
+                <AppFormField name='interetCredit' placeholder='taux de credit'/>
                 <AppFormField name='validatorsNumber' placeholder='Nombre validateurs'/>
                 <FormSubmitButton title='Ajouter'/>
             </AppForm>
