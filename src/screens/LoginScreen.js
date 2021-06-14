@@ -6,13 +6,17 @@ import AppFormField from "../components/form/AppFormField";
 import * as Yup from 'yup'
 import FormSubmitButton from "../components/form/FormSubmitButton";
 import {useDispatch, useSelector, useStore} from "react-redux";
-import {signin} from "../store/slices/authSlice";
+import {getUserAllUsers, signin} from "../store/slices/authSlice";
 
 import defaultStyles from '../utilities/styles'
 import AppText from "../components/AppText";
 import routes from "../navigation/routes";
 import AppLogoInfo from "../components/AppLogoInfo";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import {getAllMembers, getMemberAssociations} from "../store/slices/memberSlice";
+import {getPopulateReseauList, getUserTransactions} from "../store/slices/transactionSlice";
+import {reseauData} from "../utilities/reseau.data";
+import useAuth from "../hooks/useAuth";
 
 const loginValidSchema = Yup.object().shape({
     info: Yup.string().required('Entrez votre adresse mail ou votre nom utilisateur'),
@@ -21,8 +25,13 @@ const loginValidSchema = Yup.object().shape({
 
 function LoginScreen({navigation}) {
     const store = useStore()
+    const {isAdmin} = useAuth()
+
     const dispatch = useDispatch()
     const isLoading = useSelector(state => state.auth.loading)
+    const currentUser = useSelector(state => state.auth.user)
+    const assoLoading = useSelector(state => state.entities.association.loading)
+    const memberLoading = useSelector(state => state.entities.member.loading)
 
     const  validateEmail = (email) => {
         const re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+([^<>()\.,;:\s@\"]{2,}|[\d\.]+))$/
@@ -44,15 +53,22 @@ function LoginScreen({navigation}) {
                 }
             }
         await dispatch(signin(data))
-              const error = store.getState().auth.error
-              if(error !== null) return alert("Le mot de passe et/ou le pseudo n'est pas correct. Veuillez reessayer.")
-              resetForm()
-              navigation.navigate(routes.STARTER)
+        const error = store.getState().auth.error
+        if(error !== null) return alert("Le mot de passe et/ou le pseudo n'est pas correct. Veuillez reessayer.")
+        resetForm()
+        await dispatch(getAllMembers())
+        await dispatch(getMemberAssociations())
+        if(isAdmin()) {
+            dispatch(getUserAllUsers())
+        }
+        dispatch(getPopulateReseauList(reseauData))
+        dispatch(getUserTransactions({userId: currentUser.id}))
+        navigation.navigate(routes.STARTER)
     }
 
     return (
         <>
-            <AppActivityIndicator visible={isLoading}/>
+            <AppActivityIndicator visible={isLoading || assoLoading || memberLoading}/>
             <View style={styles.logoInfoContainer}>
                 <AppLogoInfo/>
             </View>

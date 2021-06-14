@@ -32,6 +32,7 @@ function AssociationBackImage({association, cameraContainer,uploadResult, camera
         const uploaded = await directUpload(result, imageData, (progress) => {
             setProgress(progress)
         })
+        setOnEdit(false)
         setUploadModalVisible(false)
         uploadResult(uploaded)
     }
@@ -65,7 +66,10 @@ function AssociationBackImage({association, cameraContainer,uploadResult, camera
                     }}/>
             </View>}
 
-            <AppUploadModal progress={progress} uploadModalVisible={uploadModalVisible}/>
+            <AppUploadModal
+                closeModal={() => setUploadModalVisible(false)}
+                progress={progress}
+                uploadModalVisible={uploadModalVisible}/>
         </View>
     );
 }

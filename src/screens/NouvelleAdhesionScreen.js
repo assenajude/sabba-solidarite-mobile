@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {FlatList, TouchableOpacity, View} from "react-native";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import MemberListItem from "../components/member/MemberListItem";

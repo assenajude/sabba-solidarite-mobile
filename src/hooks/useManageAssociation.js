@@ -1,9 +1,11 @@
 import {useSelector, useStore} from "react-redux";
 import dayjs from "dayjs";
+import useAuth from "./useAuth";
 
 let useManageAssociation;
 export default useManageAssociation = () => {
     const store = useStore()
+    const {validMembers} = useAuth()
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const connectedMember = useSelector(state => state.auth.user)
     const associationMembers = useSelector(state => state.entities.association.selectedAssociationMembers)
@@ -81,6 +83,22 @@ export default useManageAssociation = () => {
         return {investAmount, depenseAmount, gain}
     }
 
-    return {getAssociatonAllMembers, getMemberRelationType, formatFonds,
+    const votorsNumber = () => {
+        let number = 0
+        if(currentAssociation.validationLenght>0) {
+            number = currentAssociation.validationLenght
+        } else {
+            const membersLengtht = validMembers(associationMembers).length
+            if(membersLengtht <= 10) {
+                number = membersLengtht
+            } else {
+                const numberToVote = Math.ceil(membersLengtht / 3)
+                number = numberToVote
+            }
+        }
+        return number
+    }
+
+    return {getAssociatonAllMembers, getMemberRelationType, formatFonds,votorsNumber,
         formatDate, associationValidMembers, getNewAdhesion, getManagedAssociationFund}
 }

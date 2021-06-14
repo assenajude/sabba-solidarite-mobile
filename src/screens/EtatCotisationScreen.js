@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     listButton: {
         position: 'absolute',
         right: 15,
-        bottom: 15
+        bottom: 5
     }
 })
 export default EtatCotisationScreen;

@@ -1,7 +1,9 @@
 import React from 'react';
-import {ScrollView, View, StyleSheet} from "react-native";
+import {ScrollView, View, StyleSheet, TouchableOpacity} from "react-native";
 import AssociationBackImage from "../components/association/AssociationBackImage";
 import {useDispatch, useStore} from "react-redux";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 import {getAvatarUpdate} from "../store/slices/associationSlice";
 import AppLabelWithValue from "../components/AppLabelWithValue";
 import AppSimpleLabelWithValue from "../components/AppSimpleLabelWithValue";
@@ -11,6 +13,7 @@ import defaultStyles from "../utilities/styles";
 import AppAddNewButton from "../components/AppAddNewButton";
 import routes from "../navigation/routes";
 import useAuth from "../hooks/useAuth";
+import AppDocumentPicker from "../components/AppDocumentPicker";
 
 function AssociationDetailScreen({route, navigation}) {
     const selectedAssociation = route.params
@@ -18,6 +21,10 @@ function AssociationDetailScreen({route, navigation}) {
     const dispatch = useDispatch()
     const {formatFonds} = useManageAssociation()
     const {isAdmin}= useAuth()
+
+    const getReglementDocument = () => {
+
+    }
 
 
    const handleSaveChanged = async (uploadResult) => {
@@ -45,18 +52,19 @@ function AssociationDetailScreen({route, navigation}) {
                 <AppSimpleLabelWithValue label='Frequence' labelValue={selectedAssociation.frequenceCotisation}/>
                   <View style={styles.reglement}>
                       <AppText style={{color: defaultStyles.colors.bleuFbi}}> Reglement intérieur</AppText>
+                         <AppDocumentPicker/>
                   </View>
                 <AppLabelWithValue showLimit={false} label='Description' value={selectedAssociation.description}/>
               </View>
               </ScrollView>
                 {isAdmin() && <View style={{
                     position: 'absolute',
-                    right: 20,
-                    bottom: 20
+                    right: 10,
+                    bottom: 5
                 }}>
                     <AppAddNewButton
                         name='file-document-edit'
-                        onPress={() => navigation.navigate(routes.NEW_ASSOCIATION, selectedAssociation)}/>
+                        onPress={() => navigation.navigate(routes.NEW_ASSOCIATION, {selectedAssociation, edit: true})}/>
                 </View>}
         </>
     );
@@ -64,7 +72,8 @@ function AssociationDetailScreen({route, navigation}) {
 
 const styles = StyleSheet.create({
     info: {
-      marginVertical: 40
+      marginVertical: 40,
+        marginHorizontal: 20
     },
     reglement: {
         marginVertical: 10,

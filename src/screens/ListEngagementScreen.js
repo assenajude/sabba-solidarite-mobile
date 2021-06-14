@@ -67,7 +67,7 @@ function ListEngagementScreen({route, navigation}) {
                                       payingTranche={() => {dispatch(getPayingTranche(tranche))}}
                                   />:null
                               }
-                              engagement={item}
+                              engagement={item} 
                               validationDate={item.updatedAt}
                               showAvatar={false}
                               engagementDetails={item.showDetail}

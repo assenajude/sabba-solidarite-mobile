@@ -8,7 +8,7 @@ import useAuth from "../hooks/useAuth";
 import defaultStyles from '../utilities/styles'
 import {
     getAllVotes,
-    getEngagementDetail,
+    getEngagementDetail, getEngagementsByAssociation,
     showEngagementTranches,
     voteEngagement
 } from "../store/slices/engagementSlice";
@@ -43,6 +43,7 @@ function NewEngagementList(props) {
         dispatch(getAllVotes({associationId: currentAssociation.id}))
         dispatch(getSelectedAssociation({associationId: currentAssociation.id}))
         dispatch(getConnectedMember({associationId: currentAssociation.id, memberId: connectedMember().id}))
+        dispatch(getEngagementsByAssociation({associationId: currentAssociation.id}))
 
     }
 
@@ -70,6 +71,7 @@ function NewEngagementList(props) {
                ItemSeparatorComponent={ListItemSeparator}
                renderItem={({item}) =>
                    <EngagementItem
+                       getMoreDetails={() => dispatch(getEngagementDetail(item))}
                        renderRightActions={() => <View>
                            <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize:15, marginLeft: 20}}>voting...</AppText>
                        </View>}

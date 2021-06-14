@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
-import {ScrollView, Alert} from "react-native";
+import {ScrollView,} from "react-native";
 import * as Yup from 'yup'
 import {AppForm, AppFormField, FormSubmitButton} from '../components/form'
-import {addNewAssociation} from "../store/slices/associationSlice";
+import {addNewAssociation, getAllAssociation} from "../store/slices/associationSlice";
 import {useDispatch, useStore} from "react-redux";
 import FormImagePicker from "../components/form/FormImagePicker";
 import AppUploadModal from "../components/AppUploadModal";
@@ -16,10 +16,11 @@ const newAssociationValidSchema = Yup.object().shape({
     fondInitial: Yup.number(),
     seuilSecurite: Yup.number(),
     interetCredit: Yup.number(),
-    avatar: Yup.object()
+    avatar: Yup.object(),
+    validatorsNumber: Yup.number()
 })
 function NewAssociationScreen({navigation, route}) {
-    const selectedAssociation = route.params
+    const selectedParams = route.params
 
     const {directUpload, dataTransformer} = useUploadImage()
     const store = useStore()
@@ -30,59 +31,38 @@ function NewAssociationScreen({navigation, route}) {
 
     const handleNewAssociation = async(data) => {
         const avatarArray = [data.avatar]
-        let newData = {}
-        if(Object.keys(avatarArray[0]).length === 0) {
-            newData = {
-                nom:data.nom,
-                avatar: '',
-                description: data.description,
-                cotisationMensuelle: data.cotisationMensuelle,
-                frequenceCotisation: data.frequenceCotisation,
-                fondInitial: data.fondInitial,
-                seuilSecurite: data.seuilSecurite,
-                interetCredit: data.interetCredit
-            }
-        } else {
+        const associationId = selectedParams?.edit?selectedParams?.selectedAssociation.id : null
+        const isImage = Object.keys(avatarArray[0])?.length !== 0 && avatarArray[0]?.url !== '' && avatarArray[0]?.url !== undefined
+
+        let imageUploaded = false
+        if(isImage) {
             const transmedArray = dataTransformer(avatarArray)
             setProgresss(0)
             setUploadModal(true)
             const result = await directUpload(transmedArray, avatarArray, (progress) => {
                 setProgresss(progress)
             })
+            if(result) imageUploaded = true
             setUploadModal(false)
-            if(!result) {
-                Alert.alert("Erreur", "Les images n'ont pas été telechargées, voulez-vous continuer?",
-                    [{text: 'oui', onPress: () => {
-                            newData = {
-                                nom:data.nom,
-                                avatar: '',
-                                description: data.description,
-                                cotisationMensuelle: data.cotisationMensuelle,
-                                frequenceCotisation: data.frequenceCotisation,
-                                fondInitial: data.fondInitial,
-                                seuilSecurite: data.seuilSecurite,
-                                interetCredit: data.interetCredit
-                            }
-                        }}, {text: 'non', onPress: () => {
-                            return;
-                        }}])
-            }
-            const signedArray = store.getState().uploadImage.signedRequestArray
-            const avatarUrl = signedArray[0].url
-            newData = {
-                nom:data.nom,
-                avatar: avatarUrl,
-                description: data.description,
-                cotisationMensuelle: data.cotisationMensuelle,
-                frequenceCotisation: data.frequenceCotisation,
-                fondInitial: data.fondInitial,
-                seuilSecurite: data.seuilSecurite,
-                interetCredit: data.interetCredit
-            }
+        }
+        const signedArray = store.getState().uploadImage.signedRequestArray
+        const avatarUrl = imageUploaded? signedArray[0].url : ''
+        const newData = {
+            id: associationId,
+            nom:data.nom,
+            avatar: avatarUrl,
+            description: data.description,
+            cotisationMensuelle: data.cotisationMensuelle,
+            frequenceCotisation: data.frequenceCotisation,
+            fondInitial: data.fondInitial,
+            seuilSecurite: data.seuilSecurite,
+            interetCredit: data.interetCredit,
+            validatorsNumber: data.validatorsNumber
         }
         await dispatch(addNewAssociation(newData))
         const error = store.getState().entities.association.error
         if(error !== null) return alert('error adding new association')
+        await dispatch(getAllAssociation())
         alert("success!!!")
         navigation.goBack()
     }
@@ -94,14 +74,15 @@ function NewAssociationScreen({navigation, route}) {
             }}>
             <AppForm
                 initialValues={{
-                    avatar: selectedAssociation?{url: selectedAssociation.avatar}: {},
-                    nom:selectedAssociation?selectedAssociation.nom : '',
-                    description:selectedAssociation?selectedAssociation.description : '',
-                    cotisationMensuelle:selectedAssociation?String(selectedAssociation.cotisationMensuelle) : '',
-                    frequenceCotisation: selectedAssociation?selectedAssociation.frequenceCotisation : '',
-                    fondInitial: selectedAssociation?String(selectedAssociation.fondInitial) : '',
-                    seuilSecurite: selectedAssociation?String(selectedAssociation.seuilSecurite) : '',
-                    interetCredit: selectedAssociation?String(selectedAssociation.interetCredit) : ''
+                    avatar: selectedParams?.selectedAssociation.avatar !==''?{url: selectedParams?.selectedAssociation.avatar}: {},
+                    nom:selectedParams?.selectedAssociation?selectedParams?.selectedAssociation.nom : '',
+                    description:selectedParams?.selectedAssociation?selectedParams?.selectedAssociation.description : '',
+                    cotisationMensuelle:selectedParams?.selectedAssociation?String(selectedParams?.selectedAssociation.cotisationMensuelle) : '',
+                    frequenceCotisation: selectedParams?.selectedAssociation?selectedParams?.selectedAssociation.frequenceCotisation : '',
+                    fondInitial: selectedParams?.selectedAssociation?String(selectedParams?.selectedAssociation.fondInitial) : '',
+                    seuilSecurite: selectedParams?.selectedAssociation?String(selectedParams?.selectedAssociation.seuilSecurite) : '',
+                    interetCredit: selectedParams?.selectedAssociation?String(selectedParams?.selectedAssociation.interetCredit) : '',
+                    validatorsNumber: selectedParams?.selectedAssociation?String(selectedParams?.selectedAssociation.validatorsNumber) : ''
                 }}
                 validationSchema={newAssociationValidSchema}
                 onSubmit={handleNewAssociation}
@@ -109,12 +90,12 @@ function NewAssociationScreen({navigation, route}) {
                 <FormImagePicker name='avatar'/>
                 <AppFormField name='nom' placeholder='nom'/>
                 <AppFormField name='description' placeholder='description'/>
-                <AppFormField name='cotisationMensuelle' placeholder='cotisation mensuelle'/>
+                <AppFormField name='cotisationMensuelle' placeholder='montant cotisation'/>
                 <AppFormField name='frequenceCotisation' placeholder='frequence cotisation'/>
                 <AppFormField name='fondInitial' placeholder='fonds initial'/>
                 <AppFormField name='seuilSecurite' placeholder='Seuil de securité'/>
-                <AppFormField name='interetCredit' placeholder='taux de credit
-                '/>
+                <AppFormField name='interetCredit' placeholder='taux de credi'/>
+                <AppFormField name='validatorsNumber' placeholder='Nombre validateurs'/>
                 <FormSubmitButton title='Ajouter'/>
             </AppForm>
         </ScrollView>

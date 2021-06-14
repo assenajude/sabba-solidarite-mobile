@@ -4,6 +4,7 @@ import AppText from "../AppText";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import defaultStyles from "../../utilities/styles";
 import {useSelector} from "react-redux";
+import useManageAssociation from "../../hooks/useManageAssociation";
 
 function VoteItem({allVoted, handleVoteUp, upVotes,handleVoteDown, downVotes}) {
     const memberToVote = useSelector(state => {
@@ -11,6 +12,8 @@ function VoteItem({allVoted, handleVoteUp, upVotes,handleVoteDown, downVotes}) {
         const voteNumber = list.length / 2
         return Math.ceil(voteNumber)
     })
+
+    const {votorsNumber} = useManageAssociation()
 
     return (
         <View style={styles.voteContainer}>
@@ -20,7 +23,7 @@ function VoteItem({allVoted, handleVoteUp, upVotes,handleVoteDown, downVotes}) {
             }}>
                 <AppText>{allVoted}</AppText>
                 <AppText> / </AppText>
-                <AppText>{memberToVote}</AppText>
+                <AppText>{votorsNumber()}</AppText>
             </View>
             <TouchableOpacity onPress={handleVoteUp}>
                 <View style={{

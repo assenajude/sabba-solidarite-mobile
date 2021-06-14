@@ -14,9 +14,9 @@ import * as Progress from "react-native-progress";
 
 
 function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,engagement,tranches,renderRightActions,
-                            engagementDetails, handleVoteUp, handleVoteDown, showAvatar=true,
+                            engagementDetails, handleVoteUp, handleVoteDown, showAvatar=true,getMoreDetails,
                             allVoted, downVotes, upVotes, isVoting, validationDate, showTranches, getTranchesShown,
-                            handlePayTranche, onChangeTrancheMontant, editTrancheMontant, getMoreDetails}) {
+                            handlePayTranche, onChangeTrancheMontant, editTrancheMontant}) {
 
     const dispatch = useDispatch()
     const {formatFonds, formatDate} = useManageAssociation()

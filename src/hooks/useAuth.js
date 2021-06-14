@@ -4,13 +4,11 @@ import {getAllMembers, getMemberInfos, getMembersCotisations} from "../store/sli
 import {getAllVotes, getEngagementsByAssociation} from "../store/slices/engagementSlice";
 import {getAssociationInfos} from "../store/slices/informationSlice";
 import {getMemberRoles, getSelectedAssociationMembers} from "../store/slices/associationSlice";
-import useManageAssociation from "./useManageAssociation";
 
 let useAuth;
 export default useAuth = () => {
     const dispatch = useDispatch()
     const store = useStore()
-    const {associationValidMembers} = useManageAssociation()
     const connectedUser = useSelector(state => state.auth.user)
     const userRoles = useSelector(state => state.auth.roles)
     const memberRoles = useSelector(state => state.entities.association.memberRoles)
@@ -91,5 +89,5 @@ export default useAuth = () => {
         }
         return sorTable
     }
-    return {isAdmin,getMemberUserCompte, isModerator,getConnectedMember, dataSorter, getInitAssociation}
+    return {isAdmin,getMemberUserCompte, isModerator,getConnectedMember, dataSorter, getInitAssociation, validMembers}
 }

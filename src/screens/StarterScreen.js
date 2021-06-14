@@ -3,9 +3,7 @@ import {View, StyleSheet, TouchableWithoutFeedback, FlatList, TouchableOpacity} 
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../components/AppText";
 import {useDispatch, useSelector} from "react-redux";
-import {getAllMembers, getMemberAssociations} from "../store/slices/memberSlice";
 import routes from "../navigation/routes";
-import {getUserAllUsers} from "../store/slices/authSlice";
 import AssociationItem from "../components/association/AssociationItem";
 import {setSelectedAssociation} from "../store/slices/associationSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
@@ -14,8 +12,6 @@ import useAuth from "../hooks/useAuth";
 import ListItemSeparator from "../components/ListItemSeparator";
 import useManageAssociation from "../hooks/useManageAssociation";
 import AppButton from "../components/AppButton";
-import {getPopulateReseauList, getUserTransactions} from "../store/slices/transactionSlice";
-import {reseauData} from "../utilities/reseau.data";
 
 function StarterScreen({navigation}) {
     const dispatch = useDispatch()
@@ -45,13 +41,6 @@ function StarterScreen({navigation}) {
     }
 
     useEffect(() => {
-        dispatch(getAllMembers())
-        dispatch(getMemberAssociations())
-        if(isAdmin()) {
-            dispatch(getUserAllUsers())
-        }
-        dispatch(getPopulateReseauList(reseauData))
-        dispatch(getUserTransactions({userId: currentUser.id}))
         setTimeout(() => {
             setShowLinks(false)
         }, 2000)

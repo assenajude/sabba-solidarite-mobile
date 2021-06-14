@@ -1,7 +1,6 @@
 import React from 'react';
 import {Modal,TouchableOpacity, View, StyleSheet} from "react-native";
 import defaultStyles from "../utilities/styles";
-import AppText from "./AppText";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 function AppModal({visible, closeInfoModal, contentStyle, children}) {

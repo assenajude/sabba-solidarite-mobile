@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
     },
     edit: {
       position: 'absolute',
-        right: 20,
-        bottom: 25
+        right: 5,
+        bottom: 5
     },
     fontImage: {
         height: 200

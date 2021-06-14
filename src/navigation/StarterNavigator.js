@@ -19,6 +19,7 @@ import AppText from "../components/AppText";
 import {useDispatch} from "react-redux";
 import {getLogout} from "../store/slices/authSlice";
 import HelpScreen from "../screens/HelpScreen";
+import NavigHeaderButton from "../components/NavigHeaderButton";
 
 const StarterNavig = createStackNavigator()
 
@@ -79,18 +80,14 @@ function StarterNavigator() {
                     title: 'Edition '+ route.params.number
                 })}/>
             <StarterNavig.Screen name='Transaction' component={TransactionNavigator} options={({navigation}) =>({
-                title: 'Transactions',
-                headerRight: () =>
-                    <TouchableWithoutFeedback onPress={() => navigation.navigate(routes.USER_COMPTE)}>
-                        <View style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            marginHorizontal: 5
-                        }}>
-                            <MaterialCommunityIcons name="wallet" size={24} color={defaultStyles.colors.white} />
-                            <AppText style={{color: defaultStyles.colors.white}}>portefeuille</AppText>
-                        </View>
-                    </TouchableWithoutFeedback>
+                title: '',
+                headerLeft: () =><NavigHeaderButton
+                    onPress={() => navigation.navigate('StarterScreen')}
+                    title='Accueil'
+                    iconName='home'/>,
+                headerRight: () =><NavigHeaderButton
+                    onPress={() => navigation.navigate(routes.USER_COMPTE)}
+                    title='Portefeuille' iconName='wallet'/>
             })}/>
 
         </StarterNavig.Navigator>

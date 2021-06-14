@@ -5,6 +5,7 @@ import defaultStyles from "../utilities/styles";
 import NewCotisationScreen from "../screens/NewCotisationScreen";
 import MemberCotisationScreen from "../screens/MemberCotisationScreen";
 import ListCotisationScreen from "../screens/ListCotisationScreen";
+import PayementCotisationScreen from "../screens/PayementCotisationScreen";
 
 const CotisationNavig = createStackNavigator()
 
@@ -26,6 +27,10 @@ function CotisationNavigation(props) {
             <CotisationNavig.Screen name='ListCotisation' component={ListCotisationScreen}
                                     options={{
                                         title: 'Liste des cotisations'
+                                    }}/>
+            <CotisationNavig.Screen name='PayementCotisation' component={PayementCotisationScreen}
+                                    options={{
+                                        title: 'Payement de cotisation'
                                     }}/>
 
             <CotisationNavig.Screen name='MemberCotisationScreen' component={MemberCotisationScreen} options={({route, navigation}) => ({

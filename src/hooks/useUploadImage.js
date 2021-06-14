@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {useDispatch, useStore} from "react-redux";
 import {getSignedUrl} from "../store/slices/uploadImageSlice";
 import {create} from "apisauce";
@@ -15,6 +15,7 @@ export default useUploadImage = () => {
         const type = fileName.split('.').pop()
         if(type==='jpeg' || type==='jpg') fileType = 'image/jpeg'
         if(type === 'png') fileType = 'image/png'
+        if(type === 'pdf') fileType = 'application/pdf'
         return {fileName,fileType}
     }
 
