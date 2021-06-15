@@ -21,17 +21,12 @@ import {getAvatarUpdate} from "../store/slices/associationSlice";
 function DashboardScreen({navigation}) {
     const dispatch = useDispatch()
     const store = useStore()
-    const {getInitAssociation} = useAuth()
     const {formatFonds,getNewAdhesion,getManagedAssociationFund, associationValidMembers} = useManageAssociation()
     const {getCurrentAssoCotisations} = useCotisation()
     const {getAssociationEngagementTotal} = useEngagement()
 
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const isLoading = useSelector(state => state.entities.association.loading)
-    const infoLoading = useSelector(state => state.entities.information.loading)
-    const engagementLoading = useSelector(state => state.entities.engagement.loading)
-    const memberLoading = useSelector(state => state.entities.member.loading)
-    const cotisationLoading = useSelector(state => state.entities.cotisation.loading)
 
     const notReadInfo = useSelector(state => {
         const list = state.entities.member.memberInfos
@@ -55,21 +50,14 @@ function DashboardScreen({navigation}) {
         alert("Votre association a été mise à jour avec succsès.")
     }
 
-    const getStarted = useCallback(async () => {
-        await getInitAssociation(currentAssociation)
-    }, [])
-
-    useEffect(() => {
-        getStarted()
-    }, [])
-
-
     return (
         <>
-            <AppActivityIndicator visible={isLoading || infoLoading || cotisationLoading || memberLoading || engagementLoading}/>
+            <AppActivityIndicator visible={isLoading}/>
             <ScrollView>
             <AppHeaderGradient/>
-            <AssociationBackImage  association={currentAssociation} uploadResult={handleChangeImage}/>
+            <AssociationBackImage
+                association={currentAssociation}
+                uploadResult={handleChangeImage}/>
                 <View style={styles.descriptionContainer}>
                     <View>
                         <View

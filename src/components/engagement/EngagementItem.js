@@ -14,17 +14,15 @@ import * as Progress from "react-native-progress";
 
 
 function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,engagement,tranches,renderRightActions,
-                            engagementDetails, handleVoteUp, handleVoteDown, showAvatar=true,getMoreDetails,
+                            onWaiting, engagementDetails, handleVoteUp, handleVoteDown, showAvatar=true,getMoreDetails,
                             allVoted, downVotes, upVotes, isVoting, validationDate, showTranches, getTranchesShown,
-                            handlePayTranche, onChangeTrancheMontant, editTrancheMontant}) {
+                            handlePayTranche, onChangeTrancheMontant, editTrancheMontant, deleteEngagement, editEngagement}) {
 
     const dispatch = useDispatch()
     const {formatFonds, formatDate} = useManageAssociation()
 
     return (
-        <>
-
-
+        <View>
             <View style={styles.container}>
                 <View style={{
                     marginVertical: 10
@@ -117,7 +115,55 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                 handleVoteDown={handleVoteDown}
                 handleVoteUp={handleVoteUp}
             />}
-            </>
+            {onWaiting && <View style={styles.rejected}>
+            </View>}
+            {onWaiting && <View style={styles.waiting}>
+                {engagement.statut === 'pending' &&
+                <View style={{
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                <AppText
+                    style={{
+                        color: defaultStyles.colors.vert,
+                        fontWeight: 'bold'
+                    }}>en attente</AppText>
+                    <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center'
+                    }}>
+                    <TouchableOpacity onPress={deleteEngagement} style={{
+                        marginVertical: 10,
+                        marginRight: 10
+                    }}>
+                     <MaterialCommunityIcons name="delete-circle" size={30} color={defaultStyles.colors.rougeBordeau} />
+                    </TouchableOpacity>
+                        <TouchableOpacity onPress={editEngagement} style={{
+                        marginVertical: 10,
+                            marginLeft: 10
+                    }}>
+                            <MaterialCommunityIcons name="circle-edit-outline" size={30} color={defaultStyles.colors.bleuFbi} />
+                    </TouchableOpacity>
+
+                    </View>
+                </View>}
+                {engagement.statut === 'rejected' && <View style={{
+                    alignItems: 'center'
+                }}>
+                    <AppText
+                        style={{
+                            color: defaultStyles.colors.rougeBordeau,
+                            fontWeight: 'bold'
+                        }}>refusé</AppText>
+                    <TouchableOpacity onPress={deleteEngagement} style={{
+                        marginVertical: 10
+                    }}>
+                        <MaterialCommunityIcons name="delete-circle" size={30} color={defaultStyles.colors.rougeBordeau} />
+                    </TouchableOpacity>
+                </View>}
+                </View>
+               }
+            </View>
     );
 }
 
@@ -159,6 +205,14 @@ const styles = StyleSheet.create({
         right: 20,
         top: 10
     },
+    rejected: {
+        position: 'absolute',
+      height: '100%',
+      width: '100%',
+      backgroundColor: defaultStyles.colors.white,
+      opacity: 0.6,
+        zIndex: 5
+    },
     trancheContainer: {
         borderWidth: 1,
         minHeight: 100,
@@ -176,6 +230,14 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         marginHorizontal: 20,
         marginTop: 20,
+    },
+    waiting: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        zIndex: 20,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 })
 export default EngagementItem;

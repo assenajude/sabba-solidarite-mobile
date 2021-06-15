@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {View, TouchableWithoutFeedback} from "react-native";
 import {createStackNavigator} from '@react-navigation/stack'
 import {MaterialCommunityIcons} from '@expo/vector-icons'
@@ -30,11 +30,11 @@ function AssociationNavigator(props) {
         setAssociationModalVisible(!associationModalVisible)
     }
 
-    const handleSelectAssociation = (item) => {
+    const handleSelectAssociation = useCallback(async(item) => {
         dispatch(setSelectedAssociation(item))
         getInitAssociation(item)
         setAssociationModalVisible(false)
-    }
+    }, [])
 
     return (
         <>

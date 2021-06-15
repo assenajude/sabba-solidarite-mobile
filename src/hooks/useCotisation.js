@@ -97,7 +97,7 @@ export default useCotisation = () => {
         let isPayed = false
         const memberCotisations = listCotisations[currentMember?.id]
         if(memberCotisations && memberCotisations.length > 0) {
-        const isCotisPayed = memberCotisations.some(cotis => cotis.id === cotisation.id && cotis.member_cotisation.isPayed === true)
+        const isCotisPayed = memberCotisations.some(cotis => cotis?.id === cotisation?.id && cotis.member_cotisation?.isPayed === true)
         if(isCotisPayed) isPayed = true
         }
         return isPayed

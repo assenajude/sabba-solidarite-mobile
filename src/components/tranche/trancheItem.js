@@ -38,7 +38,9 @@ function TrancheItem({numero, payed,payingTranche,renderRightActions,
             </View>}
         </View>
         </Swipeable>
-            {payingTranche &&<View>
+            {payingTranche &&<View style={{
+                alignItems: 'center'
+            }}>
              <View elevation={10} style={{
                 flexDirection: 'row',
                 alignItems: 'center'

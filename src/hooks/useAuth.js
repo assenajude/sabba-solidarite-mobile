@@ -48,6 +48,7 @@ export default useAuth = () => {
     }
 
 
+
         const getInitAssociation = async(currentAssociation) => {
             await dispatch(getSelectedAssociationMembers({associationId: currentAssociation.id}))
              dispatch(getEngagementsByAssociation({associationId:currentAssociation.id}))
@@ -69,13 +70,14 @@ export default useAuth = () => {
 
 
     const getMemberUserCompte = (member) => {
-        const selected = associationMembers.find(item => item.member.id === member.id)
-        return selected || {}
+        let selected = {}
+        selected = associationMembers.find(item => item.id === member.userId)
+        return selected
     }
 
     const getConnectedMember = () => {
             const currentMember = associationMembers.find(item => item.id === connectedUser.id)
-            return currentMember || {}
+            return currentMember
     }
 
     const dataSorter = (data) => {

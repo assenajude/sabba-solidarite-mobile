@@ -15,7 +15,7 @@ import AppButton from "../components/AppButton";
 
 function StarterScreen({navigation}) {
     const dispatch = useDispatch()
-    const {isAdmin} = useAuth()
+    const {isAdmin, getInitAssociation} = useAuth()
     const {getMemberRelationType, getAssociatonAllMembers} = useManageAssociation()
 
     const currentUser = useSelector(state => state.auth.user)
@@ -35,6 +35,7 @@ function StarterScreen({navigation}) {
 
         if(isMember || isOnLeave || isAdmin()) {
         dispatch(setSelectedAssociation(association))
+            getInitAssociation(association)
             navigation.navigate('BottomTab')
         } else
             alert("Vous n'êtes pas encore membre de cette association")
@@ -50,7 +51,6 @@ function StarterScreen({navigation}) {
     return (
         <>
             <AppActivityIndicator visible={assoLoading || memberLoading}/>
-
             <View>
                 <View style={{
                     alignItems: 'center',

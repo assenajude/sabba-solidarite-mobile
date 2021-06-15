@@ -6,6 +6,7 @@ import ListEngagementScreen from "../screens/ListEngagementScreen";
 import NewEngagementScreen from "../screens/NewEngagementScreen";
 import NewEngagementList from "../screens/NewEngagementList";
 import MemberEngagementDetailScreen from "../screens/MemberEngagementDetailScreen";
+import EditEngagementScreen from "../screens/EditEngagementScreen";
 
 const EngageNavig = createStackNavigator()
 
@@ -30,6 +31,10 @@ function EngagementNavigator(props) {
 
             <EngageNavig.Screen name='MemberEngagementDetail' component={MemberEngagementDetailScreen} options={({route}) => ({
                 title: 'Détails engagement',
+            })}/>
+
+            <EngageNavig.Screen name='EditEngagementScreen' component={EditEngagementScreen} options={({route}) => ({
+                title: 'Edition engagement',
             })}/>
         </EngageNavig.Navigator>
     );

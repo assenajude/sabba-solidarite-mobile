@@ -3,6 +3,7 @@ import {ToastAndroid} from "react-native";
 import {getEngagementById, getTranchePayed} from "../store/slices/engagementSlice";
 import {getConnectedMember, getSelectedAssociation} from "../store/slices/associationSlice";
 import useAuth from "./useAuth";
+import {getUserData} from "../store/slices/authSlice";
 
 let useEngagement;
 export default useEngagement = () => {
@@ -13,13 +14,13 @@ export default useEngagement = () => {
     const currentUser = useSelector(state => state.auth.user)
     const listEngagement = useSelector(state => state.entities.engagement.list)
     const votingData = useSelector(state => state.entities.engagement.votesList)
+    const allTranches = useSelector(state => state.entities.engagement.tranches)
 
     const getMemberEngagementInfos = (member) => {
         let engagementLength = 0
         let engagementAmount = 0
         const memberEngagements = listEngagement.filter(item => item.creatorId === member.member.id)
-        const memberValidEngagements = memberEngagements.filter(engage => engage.accord === true)
-
+        const memberValidEngagements = memberEngagements.filter(engage => engage.accord === true && engage.statut !== 'pending')
          engagementLength = memberValidEngagements.length
         memberValidEngagements.forEach(engage => {
             engagementAmount += engage.montant
@@ -29,7 +30,7 @@ export default useEngagement = () => {
 
     const getAssociationEngagementTotal = () => {
         let total = 0
-        const validList = listEngagement.filter(engage => engage.accord === true)
+        const validList = listEngagement.filter(engage => engage.accord === true && engage.statut !== 'pending')
         const engagementLenght = validList.length
         validList.forEach(engage => {
             total += engage.montant
@@ -69,10 +70,18 @@ export default useEngagement = () => {
         dispatch(getEngagementById({engagementId: engagementId}))
         dispatch(getConnectedMember({associationId: currentAssociation.id, memberId: connectedMember().id}))
         dispatch(getSelectedAssociation({associationId: currentAssociation.id}))
+        dispatch(getUserData({userId: currentUser.id}))
         ToastAndroid.showWithGravity("Le payement a été effectué avec succès",
             ToastAndroid.CENTER,
             ToastAndroid.LONG)
     }
 
-    return {getMemberEngagementInfos, getAssociationEngagementTotal, getEngagementVotesdData, handlePayTranche}
+    const getEngagementTranches = (engagementId) => {
+        let engageTranches = []
+        const selectedTranches = allTranches.filter(tranch => tranch.engagementId = engagementId)
+        engageTranches = selectedTranches
+        return engageTranches
+    }
+
+    return {getMemberEngagementInfos, getAssociationEngagementTotal, getEngagementVotesdData, handlePayTranche, getEngagementTranches}
 }

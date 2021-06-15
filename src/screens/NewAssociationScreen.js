@@ -49,11 +49,11 @@ function NewAssociationScreen({navigation, route}) {
             setUploadModal(false)
         }
         const signedArray = store.getState().uploadImage.signedRequestArray
-        const avatarUrl = imageUploaded? signedArray[0].url : ''
+        const avatarUrl = imageUploaded? signedArray[0].url : selectedParams?selectedParams.avatar : ''
         const newData = {
             id: associationId,
             nom:data.nom,
-            avatar: avatarUrl,
+            avatar:avatarUrl,
             description: data.description,
             cotisationMensuelle: Number(data.cotisationMensuelle),
             frequenceCotisation: data.frequenceCotisation,

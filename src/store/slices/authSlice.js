@@ -109,6 +109,15 @@ export const getUserAllUsers = () => apiRequested({
     onError: authRequestFailed.type
 })
 
+export const getUserData = (data) => apiRequested({
+    url:'/user/userData',
+    method: 'post',
+    data,
+    onStart: authRequested.type,
+    onSuccess: userUpdated.type,
+    onError: authRequestFailed.type
+})
+
 export const getLogout = () => dispatch => {
     dispatch(logout())
 }

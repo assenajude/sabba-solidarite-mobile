@@ -30,10 +30,17 @@ const engagementSlice = createSlice({
             state.error = null
             const receiveds = action.payload
             state.list = receiveds
+            const newTrancheTab = state.tranches
             receiveds.forEach(item => {
-                const newTranches = state.tranches.concat(item.tranches)
-                state.tranches = newTranches
+                const itemTranches = item.tranches
+                if(itemTranches.length>0) {
+                itemTranches.forEach(tranche => {
+                    const isExiste = newTrancheTab.some(trch => trch.id === tranche.id)
+                    if(!isExiste) newTrancheTab.push(tranche)
+                })
+                }
             })
+            state.tranches = newTrancheTab
         },
         engagementVoted: (state, action) => {
           state.votesList[action.payload.engagement.id] = action.payload.engagements
@@ -133,6 +140,15 @@ export const getEngagementById = (data) => apiRequested({
     url: url+'/getById',
     data,
     method: 'post',
+    onStart: engagementRequested.type,
+    onSuccess: engagementUpdated.type,
+    onError: engagementRequestFailed.type
+})
+
+export const getEngagementUpdate = (data) => apiRequested({
+    url: url+'/update',
+    data,
+    method: 'patch',
     onStart: engagementRequested.type,
     onSuccess: engagementUpdated.type,
     onError: engagementRequestFailed.type

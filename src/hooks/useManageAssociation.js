@@ -72,9 +72,10 @@ export default useManageAssociation = () => {
         if(validList.length>0) {
         validList.forEach(item => {
             if(item.typeEngagement.toLowerCase() === 'remboursable') {
+                if(item.statut.toLowerCase() === 'paying' || item.statut.toLowerCase() === 'ended') {
                 investAmount += item.montant
+                }
                 if(item.statut.toLowerCase() === 'ended') {
-
                     gain += item.interetMontant
                 }
             } else depenseAmount += item.montant

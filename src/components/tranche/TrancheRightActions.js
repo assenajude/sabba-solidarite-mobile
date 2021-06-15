@@ -1,12 +1,13 @@
 import React from 'react';
-import {View, TouchableWithoutFeedback,StyleSheet} from "react-native";
+import {View, TouchableWithoutFeedback} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../AppText";
 import defaultStyles from '../../utilities/styles'
 function TrancheRightActions({payingTranche, isPaying, ended}) {
     return (
         <View style={{
-            marginLeft: 20
+            marginLeft: 20,
+            marginRight: 20
         }}>
             <TouchableWithoutFeedback onPress={payingTranche}>
                 <View>

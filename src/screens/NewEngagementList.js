@@ -15,9 +15,11 @@ import {
 import ListItemSeparator from "../components/ListItemSeparator";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import {getConnectedMember, getSelectedAssociation} from "../store/slices/associationSlice";
+import {getUserData} from "../store/slices/authSlice";
 
-function NewEngagementList(props) {
+function NewEngagementList({navigation}) {
     const dispatch = useDispatch()
+    const  {dataSorter} = useAuth()
     const {getMemberUserCompte, getConnectedMember:connectedMember} = useAuth()
     const {getEngagementVotesdData} = useEngagement()
 
@@ -28,8 +30,13 @@ function NewEngagementList(props) {
 
     const validationEngagement = useSelector(state => {
         const list = state.entities.engagement.list
-        const selectedList = list.filter(item => item.accord === false)
-        return selectedList
+        let selectedList = []
+        list.forEach(item => {
+            if(item.accord === false) selectedList.push(item)
+            else if (item.statut === 'pending') selectedList.push(item)
+        })
+        const sortedList = dataSorter(selectedList)
+        return sortedList
     })
 
     const voteUp = async (item) => {
@@ -44,6 +51,7 @@ function NewEngagementList(props) {
         dispatch(getSelectedAssociation({associationId: currentAssociation.id}))
         dispatch(getConnectedMember({associationId: currentAssociation.id, memberId: connectedMember().id}))
         dispatch(getEngagementsByAssociation({associationId: currentAssociation.id}))
+        dispatch(getUserData({userId: connectedMember().id}))
 
     }
 
@@ -56,6 +64,7 @@ function NewEngagementList(props) {
         }
         dispatch(voteEngagement(data))
         dispatch(getAllVotes({associationId: currentAssociation.id}))
+        dispatch(getEngagementsByAssociation({associationId: currentAssociation.id}))
     }
 
 
@@ -71,6 +80,9 @@ function NewEngagementList(props) {
                ItemSeparatorComponent={ListItemSeparator}
                renderItem={({item}) =>
                    <EngagementItem
+                       editEngagement={() => navigation.navigate('EditEngagementScreen', item)}
+                       onWaiting={item.statut === 'pending' || item.statut === 'rejected'}
+                       getMembersDatails={() => navigation.navigate('Members',{screen: 'MemberDetails', params: getMemberUserCompte(item.Creator)})}
                        getMoreDetails={() => dispatch(getEngagementDetail(item))}
                        renderRightActions={() => <View>
                            <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize:15, marginLeft: 20}}>voting...</AppText>
@@ -82,7 +94,7 @@ function NewEngagementList(props) {
                        isVoting={item.accord===false}
                        upVotes={getEngagementVotesdData(item).upVotes}
                        downVotes={getEngagementVotesdData(item).downVotes}
-                       allVoted={voting[item.id].length?voting[item.id].length:0}
+                       allVoted={voting[item.id]?.length?voting[item.id].length:0}
                        handleVoteUp={() => voteUp(item)}
                        handleVoteDown={() => voteDown(item)}
                        getEngagementDetails={() => dispatch(getEngagementDetail(item))}

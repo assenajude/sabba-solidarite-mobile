@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Progress from 'react-native-progress'
 
 import AppText from "../components/AppText";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch, useSelector, useStore} from "react-redux";
 import BackgroundWithAvatar from "../components/member/BackgroundWithAvatar";
 import defaultStyles from "../utilities/styles";
 import useManageAssociation from "../hooks/useManageAssociation";
@@ -15,14 +15,17 @@ import useEngagement from "../hooks/useEngagement";
 import TrancheRightActions from "../components/tranche/TrancheRightActions";
 import {getPayingTranche} from "../store/slices/engagementSlice";
 import useAuth from "../hooks/useAuth";
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function MemberEngagementDetailScreen({route}) {
-    const selectedEngagement = route.params
+    let selectedEngagement = route.params
     const dispatch = useDispatch()
+    const store = useStore()
     const {getConnectedMember} = useAuth()
     const {formatDate, formatFonds} = useManageAssociation()
     const {handlePayTranche} = useEngagement()
 
+    const isLoading = useSelector(state => state.entities.engagement.loading)
     const creatorMember = useSelector(state => {
         const membersList = state.entities.association.selectedAssociationMembers
         const selected = membersList.find(member => member.id === selectedEngagement.Creator.userId)
@@ -37,12 +40,24 @@ function MemberEngagementDetailScreen({route}) {
     const [showTranches, setShowTranches] = useState(false)
     const [montantToPay, setMontantToPay] = useState('')
 
+    const handleTranchePayed = async (tranche) => {
+        await handlePayTranche(tranche.id, selectedEngagement.id, montantToPay)
+        const error = store.getState().entities.engagement.error
+        if(error === null) {
+            const list = store.getState().entities.engagement.list
+            const newEngagement = list.find(engage => engage.id === selectedEngagement.id)
+            if(newEngagement) selectedEngagement = newEngagement
+        }
+    }
+
 
     useEffect(() => {
     }, [])
 
 
     return (
+        <>
+            <AppActivityIndicator visible={isLoading}/>
         <ScrollView contentContainerStyle={{
             paddingBottom: 20
         }}>
@@ -84,16 +99,18 @@ function MemberEngagementDetailScreen({route}) {
                 </TouchableWithoutFeedback>
                 {showTranches && <View style={styles.trancheContainer}>
                     {engagementTranches.length === 0 && <AppText>Aucune tranche trouvés</AppText>}
-                    {engagementTranches.length>0 && <View>
+                    {engagementTranches.length>0 && <View style={{
+                        marginHorizontal: 10
+                    }}>
                         {engagementTranches.map((tranche, index) =>
                             <TrancheItem
-                                key={tranche.id+index}
+                                key={tranche.id.toString()}
                                 numero={index+1}
                                 toPay={tranche.montant}
                                 payed={tranche.solde}
                                 payingTranche={tranche.paying}
                                 datePayement={tranche.solde === tranche.montant?tranche.updatedAt : tranche.echeance}
-                                handlePayTranche={() => handlePayTranche(tranche.id, selectedEngagement.id, montantToPay)}
+                                handlePayTranche={() => handleTranchePayed(tranche)}
                                 onChangeTrancheMontant={val => setMontantToPay(val)}
                                 trancheEditMontant={montantToPay}
                                 payTranche={() => {
@@ -118,6 +135,7 @@ function MemberEngagementDetailScreen({route}) {
             <AppLabelWithValue label='Echeance' value={formatDate(selectedEngagement.echeance)}/>
             <AppLabelWithValue label='Type' value={selectedEngagement.typeEngagement}/>
         </ScrollView>
+            </>
     );
 }
 

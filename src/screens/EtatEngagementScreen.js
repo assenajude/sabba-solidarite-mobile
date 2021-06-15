@@ -24,7 +24,7 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function EtatEngagementScreen({navigation}) {
     const dispatch = useDispatch()
-    const {getMemberUserCompte} = useAuth()
+    const {getMemberUserCompte, dataSorter} = useAuth()
     const {formatFonds, associationValidMembers} = useManageAssociation()
     const {getMemberEngagementInfos, handlePayTranche} = useEngagement()
 
@@ -37,8 +37,11 @@ function EtatEngagementScreen({navigation}) {
     })
     const engagements = useSelector(state => {
         const list = state.entities.engagement.list
-        const validList = list.filter(item => item.accord === true)
-        return validList
+        let validList = list.filter(item => {
+            if(item.accord === true && item.statut === 'paying' || item.statut === 'ended')return true
+        })
+        const sortedList = dataSorter(validList)
+        return sortedList
     })
     const allTranches = useSelector(state => state.entities.engagement.tranches)
     const [mainData, setMainData] = useState(engagements)
@@ -95,6 +98,7 @@ function EtatEngagementScreen({navigation}) {
                          }
 
                          return <EngagementItem
+                             getMembersDatails={() => navigation.navigate('Members',{screen: 'MemberDetails', params: getMemberUserCompte(item.Creator)})}
                              getMoreDetails={() => navigation.navigate('MemberEngagementDetail', item)}
                              renderRightActions={(tranche) =>
                                  connectedMember.id === item.creatorId?<TrancheRightActions

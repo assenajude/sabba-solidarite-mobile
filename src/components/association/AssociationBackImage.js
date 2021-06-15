@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Image, StyleSheet} from "react-native";
 import AppImagePicker from "../AppImagePicker";
 import AppText from "../AppText";
@@ -6,7 +6,11 @@ import AppButton from "../AppButton";
 import useUploadImage from "../../hooks/useUploadImage";
 import AppUploadModal from "../AppUploadModal";
 import useAuth from "../../hooks/useAuth";
+import {useDispatch} from "react-redux";
+import {getSelectedAssociation} from "../../store/slices/associationSlice";
+import {getMemberAssociations} from "../../store/slices/memberSlice";
 function AssociationBackImage({association, cameraContainer,uploadResult, cameraStyle}) {
+    const dispatch = useDispatch()
     const {isModerator, isAdmin} = useAuth()
     const {dataTransformer, directUpload} = useUploadImage()
     const [progress, setProgress] = useState(0)
@@ -35,7 +39,13 @@ function AssociationBackImage({association, cameraContainer,uploadResult, camera
         setOnEdit(false)
         setUploadModalVisible(false)
         uploadResult(uploaded)
+        if (uploaded) dispatch(getMemberAssociations())
+        if(!uploaded) setImageUrl(association.avatar)
     }
+
+    useEffect(() => {
+        setImageUrl(association.avatar)
+    }, [association])
 
     return (
         <View>

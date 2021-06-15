@@ -28,6 +28,15 @@ const associationSlice = createSlice({
         associationAdded: (state, action) => {
             state.loading = false
             state.error = null
+            const addedIndex = state.list.findIndex(ass => ass.id === action.payload.id)
+            if(addedIndex !== -1) {
+                const newTab = state.list
+                newTab[addedIndex] = action.payload
+                state.list = newTab
+                if(state.selectedAssociation.id === action.payload.id) {
+                    state.selectedAssociation = action.payload
+                }
+            }
             const newAdded = action.payload
             state.list.push(newAdded)
         },
@@ -44,7 +53,9 @@ const associationSlice = createSlice({
             state.error = null
             const updateIndex = state.list.findIndex(asso => asso.id === action.payload.id)
             state.list[updateIndex] = action.payload
-            if(state.selectedAssociation.id === action.payload.id) state.selectedAssociation = action.payload
+            if(state.selectedAssociation.id === action.payload.id) {
+                state.selectedAssociation = action.payload
+            }
         },
         connectedMemberUpdated:(state, action) => {
             state.loading = false

@@ -30,8 +30,6 @@ function LoginScreen({navigation}) {
     const dispatch = useDispatch()
     const isLoading = useSelector(state => state.auth.loading)
     const currentUser = useSelector(state => state.auth.user)
-    const assoLoading = useSelector(state => state.entities.association.loading)
-    const memberLoading = useSelector(state => state.entities.member.loading)
 
     const  validateEmail = (email) => {
         const re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+([^<>()\.,;:\s@\"]{2,}|[\d\.]+))$/
@@ -68,7 +66,7 @@ function LoginScreen({navigation}) {
 
     return (
         <>
-            <AppActivityIndicator visible={isLoading || assoLoading || memberLoading}/>
+            <AppActivityIndicator visible={isLoading}/>
             <View style={styles.logoInfoContainer}>
                 <AppLogoInfo/>
             </View>
