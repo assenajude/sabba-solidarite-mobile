@@ -50,7 +50,7 @@ function EditTransactionScreen({route, navigation}) {
                         statut: selectedTransaction? selectedTransaction.statut : ''
                     }}
                     onSubmit={handleSubmitTransaction}>
-                    <FormItemPicker  name='statut' label='Statut' data={["processing", "succeed", "failed"]}/>
+                    <FormItemPicker  name='statut' label='Statut' data={["processing", "succeeded", "failed"]}/>
                     <AppFormField name='libelle'/>
                     <AppFormField name='reseau'/>
                     <AppFormField name='montant'/>

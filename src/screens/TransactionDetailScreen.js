@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {View, StyleSheet, ScrollView, Image, Alert} from "react-native";
+import {View, StyleSheet, ScrollView, Alert} from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AppText from "../components/AppText";
 import defaultStyle from '../utilities/styles'
@@ -38,7 +38,7 @@ function TransactionDetailScreen({route, navigation}) {
         const data = {
             userId: selectedUser.id,
             libelle: transactionInfos.isRetrait? 'Retrait de fonds' : 'Rechargement de portefeuille',
-            montant: Number(transactionInfos.montant),
+            montant:transactionInfos.isRetrait? Number(transactionInfos.montant)+100: Number(transactionInfos.montant),
             reseau: transactionInfos.reseau.name,
             type : transactionInfos.isRetrait?'retrait' : 'depot',
             numero: transactionInfos.isRetrait? transactionInfos.retraitNum : transactionInfos.reseau.numero
@@ -78,6 +78,8 @@ function TransactionDetailScreen({route, navigation}) {
             <AppLabelWithValue label='Type de la transaction' value={transactionInfos.isRetrait?'Retrait de fonds' : 'Rechargement de portefeuille'}/>
             <AppLabelWithValue label='Numero' value={transactionInfos.isRetrait?transactionInfos.retraitNum: transactionInfos.reseau.numero}/>
             <AppLabelWithValue label='Montant' value={formatFonds(transactionInfos.montant)}/>
+            <AppLabelWithValue label='Frais transaction' value={transactionInfos.isRetrait?formatFonds(100):formatFonds(0)}/>
+            <AppLabelWithValue label='Total montant' value={transactionInfos.isRetrait?formatFonds(Number(transactionInfos.montant)+100):formatFonds(Number(transactionInfos.montant))}/>
 
             <AppSwith
                 label="Je suis d'accord"

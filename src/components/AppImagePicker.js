@@ -1,9 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {View, TouchableWithoutFeedback, StyleSheet, Image} from "react-native";
-import {MaterialCommunityIcons} from '@expo/vector-icons'
+import React from 'react';
 import * as ImagePicker from 'expo-image-picker'
 import AppCamera from "./AppCamera";
-import AppText from "./AppText";
 
 function AppImagePicker({onSelectImage, cameraStyle, cameraContainer, iconSize}) {
 

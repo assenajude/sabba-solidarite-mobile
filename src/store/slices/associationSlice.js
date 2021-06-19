@@ -159,6 +159,15 @@ export const getConnectedMember = (data) => apiRequested({
     onError: associationRequestFailed.type
 })
 
+export const getReglementUpdate = (data) => apiRequested({
+    url:url+'/updateReglement',
+    data,
+    method: 'post',
+    onStart: associationRequested.type,
+    onSuccess: associationUpdated.type,
+    onError: associationRequestFailed.type
+})
+
 
 export const setSelectedAssociation = (association) => dispatch => {
     dispatch(selectedAssociationSet(association))

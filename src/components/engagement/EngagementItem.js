@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, TouchableOpacity, StyleSheet} from "react-native";
+import {View,StyleSheet} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../AppText";
 import useManageAssociation from "../../hooks/useManageAssociation";
@@ -11,6 +11,7 @@ import TrancheItem from "../tranche/trancheItem";
 import {getPayingTranche} from "../../store/slices/engagementSlice";
 import {useDispatch} from "react-redux";
 import * as Progress from "react-native-progress";
+import AppIconButton from "../AppIconButton";
 
 
 function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,engagement,tranches,renderRightActions,
@@ -51,10 +52,10 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                     <AppSimpleLabelWithValue label='Date écheance' labelValue={formatDate(engagement.echeance)}/>
                     <View>
                         <View style={styles.trancheIcon}>
-                            <TouchableOpacity onPress={getTranchesShown}>
-                                {!showTranches && <MaterialCommunityIcons name="plus" size={24} color="black" />}
-                                {showTranches && <MaterialCommunityIcons name="minus" size={24} color="black" />}
-                            </TouchableOpacity>
+                            <AppIconButton iconSize={24}
+                                containerStyle={{width: 40, paddingHorizontal: 5}}
+                                onPress={getTranchesShown}
+                                iconName={showTranches?'minus':'plus'}/>
                             <AppText style={{marginLeft: 10, color: defaultStyles.colors.bleuFbi}}>Tranches({tranches.length})</AppText>
                         </View>
                         {showTranches && <View style={styles.trancheContainer}>
@@ -83,18 +84,10 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                         {tranches.length === 0 && <AppText>aucune tranche de payement</AppText>}
                     </View>}
                     </View>
-                    <View style={{
-                        alignItems: 'center',
-                        marginRight: 100,
-                        width: 60,
-                        paddingHorizontal: 15,
-                        alignSelf: 'flex-end',
-                        backgroundColor: defaultStyles.colors.white
-                    }}>
-                        <TouchableOpacity onPress={getEngagementDetails}>
-                            <MaterialCommunityIcons name="chevron-up" size={30} color={defaultStyles.colors.dark} />
-                        </TouchableOpacity>
-                    </View>
+                    <AppIconButton
+                        containerStyle={{alignSelf: 'center', marginLeft: 40}}
+                        iconName='chevron-up'
+                        onPress={getEngagementDetails}/>
                 </View>}
                 {showAvatar && <View style={styles.avatarContainer}>
                     <AppText style={{margin: 10, color: defaultStyles.colors.grey}}>Par</AppText>
@@ -102,9 +95,9 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                 </View>}
                 <View style={styles.icon}>
                     {!engagementDetails &&
-                    <TouchableOpacity onPress={getEngagementDetails}>
-                        <MaterialCommunityIcons name="chevron-down" size={30} color={defaultStyles.colors.dark} />
-                    </TouchableOpacity>
+                        <AppIconButton
+                            onPress={getEngagementDetails}
+                            iconName='chevron-down'/>
                     }
                 </View>
             </View>
@@ -132,18 +125,24 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                         flexDirection: 'row',
                         alignItems: 'center'
                     }}>
-                    <TouchableOpacity onPress={deleteEngagement} style={{
-                        marginVertical: 10,
-                        marginRight: 10
-                    }}>
-                     <MaterialCommunityIcons name="delete-circle" size={30} color={defaultStyles.colors.rougeBordeau} />
-                    </TouchableOpacity>
-                        <TouchableOpacity onPress={editEngagement} style={{
-                        marginVertical: 10,
-                            marginLeft: 10
-                    }}>
-                            <MaterialCommunityIcons name="circle-edit-outline" size={30} color={defaultStyles.colors.bleuFbi} />
-                    </TouchableOpacity>
+                    <AppIconButton
+                        containerStyle={{
+                            margin: 10,
+                            borderRadius: 30,
+                            height: 60
+                        }}
+                        onPress={deleteEngagement}
+                        iconColor={defaultStyles.colors.rougeBordeau}
+                        iconName='delete-circle'/>
+
+                     <AppIconButton
+                         containerStyle={{
+                             margin: 10,
+                            borderRadius: 30,
+                            height: 60
+                         }}
+                         onPress={editEngagement}
+                        iconName='circle-edit-outline'/>
 
                     </View>
                 </View>}
@@ -155,11 +154,15 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                             color: defaultStyles.colors.rougeBordeau,
                             fontWeight: 'bold'
                         }}>refusé</AppText>
-                    <TouchableOpacity onPress={deleteEngagement} style={{
-                        marginVertical: 10
-                    }}>
-                        <MaterialCommunityIcons name="delete-circle" size={30} color={defaultStyles.colors.rougeBordeau} />
-                    </TouchableOpacity>
+                    <AppIconButton
+                        containerStyle={{
+                            margin: 10,
+                            borderRadius: 30,
+                            height: 60
+                        }}
+                        iconColor={defaultStyles.colors.rougeBordeau}
+                        onPress={deleteEngagement}
+                        iconName='delete-circle'/>
                 </View>}
                 </View>
                }

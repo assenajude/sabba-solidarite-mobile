@@ -19,7 +19,7 @@ export default useEngagement = () => {
     const getMemberEngagementInfos = (member) => {
         let engagementLength = 0
         let engagementAmount = 0
-        const memberEngagements = listEngagement.filter(item => item.creatorId === member.member.id)
+        const memberEngagements = listEngagement.filter(item => item.creatorId === member.id)
         const memberValidEngagements = memberEngagements.filter(engage => engage.accord === true && engage.statut !== 'pending')
          engagementLength = memberValidEngagements.length
         memberValidEngagements.forEach(engage => {

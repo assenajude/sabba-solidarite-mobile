@@ -39,7 +39,6 @@ function NewsScreen({navigation}) {
     }
 
 
-
     return (
         <>
            {infos.length === 0 && error === null && <View style={{

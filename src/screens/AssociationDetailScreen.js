@@ -1,19 +1,17 @@
 import React from 'react';
-import {ScrollView, View, StyleSheet, TouchableOpacity} from "react-native";
+import {ScrollView, View, StyleSheet} from "react-native";
 import AssociationBackImage from "../components/association/AssociationBackImage";
-import {useDispatch, useStore} from "react-redux";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import {useDispatch, useSelector, useStore} from "react-redux";
 
 import {getAvatarUpdate} from "../store/slices/associationSlice";
 import AppLabelWithValue from "../components/AppLabelWithValue";
 import AppSimpleLabelWithValue from "../components/AppSimpleLabelWithValue";
 import useManageAssociation from "../hooks/useManageAssociation";
-import AppText from "../components/AppText";
-import defaultStyles from "../utilities/styles";
 import AppAddNewButton from "../components/AppAddNewButton";
 import routes from "../navigation/routes";
 import useAuth from "../hooks/useAuth";
-import AppDocumentPicker from "../components/AppDocumentPicker";
+import AppReglement from "../components/AppReglement";
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function AssociationDetailScreen({route, navigation}) {
     const selectedAssociation = route.params
@@ -22,10 +20,7 @@ function AssociationDetailScreen({route, navigation}) {
     const {formatFonds} = useManageAssociation()
     const {isAdmin}= useAuth()
 
-    const getReglementDocument = () => {
-
-    }
-
+    const isLoading = useSelector(state => state.entities.association.loading)
 
    const handleSaveChanged = async (uploadResult) => {
         if(uploadResult) {
@@ -39,21 +34,19 @@ function AssociationDetailScreen({route, navigation}) {
             if(error !== null) {
                 return alert("Impossible de faire la mise à jour.")
             }
-            alert("Mise à jour avec succès")
+            alert("Mise à jour effectué avec succès")
         }
    }
 
     return (
         <>
+            <AppActivityIndicator visible={isLoading}/>
             <ScrollView>
               <AssociationBackImage  uploadResult={handleSaveChanged} association={selectedAssociation}/>
               <View style={styles.info}>
                 <AppSimpleLabelWithValue label='Cotisation' labelValue={formatFonds(selectedAssociation.cotisationMensuelle)}/>
                 <AppSimpleLabelWithValue label='Frequence' labelValue={selectedAssociation.frequenceCotisation}/>
-                  <View style={styles.reglement}>
-                      <AppText style={{color: defaultStyles.colors.bleuFbi}}> Reglement intérieur</AppText>
-                         <AppDocumentPicker/>
-                  </View>
+                  <AppReglement association={selectedAssociation}/>
                 <AppLabelWithValue showLimit={false} label='Description' value={selectedAssociation.description}/>
               </View>
               </ScrollView>
@@ -74,11 +67,6 @@ const styles = StyleSheet.create({
     info: {
       marginVertical: 40,
         marginHorizontal: 20
-    },
-    reglement: {
-        marginVertical: 10,
-        marginHorizontal: 15,
-        flexDirection: 'row'
     },
 })
 

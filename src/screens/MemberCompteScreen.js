@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {View, ScrollView, StyleSheet} from "react-native";
 
 import AppText from "../components/AppText";
@@ -15,9 +15,9 @@ import useAuth from "../hooks/useAuth";
 import EditImagesModal from "../components/member/EditImagesModal";
 
 
-function MemberCompteScreen({route, navigation}) {
+function MemberCompteScreen({navigation}) {
 
-    const {isModerator, getConnectedMember, isAdmin} = useAuth()
+    const {isModerator, getConnectedMember, getMemberUserCompte, isAdmin} = useAuth()
     const {getMemberCotisations} = useCotisation()
     const {getMemberEngagementInfos} = useEngagement()
     const {formatFonds, formatDate} = useManageAssociation()
@@ -25,9 +25,6 @@ function MemberCompteScreen({route, navigation}) {
     const [editImages, setEditImages] = useState(false)
 
     const isAuthorized = isAdmin() || isModerator()
-
-    useEffect(() => {
-    }, [])
 
     return (
         <>
@@ -39,11 +36,11 @@ function MemberCompteScreen({route, navigation}) {
                     showCamera={true}
                 />
                 <View style={styles.statut}>
-                    <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 22, fontWeight: 'bold'}}>{getConnectedMember().member.statut}</AppText>
+                    <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 22, fontWeight: 'bold'}}>{getConnectedMember().statut}</AppText>
                 </View>
                 <View style={{marginTop: 30}}>
-                    <AppLabelWithValue label='Fonds' value={formatFonds(getConnectedMember().member.fonds)}/>
-                    <AppLabelWithValue label="Date d'adhesion" value={formatDate(getConnectedMember().member.adhesionDate)}/>
+                    <AppLabelWithValue label='Fonds' value={formatFonds(getConnectedMember().fonds)}/>
+                    <AppLabelWithValue label="Date d'adhesion" value={formatDate(getConnectedMember().adhesionDate)}/>
                 </View>
                 <View style={{
                     marginVertical: 10,

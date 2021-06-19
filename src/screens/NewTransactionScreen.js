@@ -5,7 +5,6 @@ import {useDispatch, useSelector} from "react-redux";
 import { getReseauSelect} from "../store/slices/transactionSlice";
 import TransactionItem from "../components/transaction/TransactionItem";
 import ListItemSeparator from "../components/ListItemSeparator";
-import routes from "../navigation/routes";
 
 function NewTransactionScreen({route, navigation}) {
     const typeTransaction = route.params
@@ -13,25 +12,6 @@ function NewTransactionScreen({route, navigation}) {
 
     const reseauList = useSelector(state => state.entities.transaction.reseauList)
     const [retraitTransac, setRetraitTransac] = useState(false)
-    const [montant, setMontant] = useState('')
-    const [numRetrait, setNumRetrait] = useState('')
-
-
-    const handleValidateMontant = (reseau) => {
-        if(Number(montant)<0) {
-            return alert("Veuillez specifier un montant superieur à zero et/ou un numero de retrait (pour les retraits) avant de continuer.")
-        }
-        const transInfos = {
-            reseau,
-            montant,
-            retraitNum: numRetrait,
-           isRetrait: retraitTransac,
-            mode: retraitTransac?'Retrait' : 'Depôt'
-        }
-        navigation.navigate(routes.TRANSACTION_DETAIL, transInfos)
-        setMontant('')
-        dispatch(getReseauSelect(reseau))
-    }
 
     useEffect(() => {
         const transLabel = typeTransaction.typeTrans.toLowerCase()
@@ -48,15 +28,13 @@ function NewTransactionScreen({route, navigation}) {
             ItemSeparatorComponent={ListItemSeparator}
             renderItem={({item}) =>
                 <TransactionItem
-                    retraitNum={numRetrait}
-                    onChangeRetraitNum={val => setNumRetrait(val)}
-                    isRetrait={retraitTransac}
+                    isSelected={item.selected}
                     item={item}
-                    montant={montant}
-                    onChangeMontant={(val) => setMontant(val)}
-                    onValidation={() => handleValidateMontant(item)}
-                    onSelectReseau={() => dispatch(getReseauSelect(item))}
-                    isSelected={item.selected}/>
+                    onSelectReseau={() => {
+                        dispatch(getReseauSelect(item))
+                        navigation.navigate('SelectedReseau',{...item, isRetrait: retraitTransac})
+                    }}
+                />
             }
         />
         </>

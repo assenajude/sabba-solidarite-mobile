@@ -11,20 +11,22 @@ import TransactionDetailScreen from "../screens/TransactionDetailScreen";
 import ValidationTransacDetailScreen from "../screens/ValidationTransacDetailScreen";
 import EditTransactionScreen from "../screens/EditTransactionScreen";
 import TransactionNavigator from "./TransactionNavigator";
-import {TouchableOpacity, TouchableWithoutFeedback, View} from "react-native";
+import {TouchableOpacity, View} from "react-native";
 import routes from "./routes";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import defaultStyles from "../utilities/styles";
 import AppText from "../components/AppText";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {getLogout} from "../store/slices/authSlice";
 import HelpScreen from "../screens/HelpScreen";
 import NavigHeaderButton from "../components/NavigHeaderButton";
+import SelectedTransactionReseauScreen from "../screens/SelectedTransactionReseauScreen";
 
 const StarterNavig = createStackNavigator()
 
 function StarterNavigator() {
     const dispatch = useDispatch()
+    const currentUser = useSelector(state => state.auth.user)
 
 
     return (
@@ -67,6 +69,13 @@ function StarterNavigator() {
                 options={({route}) => ({
                     title: 'Detail '+ route.params?.mode
                 })}/>
+
+                <StarterNavig.Screen
+                name='SelectedReseau'
+                component={SelectedTransactionReseauScreen}
+                options={({route}) => ({
+                    title: route.params.isRetrait?`Retrait ${route.params.name}`:`Depot ${route.params.name}`
+                })}/>
             <StarterNavig.Screen
                 name='ValidationTransacDetail'
                 component={ValidationTransacDetailScreen}
@@ -86,7 +95,7 @@ function StarterNavigator() {
                     title='Accueil'
                     iconName='home'/>,
                 headerRight: () =><NavigHeaderButton
-                    onPress={() => navigation.navigate(routes.USER_COMPTE)}
+                    onPress={() => navigation.navigate(routes.USER_COMPTE, currentUser)}
                     title='Portefeuille' iconName='wallet'/>
             })}/>
 

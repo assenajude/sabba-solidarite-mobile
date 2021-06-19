@@ -21,7 +21,8 @@ import AppUploadModal from "../components/AppUploadModal";
 import AppShowImage from "../components/AppShowImage";
 
 
-function UserCompteScreen({navigation}) {
+function UserCompteScreen({navigation, route}) {
+    const selectedUser = route.params
 
     const store = useStore()
     const dispatch = useDispatch()
@@ -29,7 +30,6 @@ function UserCompteScreen({navigation}) {
     const {formatFonds} = useManageAssociation()
     const {directUpload, dataTransformer} = useUploadImage()
 
-    const selectedUser = useSelector(state => state.auth.user)
     const [avatarImage, setAvatarImage] = useState(selectedUser)
     const [pieceRecto, setPieceRecto] = useState(selectedUser)
     const [pieceVerso, setPieceVerso] = useState(selectedUser)

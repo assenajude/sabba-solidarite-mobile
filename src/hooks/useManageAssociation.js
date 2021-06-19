@@ -4,7 +4,6 @@ import useAuth from "./useAuth";
 
 let useManageAssociation;
 export default useManageAssociation = () => {
-    const store = useStore()
     const {validMembers} = useAuth()
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const connectedMember = useSelector(state => state.auth.user)

@@ -8,9 +8,10 @@ import defaulStyles from '../../utilities/styles'
 import LottieView from 'lottie-react-native'
 import AppButton from "../AppButton";
 import useAuth from "../../hooks/useAuth";
+import routes from "../../navigation/routes";
 
 function ValidationTransactionItem({reseau,getEditTransaction, transaction, creatorUser, showMore,
-                                       getTransactionMore, getTransactionDetails}) {
+                                       getTransactionMore, getTransactionDetails, getCreatorDetails}) {
     const {formatFonds, formatDate} = useManageAssociation()
     const {isAdmin} = useAuth()
     return (
@@ -35,7 +36,7 @@ function ValidationTransactionItem({reseau,getEditTransaction, transaction, crea
                 }
 
 
-                {transaction.statut.toLowerCase() === 'succeed' && <MaterialCommunityIcons name="credit-card-check" size={30} color={defaulStyles.colors.vert} />}
+                {transaction.statut.toLowerCase() === 'succeeded' && <MaterialCommunityIcons name="credit-card-check" size={30} color={defaulStyles.colors.vert} />}
                 {transaction.statut.toLowerCase() === 'failed' && <MaterialCommunityIcons name="credit-card-off" size={24} color={defaulStyles.colors.rougeBordeau} />}
                 <AppText style={{fontWeight: 'bold'}}>{formatDate(transaction.createdAt)}</AppText>
             </View>
@@ -77,7 +78,7 @@ function ValidationTransactionItem({reseau,getEditTransaction, transaction, crea
             </View>
             <View style={styles.creator}>
                 <AppText>par</AppText>
-                <MemberItem showPhone={true} selectedMember={creatorUser}/>
+                <MemberItem getMemberDetails={getCreatorDetails} showPhone={true} selectedMember={creatorUser}/>
             </View>
             <View style={{marginTop: 20}}>
             <TouchableWithoutFeedback onPress={getTransactionDetails}>

@@ -36,7 +36,7 @@ function ValidationTransacDetailScreen({route, navigation}) {
                 <AppSimpleLabelWithValue label='Date émission' labelValue={formatDate(selectedTransaction.createdAt)}/>
                 <AppSimpleLabelWithValue
                     label='Statut'
-                    valueStyle={{color: selectedTransaction.statut.toLowerCase() ==='processing'? defaultStyles.colors.leger : selectedTransaction.statut.toLowerCase() === 'succeed'? defaultStyles.colors.vert : defaultStyles.colors.rougeBordeau}}
+                    valueStyle={{color: selectedTransaction.statut.toLowerCase() ==='processing'? defaultStyles.colors.leger : selectedTransaction.statut.toLowerCase() === 'succeeded'? defaultStyles.colors.vert : defaultStyles.colors.rougeBordeau}}
                     labelValue={selectedTransaction.statut.toLowerCase() ==='processing'? 'en cours de traitement' : selectedTransaction.statut.toLowerCase() === 'succeed'?'terminée avec succès' : 'échec'}/>
                 <MemberItem avatarStyle={{
                     marginVertical: 20

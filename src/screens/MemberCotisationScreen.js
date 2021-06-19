@@ -8,9 +8,7 @@ import YearItem from "../components/cotisation/YearItem";
 import MonthItem from "../components/cotisation/MonthItem";
 import ListItemSeparator from "../components/ListItemSeparator";
 import useCotisation from "../hooks/useCotisation";
-import AppAddNewButton from "../components/AppAddNewButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import useAuth from "../hooks/useAuth";
 import {getCotisationDetails, getMonthDetails, getYearSelected, populateTimeData} from "../store/slices/memberSlice";
 
 
@@ -111,11 +109,4 @@ function MemberCotisationScreen({route, navigation}) {
     );
 }
 
-const styles = StyleSheet.create({
-    newCotisation: {
-        position: 'absolute',
-        right: 20,
-        bottom: 30
-    }
-})
 export default MemberCotisationScreen;

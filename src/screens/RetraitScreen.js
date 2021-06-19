@@ -8,6 +8,7 @@ import {showTransactionMore} from "../store/slices/transactionSlice";
 import routes from "../navigation/routes";
 import AppErrorOrEmptyScreen from "../components/AppErrorOrEmptyScreen";
 import AppAddNewButton from "../components/AppAddNewButton";
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function RetraitScreen({navigation}) {
     const dispatch = useDispatch()
@@ -15,6 +16,7 @@ function RetraitScreen({navigation}) {
     const {dataSorter} = useAuth()
 
     const error = useSelector(state => state.entities.transaction.error)
+    const isLoading = useSelector(state => state.entities.transaction.loading)
     const retraitList = useSelector(state => {
         let retraits = []
         const list = state.entities.transaction.list
@@ -25,6 +27,7 @@ function RetraitScreen({navigation}) {
 
     return (
         <>
+            <AppActivityIndicator visible={isLoading}/>
             {retraitList.length === 0 && error === null && <AppErrorOrEmptyScreen message='Aucun retrait effectué.'/>}
 
             {error !== null && <AppErrorOrEmptyScreen message="Nous n'avons pas pu avoir accès au server une erreur est apparue."/>}
@@ -33,6 +36,7 @@ function RetraitScreen({navigation}) {
                 keyExtractor={item => item.id.toString()}
                 renderItem={({item})=>
                     <ValidationTransactionItem
+                        getCreatorDetails={() => navigation.navigate(routes.USER_COMPTE,item.user)}
                         getEditTransaction={() => navigation.navigate(routes.EDITI_TRANSACTION, item)}
                         getTransactionDetails={() => navigation.navigate(routes.VALIDATION_TRANSAC_DETAIL, item)}
                         getTransactionMore={() => dispatch(showTransactionMore(item))}

@@ -118,6 +118,15 @@ export const getUserData = (data) => apiRequested({
     onError: authRequestFailed.type
 })
 
+export const getNotificationTokenUpdate = (data) => apiRequested({
+    url:'/user/pushNotifications',
+    method: 'post',
+    data,
+    onStart: authRequested.type,
+    onSuccess: userUpdated.type,
+    onError: authRequestFailed.type
+})
+
 export const getLogout = () => dispatch => {
     dispatch(logout())
 }

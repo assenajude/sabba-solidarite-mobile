@@ -81,13 +81,22 @@ const engagementSlice = createSlice({
             state.error = null
             const updatedIndex = state.tranches.findIndex(item => item.id === action.payload.id)
             state.tranches[updatedIndex] = action.payload
+        },
+        engagementDeleted: (state, action) => {
+            state.loading = false
+            state.error = null
+            const newList = state.list.filter(item => item.id !== action.payload.engagementId)
+            state.list = newList
+            const newTranchesList = state.tranches.filter(tranche => tranche.engagementId !== action.payload.engagementId)
+            state.tranches = newTranchesList
         }
     }
 })
 
 export default engagementSlice.reducer
 const {engagementAdded, engagementRequested, engagementRequestFailed,payingTranche, engagementUpdated,
-    engagementsReceived, showDetails, engagementVoted, votesReceived, showTranches, tranchePayed} = engagementSlice.actions
+    engagementsReceived, showDetails, engagementVoted, votesReceived,
+    showTranches, tranchePayed, engagementDeleted} = engagementSlice.actions
 
 const url = '/engagements'
 
@@ -151,6 +160,15 @@ export const getEngagementUpdate = (data) => apiRequested({
     method: 'patch',
     onStart: engagementRequested.type,
     onSuccess: engagementUpdated.type,
+    onError: engagementRequestFailed.type
+})
+
+export const getEngagementDelete = (data) => apiRequested({
+    url: url+'/deleteOne',
+    data,
+    method: 'delete',
+    onStart: engagementRequested.type,
+    onSuccess: engagementDeleted.type,
     onError: engagementRequestFailed.type
 })
 

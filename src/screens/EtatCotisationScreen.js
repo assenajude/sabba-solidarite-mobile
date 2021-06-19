@@ -20,7 +20,6 @@ function EtatCotisationScreen({navigation}) {
     const {formatFonds, associationValidMembers} = useManageAssociation()
     const error = useSelector(state => state.entities.cotisation.error)
 
-
     return (
         <>
             <AppHeaderGradient/>
@@ -48,7 +47,7 @@ function EtatCotisationScreen({navigation}) {
 
             <View style={styles.listButton}>
                 <AppAddNewButton
-                    compter={notPayedCompter(getConnectedMember()?.member)}
+                    compter={notPayedCompter(getConnectedMember())}
                     name='view-list'
                     onPress={() => navigation.navigate(routes.LIST_COTISATION)}/>
             </View>

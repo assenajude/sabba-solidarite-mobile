@@ -8,7 +8,7 @@ const TransactionNavig = createMaterialTopTabNavigator();
 
 function TransactionNavigator(props) {
     return (
-        <TransactionNavig.Navigator>
+        <TransactionNavig.Navigator >
             <TransactionNavig.Screen name='Depot' component={DepotScreen}/>
             <TransactionNavig.Screen name='Retrait' component={RetraitScreen}/>
         </TransactionNavig.Navigator>

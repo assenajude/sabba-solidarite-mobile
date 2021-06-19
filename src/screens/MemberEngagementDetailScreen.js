@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {View, StyleSheet, ScrollView, TouchableWithoutFeedback} from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Progress from 'react-native-progress'
@@ -49,10 +49,6 @@ function MemberEngagementDetailScreen({route}) {
             if(newEngagement) selectedEngagement = newEngagement
         }
     }
-
-
-    useEffect(() => {
-    }, [])
 
 
     return (

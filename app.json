@@ -19,9 +19,10 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos",
-        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera",
-        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
+        "NSPhotoLibraryUsageDescription": "Autoriser $(PRODUCT_NAME) à acceder à vos photos",
+        "NSCameraUsageDescription": "Autoriser $(PRODUCT_NAME) à acceder à votre camera",
+        "NSMicrophoneUsageDescription": "Autoriser $(PRODUCT_NAME) à acceder à votre microphone",
+        "NSPhotoLibraryAddUsageDescription": "Allow $(PRODUCT_NAME) to save photos"
       }
     },
     "androidStatusBar": {
@@ -37,7 +38,8 @@
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET"
       ]
     },
     "web": {
@@ -46,7 +48,10 @@
     "plugins": [
       "sentry-expo",
       "expo-image-picker",
-      "expo-document-picker"
+      "expo-document-picker",
+      "expo-file-system",
+      "expo-media-library",
+      "expo-notifications"
     ],
     "hooks": {
       "postPublish": [

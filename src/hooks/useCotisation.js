@@ -1,18 +1,20 @@
 import {useSelector} from "react-redux";
 import dayjs from "dayjs";
+import useAuth from "./useAuth";
 
 let useCotisation;
 export default useCotisation = () => {
+    const {getConnectedMember} = useAuth()
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const associationCotisations = useSelector(state => state.entities.cotisation.list)
     const listCotisations = useSelector(state => state.entities.member.membersCotisations)
-    const currentMember = useSelector(state => {
+  /*  const currentMember = useSelector(state => {
         let selectedMember
         const list = state.entities.member.list
         const user = state.auth.user
          selectedMember = list.find(member => member.userId === user.id && member.associationId === currentAssociation.id)
         return selectedMember
-    })
+    })*/
     const yearCotisations = useSelector(state => state.entities.member.memberYearCotisations)
 
     const getMonthString = (number) => {
@@ -95,7 +97,7 @@ export default useCotisation = () => {
 
     const isCotisationPayed = (cotisation) => {
         let isPayed = false
-        const memberCotisations = listCotisations[currentMember?.id]
+        const memberCotisations = listCotisations[getConnectedMember().id]
         if(memberCotisations && memberCotisations.length > 0) {
         const isCotisPayed = memberCotisations.some(cotis => cotis?.id === cotisation?.id && cotis.member_cotisation?.isPayed === true)
         if(isCotisPayed) isPayed = true

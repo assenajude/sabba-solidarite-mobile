@@ -1,13 +1,13 @@
 import React from 'react';
-import {View, FlatList, StyleSheet} from "react-native";
+import {View, FlatList, StyleSheet, Alert, ToastAndroid} from "react-native";
 import AppText from "../components/AppText";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch, useSelector, useStore} from "react-redux";
 import EngagementItem from "../components/engagement/EngagementItem";
 import useEngagement from "../hooks/useEngagement";
 import useAuth from "../hooks/useAuth";
 import defaultStyles from '../utilities/styles'
 import {
-    getAllVotes,
+    getAllVotes, getEngagementDelete,
     getEngagementDetail, getEngagementsByAssociation,
     showEngagementTranches,
     voteEngagement
@@ -20,6 +20,7 @@ import {getUserData} from "../store/slices/authSlice";
 function NewEngagementList({navigation}) {
     const dispatch = useDispatch()
     const  {dataSorter} = useAuth()
+    const store = useStore()
     const {getMemberUserCompte, getConnectedMember:connectedMember} = useAuth()
     const {getEngagementVotesdData} = useEngagement()
 
@@ -67,6 +68,24 @@ function NewEngagementList({navigation}) {
         dispatch(getEngagementsByAssociation({associationId: currentAssociation.id}))
     }
 
+    const handleDeleteEngagement = (engagement) => {
+        Alert.alert("Attention.", "Voulez-vous supprimer definitivement cet engagement?",
+            [
+                {
+                    text: 'oui', onPress: async () => {
+                       await dispatch(getEngagementDelete({engagementId: engagement.id}))
+                        const error = store.getState().entities.engagement.error
+                        if(error !== null) {
+                            return alert("Impossible de faire la suppression. Une erreur est apparue.")
+                        }
+                       ToastAndroid.showWithGravity("Engagement supprimé.",
+                           ToastAndroid.LONG,
+                           ToastAndroid.CENTER)
+                    }
+                }, {
+            text: 'non', onPress: () => {return;}
+            }])
+    }
 
     return (
         <>
@@ -80,6 +99,7 @@ function NewEngagementList({navigation}) {
                ItemSeparatorComponent={ListItemSeparator}
                renderItem={({item}) =>
                    <EngagementItem
+                       deleteEngagement={() => handleDeleteEngagement(item)}
                        editEngagement={() => navigation.navigate('EditEngagementScreen', item)}
                        onWaiting={item.statut === 'pending' || item.statut === 'rejected'}
                        getMembersDatails={() => navigation.navigate('Members',{screen: 'MemberDetails', params: getMemberUserCompte(item.Creator)})}

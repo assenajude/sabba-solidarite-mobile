@@ -3,19 +3,21 @@ import {Image, View, StyleSheet} from "react-native";
 import {LinearGradient} from "expo-linear-gradient";
 import MemberItem from "./MemberItem";
 import AppCamera from "../AppCamera";
+import useAuth from "../../hooks/useAuth";
 
 function BackgroundWithAvatar({getCompteDetails, fondStyle, selectedMember,onChangeImages, avatarStyle, showCamera}) {
+    const {getMemberUserCompte} = useAuth()
     
     return (
         <View>
-            {!selectedMember.member.backImage && <LinearGradient
+            {!selectedMember.backImage && <LinearGradient
                 colors={['#860432', 'transparent']}
                 style={styles.background}
             />}
-            {selectedMember.member.backImage && <Image
+            {selectedMember.backImage && <Image
                 style={[styles.fontImage, fondStyle]}
-                source={{uri: selectedMember.member.backImage}}/>}
-            <MemberItem selectedMember={selectedMember} avatarStyle={avatarStyle} getMemberDetails={getCompteDetails}/>
+                source={{uri: selectedMember.backImage}}/>}
+            <MemberItem selectedMember={getMemberUserCompte()} avatarStyle={avatarStyle} getMemberDetails={getCompteDetails}/>
             {showCamera &&
                 <AppCamera
                     onPress={onChangeImages}

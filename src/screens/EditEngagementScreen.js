@@ -7,7 +7,7 @@ import {AppForm, AppFormField, FormSubmitButton} from "../components/form";
 import FormItemPicker from "../components/form/FormItemPicker";
 import useManageAssociation from "../hooks/useManageAssociation";
 import {getEngagementUpdate} from "../store/slices/engagementSlice";
-import {getSelectedAssociation, setSelectedAssociation} from "../store/slices/associationSlice";
+import {getSelectedAssociation} from "../store/slices/associationSlice";
 
 const validEngagement = Yup.object().shape({
     libelle: Yup.string(),

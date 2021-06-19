@@ -30,8 +30,6 @@ function MemberDetails({route, navigation}) {
     return (
         <>
         <ScrollView contentContainerStyle={{paddingBottom: 20}}>
-
-
             <BackgroundWithAvatar selectedMember={selectedMember}/>
             {isAuthorized && <TouchableWithoutFeedback
                 onPress={() => navigation.navigate(routes.EDIT_MEMBER, selectedMember)}>

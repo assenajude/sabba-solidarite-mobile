@@ -1,6 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {View, StyleSheet, TouchableWithoutFeedback, FlatList, TouchableOpacity} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
+import * as Notifications from 'expo-notifications'
+
 import AppText from "../components/AppText";
 import {useDispatch, useSelector} from "react-redux";
 import routes from "../navigation/routes";
@@ -12,9 +14,14 @@ import useAuth from "../hooks/useAuth";
 import ListItemSeparator from "../components/ListItemSeparator";
 import useManageAssociation from "../hooks/useManageAssociation";
 import AppButton from "../components/AppButton";
+import {getNotificationTokenUpdate, getUserAllUsers} from "../store/slices/authSlice";
+import {getPopulateReseauList, getUserTransactions} from "../store/slices/transactionSlice";
+import {reseauData} from "../utilities/reseau.data";
+import useNotification from "../hooks/useNotification";
 
 function StarterScreen({navigation}) {
     const dispatch = useDispatch()
+    const {registerForPushNotificationsAsync} = useNotification()
     const {isAdmin, getInitAssociation} = useAuth()
     const {getMemberRelationType, getAssociatonAllMembers} = useManageAssociation()
 
@@ -28,6 +35,13 @@ function StarterScreen({navigation}) {
     const [showLinks, setShowLinks] = useState(true)
 
 
+    const getInit = useCallback(() => {
+        if(isAdmin()) {
+            dispatch(getUserAllUsers())
+        }
+        dispatch(getPopulateReseauList(reseauData))
+        dispatch(getUserTransactions({userId: currentUser.id}))
+    }, [])
 
     const handleGoToDashboard = (association) => {
         const isMember = getMemberRelationType(association).toLowerCase() === 'member'
@@ -41,7 +55,23 @@ function StarterScreen({navigation}) {
             alert("Vous n'êtes pas encore membre de cette association")
     }
 
+    const getNotifToken = async () => {
+        const notifToken = await registerForPushNotificationsAsync()
+        const oldToken = currentUser.pushNotificationToken
+        if(oldToken && oldToken === notifToken) {
+            return ;
+        } else {
+        if (notifToken && notifToken !== '') {
+            dispatch(getNotificationTokenUpdate({userId: currentUser.id, notificationToken: notifToken}))
+        }
+        }
+    }
+
+
+
     useEffect(() => {
+        getNotifToken()
+        getInit()
         setTimeout(() => {
             setShowLinks(false)
         }, 2000)
@@ -68,7 +98,7 @@ function StarterScreen({navigation}) {
                     marginVertical:20,
                      marginHorizontal: 10
                 }}>
-                    <TouchableWithoutFeedback onPress={() => navigation.navigate(routes.USER_COMPTE)}>
+                    <TouchableWithoutFeedback onPress={() => navigation.navigate(routes.USER_COMPTE, currentUser)}>
                         <View style={{
                             flexDirection: 'row',
                             alignItems: 'center'
@@ -96,7 +126,7 @@ function StarterScreen({navigation}) {
                                 alignItems: 'center'
                             }}>
                                 <MaterialCommunityIcons name='account-group' color="black" size={24}/>
-                                <AppText style={{color: defaultStyles.colors.bleuFbi, marginLeft: 5}}>Adherer</AppText>
+                                <AppText style={{color: defaultStyles.colors.bleuFbi, marginLeft: 5}}>Associations</AppText>
                             </View>
                         </TouchableWithoutFeedback>
 

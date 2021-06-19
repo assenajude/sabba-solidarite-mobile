@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState} from 'react';
 import {View,TouchableOpacity,StyleSheet, ScrollView} from "react-native";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
@@ -15,8 +15,8 @@ import routes from "../navigation/routes";
 import AppHeaderGradient from "../components/AppHeaderGradient";
 import AssociationBackImage from "../components/association/AssociationBackImage";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import useAuth from "../hooks/useAuth";
 import {getAvatarUpdate} from "../store/slices/associationSlice";
+import AppReglement from "../components/AppReglement";
 
 function DashboardScreen({navigation}) {
     const dispatch = useDispatch()
@@ -188,9 +188,7 @@ function DashboardScreen({navigation}) {
                         </View>}
                     </View>
                 </View>
-                <View style={styles.reglement}>
-                    <AppText style={{color: defaultStyles.colors.bleuFbi}}> Reglement intérieur</AppText>
-                </View>
+                <AppReglement association={currentAssociation}/>
             </ScrollView>
         </>
     );
@@ -272,11 +270,6 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         borderRadius: 10,
-    },
-    reglement: {
-      marginVertical: 30,
-        marginHorizontal: 30,
-        flexDirection: 'row'
     },
     secondFonds: {
         flexDirection: 'row',

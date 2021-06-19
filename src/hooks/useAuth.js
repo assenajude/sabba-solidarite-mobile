@@ -69,15 +69,16 @@ export default useAuth = () => {
         }
 
 
-    const getMemberUserCompte = (member) => {
-        let selected = {}
-        selected = associationMembers.find(item => item.id === member.userId)
-        return selected
+    const getConnectedMember = () => {
+        const currentMember = associationMembers.find(item => item.id === connectedUser.id)
+        return currentMember?.member
     }
 
-    const getConnectedMember = () => {
-            const currentMember = associationMembers.find(item => item.id === connectedUser.id)
-            return currentMember
+    const getMemberUserCompte = () => {
+        let selected = {}
+        const currentMember = getConnectedMember()
+        selected = associationMembers.find(item => item.id === currentMember.userId)
+        return selected
     }
 
     const dataSorter = (data) => {

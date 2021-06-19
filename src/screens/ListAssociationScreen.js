@@ -1,4 +1,4 @@
-import React, {useEffect, useCallback} from 'react';
+import React, {useEffect, useCallback, useState} from 'react';
 import {View, StyleSheet, FlatList} from "react-native";
 import useAuth from "../hooks/useAuth";
 import AppAddNewButton from "../components/AppAddNewButton";
@@ -10,6 +10,7 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 import AssociationItem from "../components/association/AssociationItem";
 import useManageAssociation from "../hooks/useManageAssociation";
 import {getMemberAssociations, sendAdhesionMessage} from "../store/slices/memberSlice";
+import AppTextInput from "../components/AppTextInput";
 
 function ListAssociationScreen({navigation}) {
     const store = useStore()
@@ -18,11 +19,12 @@ function ListAssociationScreen({navigation}) {
     const dispatch = useDispatch()
 
     const connectedMember = useSelector(state => state.auth.user)
-    const associationList = useSelector(state => state.entities.association.list)
     const isLoadding = useSelector(state=> state.entities.association.loading)
     const isMemberLoading = useSelector(state => state.entities.member.loading)
 
-
+    const [selectedList, setSelectedList] = useState([])
+    const [searchLabel, setSearchLabel] = useState('')
+    const [searching, setSearching] = useState(false)
 
     const handleSendAdhesionMessage = async(item) => {
         const data = {
@@ -38,23 +40,52 @@ function ListAssociationScreen({navigation}) {
         }
     }
 
-    const allAssociations = useCallback(() => {
-        dispatch(getAllAssociation())
-    }, [])
+    const getAssociationList = async () => {
+        if(!searching) {
+        await dispatch(getAllAssociation())
+        }
+        const associationList = store.getState().entities.association.list
+        if(searchLabel.length === 0) {
+            setSelectedList(associationList)
+        } else {
+            const filteredList = associationList.filter(association => {
+                const searchString = association.nom+' '+association.description
+                const normalizeInfos = searchString.toLowerCase()
+                const normalizeTerme = searchLabel.toLowerCase()
+                if(normalizeInfos.search(normalizeTerme) !== -1) return true
+            })
+            setSelectedList(filteredList)
+        }
+    }
 
     useEffect(() => {
-        allAssociations()
-    }, [])
+        getAssociationList()
+    }, [searchLabel])
 
     return (
         <>
             <AppActivityIndicator visible={isLoadding || isMemberLoading}/>
-            {associationList?.length === 0 && !isLoadding && <View style={styles.emptyStyle}>
+            <View style={{
+                alignItems: 'center',
+            }}>
+                <AppTextInput
+                    onChangeText={val => {
+                        setSearching(true)
+                        setSearchLabel(val)
+                    }}
+                    value={searchLabel}
+                    style={{
+                        height: 20
+                    }}
+                    width={200}
+                    icon='book-search-outline'/>
+            </View>
+            {selectedList.length === 0 && !isLoadding && <View style={styles.emptyStyle}>
                 <AppText>Aucune association trouvée</AppText>
             </View>}
-            {associationList?.length > 0 &&
+            {selectedList.length > 0 &&
             <FlatList
-                data={associationList}
+                data={selectedList}
                 keyExtractor={item => item.id.toString()}
                 numColumns={2}
                 renderItem={({item}) =>

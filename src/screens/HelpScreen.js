@@ -1,14 +1,14 @@
 import React from 'react';
-import {ScrollView,Image, View, StyleSheet, TouchableOpacity} from 'react-native'
+import {ScrollView,Image, View, StyleSheet} from 'react-native'
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
-import { AntDesign, FontAwesome5 , MaterialCommunityIcons} from '@expo/vector-icons';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 
 import defaulStyles from '../utilities/styles'
 import AppHeaderGradient from "../components/AppHeaderGradient";
 
 
-function HelpScreen({navigation}) {
+function HelpScreen() {
     return (
         <ScrollView>
             <AppHeaderGradient/>
