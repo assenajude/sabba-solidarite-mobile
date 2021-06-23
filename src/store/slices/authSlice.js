@@ -10,7 +10,7 @@ const authSlice = createSlice({
         user: {},
         roles: [],
         allUsers: [],
-        token: null
+        token: null,
     },
     reducers: {
         authRequested: (state, action) => {
@@ -46,7 +46,8 @@ const authSlice = createSlice({
             state.loading = false
             state.error = null
             state.allUsers = action.payload
-        }
+        },
+
     }
 
 })
@@ -126,6 +127,7 @@ export const getNotificationTokenUpdate = (data) => apiRequested({
     onSuccess: userUpdated.type,
     onError: authRequestFailed.type
 })
+
 
 export const getLogout = () => dispatch => {
     dispatch(logout())

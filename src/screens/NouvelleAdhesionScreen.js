@@ -5,8 +5,8 @@ import MemberListItem from "../components/member/MemberListItem";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import defaultStyles from '../utilities/styles'
 import AppSwiper from "../components/AppSwiper";
-import {getMemberAssociations, respondToAdhesionMessage} from "../store/slices/memberSlice";
-import {getMemberRolesEdited, getSelectedAssociationMembers} from "../store/slices/associationSlice";
+import {getSelectedAssociationMembers, respondToAdhesionMessage} from "../store/slices/memberSlice";
+import {getMemberRolesEdited} from "../store/slices/associationSlice";
 import AppText from "../components/AppText";
 import useManageAssociation from "../hooks/useManageAssociation";
 import ListItemSeparator from "../components/ListItemSeparator";
@@ -36,7 +36,6 @@ function NouvelleAdhesionScreen({navigation}) {
         if(error !== null) {
             return alert("Erreur: impossible d'ajouter le membre")
         }
-        dispatch(getMemberAssociations())
         dispatch(getMemberRolesEdited({memberId: member.member.id}))
         dispatch(getSelectedAssociationMembers({associationId: selectedAssociation.id}))
         return alert(response === 'member'?"Membre ajouté avec succès." : "La reponse de reject a été envoyée au demandeur.")

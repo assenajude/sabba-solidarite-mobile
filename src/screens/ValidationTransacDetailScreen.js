@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
-import {View, ScrollView, StyleSheet} from "react-native";
+import React, {useCallback, useEffect, useState} from 'react';
+import {View, ScrollView, StyleSheet, BackHandler} from "react-native";
+import {useFocusEffect} from "@react-navigation/native";
 import AppText from "../components/AppText";
 import ReseauBackImageAndLabel from "../components/transaction/ReseauBackImageAndLabel";
 import useTransaction from "../hooks/useTransaction";
@@ -17,6 +18,20 @@ function ValidationTransacDetailScreen({route, navigation}) {
     const {isAdmin} = useAuth()
     const {formatFonds, formatDate} = useManageAssociation()
     const [selectedReseau, setSelectedReseau] = useState(getReseau(selectedTransaction.reseau))
+
+    useFocusEffect(
+        useCallback(() => {
+            const onBackPress = () => {
+                const routeScreen = selectedTransaction.typeTransac.toLowerCase() === 'depot'?'Depot':'Retrait'
+                navigation.navigate('Transaction', {screen: routeScreen})
+                return true
+            }
+            BackHandler.addEventListener('hardwareBackPress', onBackPress)
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', onBackPress)
+            }
+        }, [])
+    )
 
     return (
         <>
@@ -38,9 +53,12 @@ function ValidationTransacDetailScreen({route, navigation}) {
                     label='Statut'
                     valueStyle={{color: selectedTransaction.statut.toLowerCase() ==='processing'? defaultStyles.colors.leger : selectedTransaction.statut.toLowerCase() === 'succeeded'? defaultStyles.colors.vert : defaultStyles.colors.rougeBordeau}}
                     labelValue={selectedTransaction.statut.toLowerCase() ==='processing'? 'en cours de traitement' : selectedTransaction.statut.toLowerCase() === 'succeed'?'terminée avec succès' : 'échec'}/>
-                <MemberItem avatarStyle={{
+                <MemberItem
+                    getMemberDetails={() => navigation.navigate(routes.USER_COMPTE, selectedTransaction.user)}
+                    avatarStyle={{
                     marginVertical: 20
-                }} selectedMember={selectedTransaction.user} showPhone={true}/>
+                }}
+                    selectedMember={selectedTransaction.user} showPhone={true}/>
         </ScrollView>
                 {isAdmin() && <View style={styles.editTransaction}>
                     <AppAddNewButton onPress={() => navigation.navigate(routes.EDITI_TRANSACTION, selectedTransaction)} name='account-edit'/>

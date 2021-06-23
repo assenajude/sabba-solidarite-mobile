@@ -46,7 +46,8 @@
     "expo-document-picker": "~9.1.2",
     "expo-file-system": "~11.0.2",
     "expo-media-library": "~12.0.2",
-    "expo-notifications": "~0.11.6"
+    "expo-notifications": "~0.11.6",
+    "expo-sms": "~9.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0"

@@ -7,6 +7,7 @@ import NewEngagementScreen from "../screens/NewEngagementScreen";
 import NewEngagementList from "../screens/NewEngagementList";
 import MemberEngagementDetailScreen from "../screens/MemberEngagementDetailScreen";
 import EditEngagementScreen from "../screens/EditEngagementScreen";
+import NavigHeaderButton from "../components/NavigHeaderButton";
 
 const EngageNavig = createStackNavigator()
 
@@ -25,8 +26,11 @@ function EngagementNavigator(props) {
             <EngageNavig.Screen name='ListEngagementScreen' component={ListEngagementScreen} options={({route}) => ({
                 title: 'Engagements de '+route.params?.username,
             })}/>
-            <EngageNavig.Screen name='NewEngagementList' component={NewEngagementList} options={({route}) => ({
+            <EngageNavig.Screen name='NewEngagementList' component={NewEngagementList} options={({route,navigation}) => ({
                 title: 'Engagements en validation',
+                headerLeft: () =>
+                    <NavigHeaderButton
+                        iconName='arrow-left' onPress={() => navigation.navigate('EtatEngagement')}/>
             })}/>
 
             <EngageNavig.Screen name='MemberEngagementDetail' component={MemberEngagementDetailScreen} options={({route}) => ({

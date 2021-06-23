@@ -14,8 +14,9 @@ import {
 } from "../store/slices/engagementSlice";
 import ListItemSeparator from "../components/ListItemSeparator";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import {getConnectedMember, getSelectedAssociation} from "../store/slices/associationSlice";
+import {getSelectedAssociation} from "../store/slices/associationSlice";
 import {getUserData} from "../store/slices/authSlice";
+import {getConnectedMemberUser} from "../store/slices/memberSlice";
 
 function NewEngagementList({navigation}) {
     const dispatch = useDispatch()
@@ -50,7 +51,7 @@ function NewEngagementList({navigation}) {
         dispatch(voteEngagement(data))
         dispatch(getAllVotes({associationId: currentAssociation.id}))
         dispatch(getSelectedAssociation({associationId: currentAssociation.id}))
-        dispatch(getConnectedMember({associationId: currentAssociation.id, memberId: connectedMember().id}))
+        dispatch(getConnectedMemberUser({associationId: currentAssociation.id}))
         dispatch(getEngagementsByAssociation({associationId: currentAssociation.id}))
         dispatch(getUserData({userId: connectedMember().id}))
 

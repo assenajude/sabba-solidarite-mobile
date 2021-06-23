@@ -26,7 +26,13 @@ function AssociationModal({visible, closeModal, associations, selectAssociation}
                 <View style={{alignItems: 'center', paddingVertical: 20}}>
                     <AppText style={{color: defaultStyles.colors.bleuFbi, fontWeight: 'bold'}}>Liste de vos associations</AppText>
                 </View>
-                <FlatList data={associations}
+                {associations.length === 0 && <View style={{
+                    alignItems: "center",
+                    justifyContent: "center"
+                }}>
+                    <AppText>Vous netes pas encore membre d'associations.</AppText>
+                </View>}
+                {associations.length > 0 && <FlatList data={associations}
                           keyExtractor={item => item.id.toString()}
                           numColumns={2}
                           renderItem={({item}) =>
@@ -35,7 +41,7 @@ function AssociationModal({visible, closeModal, associations, selectAssociation}
                                   association={item}
                                   nom={item.nom} showState={false}
                                   onPress={() => selectAssociation(item)}/>}
-                />
+                />}
             </View>
         </Modal>
     );

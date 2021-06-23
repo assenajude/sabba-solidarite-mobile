@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Alert, Image} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../components/AppText";
 import AppAvatar from "../components/AppAvatar";
-import {useDispatch, useSelector, useStore} from "react-redux";
+import {useDispatch, useStore} from "react-redux";
 import defaultStyles from '../utilities/styles'
 import LottieView from "lottie-react-native";
 import useManageAssociation from "../hooks/useManageAssociation";
@@ -22,7 +22,7 @@ import AppShowImage from "../components/AppShowImage";
 
 
 function UserCompteScreen({navigation, route}) {
-    const selectedUser = route.params
+    let selectedUser = route.params
 
     const store = useStore()
     const dispatch = useDispatch()
@@ -96,6 +96,8 @@ function UserCompteScreen({navigation, route}) {
         if(error !== null) {
             return alert("Nous n'avons pas pu valider les images, veuillez reessayer plutard")
         }
+        const updatedUser = store.getState().auth.user
+        selectedUser = updatedUser
         alert("Vos images ont été editées avec succès.")
     }
 
@@ -103,6 +105,7 @@ function UserCompteScreen({navigation, route}) {
         setImageUrl(url)
         setImageModal(true)
     }
+
 
     return (
         <>
@@ -194,10 +197,16 @@ function UserCompteScreen({navigation, route}) {
             <View style={{marginVertical: 10}}>
                 <ListItemSeparator/>
             </View>
+            <View style={{
+                marginHorizontal: 20
+            }}>
             <AppSimpleLabelWithValue label='Nom' labelValue={selectedUser.nom?selectedUser.nom:'renseignez votre nom'}/>
             <AppSimpleLabelWithValue label='Prenom' labelValue={selectedUser.prenom?selectedUser.prenom:'renseignez votre prenom'}/>
             <AppSimpleLabelWithValue label='Phone' labelValue={selectedUser.phone?selectedUser.phone:'renseignez votre phone'}/>
+            <AppSimpleLabelWithValue label='Profession' labelValue={selectedUser.phone?selectedUser.phone:'renseignez votre profession ou formation'}/>
+            <AppSimpleLabelWithValue label='Emploi' labelValue={selectedUser.phone?selectedUser.phone:'renseignez votre emploi'}/>
             <AppSimpleLabelWithValue label='Adresse' labelValue={selectedUser.adresse?selectedUser.adresse:'renseignez votre adresse'}/>
+            </View>
 
             <TouchableWithoutFeedback onPress={() => navigation.navigate(routes.EDIT_USER_COMPTE)}>
                 <View elevation={10} style={styles.editInfo}>
@@ -218,7 +227,9 @@ function UserCompteScreen({navigation, route}) {
             </TouchableOpacity>
 
         </ScrollView>
-            <EditFundModal editVisible={editFund} closeFundModal={() => setEditFund(false)}/>
+            <EditFundModal
+                editVisible={editFund}
+                closeFundModal={() => setEditFund(false)}/>
             <AppUploadModal progress={progress} uploadModalVisible={uploadModal}/>
             <AppShowImage
                 closeImageModal={() => setImageModal(false)}

@@ -2,7 +2,6 @@ import {useSelector} from "react-redux";
 
 let useInfo
 export default useInfo = () => {
-    const infoList = useSelector(state => state.entities.information.list)
     const memberInfos = useSelector(state => state.entities.member.memberInfos)
 
     const getMemberInfoState = (info) => {

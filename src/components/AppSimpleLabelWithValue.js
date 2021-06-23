@@ -1,14 +1,17 @@
 import React from 'react';
 import AppText from "./AppText";
 import {View, StyleSheet} from "react-native";
-
 function AppSimpleLabelWithValue({label, labelValue, valueStyle}) {
+
     return (
         <View style={styles.container}>
             <AppText style={{fontWeight: 'bold'}}>{label}</AppText>
-            <AppText style={[{
-                marginLeft: '20%'
-            }, valueStyle]}>{labelValue}</AppText>
+            <View style={{
+                justifyContent: 'flex-start',
+                width: 150,
+            }}>
+                <AppText style={valueStyle}>{labelValue}</AppText>
+            </View>
         </View>
     );
 }
@@ -16,10 +19,9 @@ function AppSimpleLabelWithValue({label, labelValue, valueStyle}) {
 const styles = StyleSheet.create({
     container: {
     flexDirection: 'row',
-        alignItems: 'center',
+     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 10
+    marginVertical: 10
 }
 })
 export default AppSimpleLabelWithValue;

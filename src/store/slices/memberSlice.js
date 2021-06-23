@@ -8,14 +8,14 @@ const memberSlice = createSlice({
         loading:  false,
         error: null,
         list: [],
-        memberAssociations: [],
         memberInfos: [],
         membersCotisations: {},
         randomIdentity: {},
         memberYearCotisations: [],
         selectedMonthCotisations: [],
         years: [],
-        months: []
+        months: [],
+        userAssociations: []
     },
     reducers: {
         memberRequested: (state,action) => {
@@ -113,12 +113,15 @@ const memberSlice = createSlice({
             const others = state.selectedMonthCotisations.filter(cotisation => cotisation.id !== selectedCotisation.id)
             others.forEach(cotisation => cotisation.showDetail = false)
         },
-
-
+        userAssociationsReceived: (state, action) => {
+            state.loading = false
+            state.error = null
+            state.userAssociations = action.payload
+        }
     }
 })
 
-const {memberRequested, memberRequestFailed, memberAssociationReceived,
+const {memberRequested, memberRequestFailed, userAssociationsReceived,
     memberAdded,updateOne, memberInfosReceived,
     allMembersReceived, memberCotisationPayed,
     membersCotisationReceived, showCotisationDetails,
@@ -127,21 +130,23 @@ export default memberSlice.reducer
 
 const url = '/members'
 
-export const getAllMembers = () => apiRequested({
-    url,
+export const getConnectedUserAssociations = () => apiRequested({
+    url:url+'/associations',
     method: 'get',
+    onStart: memberRequested.type,
+    onSuccess: userAssociationsReceived.type,
+    onError: memberRequestFailed.type
+})
+
+export const getSelectedAssociationMembers = (data) => apiRequested({
+    url:url+'/byAssociation',
+    data,
+    method: 'post',
     onStart: memberRequested.type,
     onSuccess: allMembersReceived.type,
     onError: memberRequestFailed.type
 })
 
-export const getMemberAssociations = () => apiRequested({
-    url:url+'/associations',
-    method: 'get',
-    onStart: memberRequested.type,
-    onSuccess: memberAssociationReceived.type,
-    onError: memberRequestFailed.type
-})
 
 export const addNewMember = (data) => apiRequested({
     url,
@@ -185,7 +190,7 @@ export const sendAdhesionMessage = (data) => apiRequested({
     data,
     method: 'patch',
     onStart: memberRequested.type,
-    onSuccess: allMembersReceived.type,
+    onSuccess: userAssociationsReceived.type,
     onError: memberRequestFailed.type
 })
 
@@ -222,6 +227,15 @@ export const getMembersCotisations = (data) => apiRequested({
     method: 'post',
     onStart: memberRequested.type,
     onSuccess: membersCotisationReceived.type,
+    onError: memberRequestFailed.type
+})
+
+export const getConnectedMemberUser = (data) => apiRequested({
+    url: url+'/connectedMemberUser',
+    method: 'post',
+    data,
+    onStart: memberRequested.type,
+    onSuccess: updateOne.type,
     onError: memberRequestFailed.type
 })
 

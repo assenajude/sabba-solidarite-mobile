@@ -4,17 +4,17 @@ import {useDispatch, useSelector} from "react-redux";
 import ValidationTransactionItem from "../components/transaction/ValidationTransactionItem";
 import useTransaction from "../hooks/useTransaction";
 import useAuth from "../hooks/useAuth";
-import {showTransactionMore} from "../store/slices/transactionSlice";
+import { showTransactionMore} from "../store/slices/transactionSlice";
 import routes from "../navigation/routes";
 import AppErrorOrEmptyScreen from "../components/AppErrorOrEmptyScreen";
 import AppAddNewButton from "../components/AppAddNewButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import ListItemSeparator from "../components/ListItemSeparator";
 
 function RetraitScreen({navigation}) {
     const dispatch = useDispatch()
     const {getReseau} = useTransaction()
     const {dataSorter} = useAuth()
-
     const error = useSelector(state => state.entities.transaction.error)
     const isLoading = useSelector(state => state.entities.transaction.loading)
     const retraitList = useSelector(state => {
@@ -25,6 +25,7 @@ function RetraitScreen({navigation}) {
         return retraitSorted
     })
 
+
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
@@ -34,6 +35,7 @@ function RetraitScreen({navigation}) {
             {error === null && retraitList.length >0 && <FlatList
                 data={retraitList}
                 keyExtractor={item => item.id.toString()}
+                ItemSeparatorComponent={ListItemSeparator}
                 renderItem={({item})=>
                     <ValidationTransactionItem
                         getCreatorDetails={() => navigation.navigate(routes.USER_COMPTE,item.user)}

@@ -8,7 +8,6 @@ import defaulStyles from '../../utilities/styles'
 import LottieView from 'lottie-react-native'
 import AppButton from "../AppButton";
 import useAuth from "../../hooks/useAuth";
-import routes from "../../navigation/routes";
 
 function ValidationTransactionItem({reseau,getEditTransaction, transaction, creatorUser, showMore,
                                        getTransactionMore, getTransactionDetails, getCreatorDetails}) {

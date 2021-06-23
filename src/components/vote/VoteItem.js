@@ -7,11 +7,6 @@ import {useSelector} from "react-redux";
 import useManageAssociation from "../../hooks/useManageAssociation";
 
 function VoteItem({allVoted, handleVoteUp, upVotes,handleVoteDown, downVotes}) {
-    const memberToVote = useSelector(state => {
-        const list  = state.entities.association.selectedAssociationMembers
-        const voteNumber = list.length / 2
-        return Math.ceil(voteNumber)
-    })
 
     const {votorsNumber} = useManageAssociation()
 

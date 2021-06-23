@@ -5,6 +5,7 @@ import {AppForm, AppFormField, FormSubmitButton} from "../components/form";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import {saveEditInfo} from "../store/slices/authSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import routes from "../navigation/routes";
 
 
 const validInfo = Yup.object().shape({
@@ -32,14 +33,20 @@ function EditUserCompteScreen({navigation}) {
             return alert("Nous n'avons pas pu mettre à jour vos infos. Veuillez reessayer plutard")
         }
         Alert.alert("Felicitation:", "Vos infos ont été mises à jour avec succès.", [{text: 'ok', onPress: () => {
-            navigation.goBack()
+            const updatedUser = store.getState().auth.user
+            navigation.navigate(routes.USER_COMPTE, updatedUser)
             }}])
     }
 
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
-        <ScrollView>
+        <ScrollView
+            contentContainerStyle={{
+                marginHorizontal: 20,
+                marginVertical: 20,
+                paddingBottom: 40
+            }}>
            <AppForm
                validationSchema={validInfo}
                initialValues={{

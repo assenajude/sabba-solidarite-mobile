@@ -1,9 +1,10 @@
 import {useDispatch, useSelector, useStore} from "react-redux";
-import {getAllCotisations} from "../store/slices/cotisationSlice";
-import {getAllMembers, getMemberInfos, getMembersCotisations} from "../store/slices/memberSlice";
+import {getAssociationCotisations} from "../store/slices/cotisationSlice";
+import {getMemberInfos, getMembersCotisations, getSelectedAssociationMembers} from "../store/slices/memberSlice";
 import {getAllVotes, getEngagementsByAssociation} from "../store/slices/engagementSlice";
 import {getAssociationInfos} from "../store/slices/informationSlice";
-import {getMemberRoles, getSelectedAssociationMembers} from "../store/slices/associationSlice";
+import {getMemberRoles} from "../store/slices/associationSlice";
+import {useCallback} from "react";
 
 let useAuth;
 export default useAuth = () => {
@@ -12,7 +13,7 @@ export default useAuth = () => {
     const connectedUser = useSelector(state => state.auth.user)
     const userRoles = useSelector(state => state.auth.roles)
     const memberRoles = useSelector(state => state.entities.association.memberRoles)
-    const associationMembers = useSelector(state => state.entities.association.selectedAssociationMembers)
+    const associationMembers = useSelector(state => state.entities.member.list)
 
     const isAdmin = () => {
         let isMemberAdmin = false
@@ -37,36 +38,22 @@ export default useAuth = () => {
         return isModarat
     }
 
-    const validMembers = (allMembers) => {
-        let validList = []
-        validList = allMembers.filter(item => {
-            const isMember = item.member.relation.toLowerCase() === 'member'
-            const isOnLeave = item.member.relation.toLowerCase() === 'onleave'
-            if(isMember || isOnLeave) return true
-        })
-        return validList
-    }
-
-
-
-        const getInitAssociation = async(currentAssociation) => {
+        const getInitAssociation = useCallback( async(currentAssociation) => {
             await dispatch(getSelectedAssociationMembers({associationId: currentAssociation.id}))
-             dispatch(getEngagementsByAssociation({associationId:currentAssociation.id}))
-             dispatch(getAssociationInfos({associationId: currentAssociation.id}))
-             dispatch(getAllCotisations({associationId: currentAssociation.id}))
+            dispatch(getEngagementsByAssociation({associationId:currentAssociation.id}))
+            dispatch(getAssociationInfos({associationId: currentAssociation.id}))
+            dispatch(getAssociationCotisations({associationId: currentAssociation.id}))
             dispatch(getMembersCotisations({associationId: currentAssociation.id}))
-             dispatch(getAllMembers())
-              dispatch(getAllVotes({associationId: currentAssociation.id}))
-            const members = store.getState().entities.association.selectedAssociationMembers
-            const associationValidMembers = validMembers(members)
-            if(associationValidMembers.length>0) {
-                const currentMember = members.find(item => item.id === connectedUser.id)
+            dispatch(getAllVotes({associationId: currentAssociation.id}))
+            const associationMembers = store.getState().entities.member.list
+            if(associationMembers.length>0) {
+                const currentMember = associationMembers.find(item => item.id === connectedUser.id)
                 if(currentMember) {
                     dispatch(getMemberInfos({memberId: currentMember.member.id}))
                     dispatch(getMemberRoles({memberId: currentMember.member.id}))
                 }
             }
-        }
+        }, [])
 
 
     const getConnectedMember = () => {
@@ -92,5 +79,5 @@ export default useAuth = () => {
         }
         return sorTable
     }
-    return {isAdmin,getMemberUserCompte, isModerator,getConnectedMember, dataSorter, getInitAssociation, validMembers}
+    return {isAdmin,getMemberUserCompte, isModerator,getConnectedMember, dataSorter, getInitAssociation}
 }

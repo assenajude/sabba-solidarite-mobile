@@ -1,7 +1,5 @@
 import React, {useCallback, useState} from 'react';
-import {View, TouchableWithoutFeedback} from "react-native";
 import {createStackNavigator} from '@react-navigation/stack'
-import {MaterialCommunityIcons} from '@expo/vector-icons'
 import DashboardScreen from "../screens/DashboardScreen";
 import AppLabelWithIcon from "../components/AppLabelWithIcon";
 import AssociationModal from "../components/association/AssociationModal";
@@ -12,6 +10,7 @@ import NewInformationScreen from "../screens/NewInformation";
 import NouvelleAdhesionScreen from "../screens/NouvelleAdhesionScreen";
 import {setSelectedAssociation} from "../store/slices/associationSlice";
 import useAuth from "../hooks/useAuth";
+import NavigHeaderButton from "../components/NavigHeaderButton";
 
 const AssocNavig = createStackNavigator()
 
@@ -21,8 +20,8 @@ function AssociationNavigator(props) {
 
     const [associationModalVisible, setAssociationModalVisible] = useState(false)
     const memberAssociations = useSelector(state => {
-        const list = state.entities.member.memberAssociations
-        const validList = list.filter(ass => ass.member?.relation.toLowerCase() === 'member')
+        const list = state.entities.member.userAssociations
+        const validList = list.filter(ass => ass.member?.relation.toLowerCase() === 'member' || ass.member?.relation.toLowerCase() === 'onleave')
         return validList
     })
 
@@ -30,11 +29,11 @@ function AssociationNavigator(props) {
         setAssociationModalVisible(!associationModalVisible)
     }
 
-    const handleSelectAssociation = useCallback(async(item) => {
+    const handleSelectAssociation = async(item) => {
         dispatch(setSelectedAssociation(item))
         getInitAssociation(item)
         setAssociationModalVisible(false)
-    }, [])
+    }
 
     return (
         <>
@@ -45,19 +44,17 @@ function AssociationNavigator(props) {
             <AssocNavig.Screen
                 name='DashboardScreen'
                 component={DashboardScreen}
-                options={() =>({
+                options={({navigation}) =>({
                     headerTitle: () =>
                         <AppLabelWithIcon
                             icon='tablet-dashboard'
                             label='Dashboard'
                         />,
-                    headerRight: () => <TouchableWithoutFeedback onPress={handleShowAssociationModal}>
-                        <View style={{
-                            padding: 20
-                        }}>
-                            <MaterialCommunityIcons name="group" size={30} color={defaultStyles.colors.white} />
-                        </View>
-                    </TouchableWithoutFeedback>
+                    headerLeft: () => null,
+                    headerRight: () =>
+                        <NavigHeaderButton
+                            iconName='group'
+                            onPress={handleShowAssociationModal}/>
                 })}/>
                 <AssocNavig.Screen name='NEWS' component={NewsScreen} options={{
                     title: 'The News'

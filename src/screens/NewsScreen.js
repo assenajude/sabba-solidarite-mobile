@@ -9,17 +9,14 @@ import {readMemberInfos} from "../store/slices/memberSlice";
 import useInfo from "../hooks/useInfo";
 import {showInfoDetails} from "../store/slices/informationSlice";
 import AppText from "../components/AppText";
+import useAuth from "../hooks/useAuth";
+import useManageAssociation from "../hooks/useManageAssociation";
 
 function NewsScreen({navigation}) {
     const dispatch = useDispatch()
     const {getMemberInfoState} = useInfo()
+    const {associationValidMembers} = useManageAssociation()
     const currentUser = useSelector(state => state.auth.user)
-    const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
-    const members = useSelector(state => {
-        const list = state.entities.member.list
-        const selectedList = list.filter(item => item.associationId === currentAssociation.id)
-        return selectedList
-    })
     const infos = useSelector(state => state.entities.information.list)
     const error = useSelector(state => state.entities.information.error)
 
@@ -30,7 +27,7 @@ function NewsScreen({navigation}) {
             return;
         }
         dispatch(showInfoDetails(info))
-        const currentMember = members.find(item => item.userId === currentUser.id)
+        const currentMember = associationValidMembers().members.find(item => item.userId === currentUser.id)
         const data = {
             informationId: info.id,
             memberId: currentMember.id

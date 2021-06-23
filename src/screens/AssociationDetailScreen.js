@@ -1,5 +1,6 @@
-import React from 'react';
-import {ScrollView, View, StyleSheet} from "react-native";
+import React, {useCallback} from 'react';
+import {ScrollView, View, StyleSheet, BackHandler} from "react-native";
+import {useFocusEffect} from '@react-navigation/native'
 import AssociationBackImage from "../components/association/AssociationBackImage";
 import {useDispatch, useSelector, useStore} from "react-redux";
 
@@ -15,6 +16,7 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function AssociationDetailScreen({route, navigation}) {
     const selectedAssociation = route.params
+    const currentUser = useSelector(state => state.auth.user)
     const store = useStore()
     const dispatch = useDispatch()
     const {formatFonds} = useManageAssociation()
@@ -37,6 +39,19 @@ function AssociationDetailScreen({route, navigation}) {
             alert("Mise à jour effectué avec succès")
         }
    }
+
+   useFocusEffect(
+       useCallback(() => {
+           const onBackPress = () => {
+               navigation.navigate(routes.ASSOCIATION_LIST)
+               return true
+           }
+           BackHandler.addEventListener('hardwareBackPress', onBackPress)
+           return () => {
+               BackHandler.removeEventListener('hardwareBackPress', onBackPress)
+           }
+       }, [])
+   )
 
     return (
         <>

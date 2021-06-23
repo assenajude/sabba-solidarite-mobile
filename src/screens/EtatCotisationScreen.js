@@ -23,21 +23,21 @@ function EtatCotisationScreen({navigation}) {
     return (
         <>
             <AppHeaderGradient/>
-            {associationValidMembers().length === 0 && error === null && <View style={{
+            {associationValidMembers().members.length === 0 && error === null && <View style={{
                 flex: 1,
                 justifyContent: "center",
                 alignItems: 'center'
             }}>
                 <AppText>Aucune cotisation trouvée</AppText>
                 </View>}
-            {associationValidMembers().length>0 && <FlatList data={associationValidMembers()}
+            {associationValidMembers().members.length>0 && <FlatList data={associationValidMembers().users}
                       keyExtractor={item => item.id.toString()}
                       ItemSeparatorComponent={ListItemSeparator}
                       renderItem={({item}) =>
                           <MemberListItem selectedMember={item}
                               getMemberDetails={() => navigation.navigate('MemberCotisationScreen',item)}>
-                              <AppText style={{marginHorizontal: 10}}>({getMemberCotisations(item).cotisationLenght})</AppText>
-                              <AppText style={{marginHorizontal: 10}}>{formatFonds(getMemberCotisations(item).totalCotisation)}</AppText>
+                              <AppText style={{marginHorizontal: 10}}>({getMemberCotisations(item.member).cotisationLenght})</AppText>
+                              <AppText style={{marginHorizontal: 10}}>{formatFonds(getMemberCotisations(item.member).totalCotisation)}</AppText>
                           <View style={styles.checker}>
                             {notPayedCompter(item.member) === 0 && <MaterialCommunityIcons name="account-check" size={24} color={defaultStyles.colors.vert} />}
                               {notPayedCompter(item.member) > 0 && <MaterialCommunityIcons name="account-alert" size={24} color="orange" />}

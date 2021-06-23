@@ -36,6 +36,7 @@ function StarterNavigator() {
         })}>
             <StarterNavig.Screen name='StarterScreen' component={StarterScreen} options={({navigation}) => ({
                 title: 'Accueil',
+                headerLeft: () =>null,
                 headerRight: () =>
                     <TouchableOpacity onPress={() => {
                         dispatch(getLogout())
@@ -54,8 +55,16 @@ function StarterNavigator() {
             <StarterNavig.Screen name='NewAssociationScreen' component={NewAssociationScreen} options={{title:'Nouvelle association'}}/>
             <StarterNavig.Screen name='EditUserCompte' component={EditUserCompteScreen} options={{title:'Edition du compte'}}/>
             <StarterNavig.Screen name='AssociationDetailScreen' component={AssociationDetailScreen}
-                              options={({route}) =>({
-                                  title: route.params.nom + ' infos'
+                              options={({route, navigation}) =>({
+                                  title: route.params.nom + ' infos',
+                                  headerLeft: () => <NavigHeaderButton
+                                      onPress={() => navigation.navigate(routes.ASSOCIATION_LIST)}
+                                      title='Liste'
+                                      iconName='arrow-left'/>,
+                                  headerRight: () => <NavigHeaderButton
+                                      onPress={() => navigation.navigate('StarterScreen')}
+                                      title='Accueil'
+                                      iconName='home'/>
                               })}/>
             <StarterNavig.Screen
                 name='NewTransaction'
@@ -79,8 +88,16 @@ function StarterNavigator() {
             <StarterNavig.Screen
                 name='ValidationTransacDetail'
                 component={ValidationTransacDetailScreen}
-                options={({route}) => ({
-                    title: 'Transaction '+ route.params.number
+                options={({route,navigation}) => ({
+                    title: route.params.typeTransac.toLowerCase() === 'retrait'?'Detailt retrait':'detail depot',
+                    headerLeft: () => <NavigHeaderButton
+                        onPress={() => navigation.navigate('Transaction')}
+                        title='Liste'
+                        iconName='arrow-left'/>,
+                    headerRight: () => <NavigHeaderButton
+                        onPress={() => navigation.navigate('StarterScreen')}
+                        title='Accueil'
+                        iconName='home'/>
                 })}/>
             <StarterNavig.Screen
                 name='EditTransaction'

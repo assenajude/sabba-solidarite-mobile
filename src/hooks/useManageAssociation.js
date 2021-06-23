@@ -1,4 +1,4 @@
-import {useSelector, useStore} from "react-redux";
+import {useSelector} from "react-redux";
 import dayjs from "dayjs";
 import useAuth from "./useAuth";
 
@@ -7,26 +7,16 @@ export default useManageAssociation = () => {
     const {validMembers} = useAuth()
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const connectedMember = useSelector(state => state.auth.user)
-    const associationMembers = useSelector(state => state.entities.association.selectedAssociationMembers)
         const engagementsList = useSelector(state => state.entities.engagement.list)
-    const allMember = useSelector(state => state.entities.member.list)
+    const associationMembers = useSelector(state => state.entities.member.list)
+    const userAssociations = useSelector(state => state.entities.member.userAssociations)
 
-    const getAssociatonAllMembers = (association) => {
-        let members = []
-            if(association && allMember.length > 0) {
-            members = allMember.filter(item => item.associationId === association.id)
-            }
-        return members
-    }
 
     const getMemberRelationType = (association) => {
-        let associationType = ''
-        const associatedMembers = getAssociatonAllMembers(association)
-        if(associatedMembers && associatedMembers.length>0) {
-         const selectedMember = associatedMembers.find(member => member.userId === connectedMember.id)
-        if(selectedMember) {
-            associationType = selectedMember.relation
-        }
+        let associationType = "noRelation"
+        const selectedAssociation = userAssociations.find(ass => ass.id === association.id)
+        if(selectedAssociation) {
+            associationType = selectedAssociation.member?.relation
         }
      return associationType
     }
@@ -46,13 +36,11 @@ export default useManageAssociation = () => {
 
     const associationValidMembers = () => {
         let validList = []
-        validList = associationMembers.filter(item => {
-            const isMember = item.member.relation.toLowerCase() === 'member'
-            const isOnLeave = item.member.relation.toLowerCase() === 'onleave'
-            if(isMember || isOnLeave) return true
-        })
-        return validList
+        validList = associationMembers.filter(item => item.member.relation.toLowerCase() === 'member' || item.member.relation.toLowerCase() === 'onleave')
+        const validMembers = validList.map(user => user.member)
+        return {users: validList, members: validMembers}
     }
+
 
     const getNewAdhesion = () => {
             const adhesionList = associationMembers.filter(item => {
@@ -88,7 +76,7 @@ export default useManageAssociation = () => {
         if(currentAssociation.validationLenght>0) {
             number = currentAssociation.validationLenght
         } else {
-            const membersLengtht = validMembers(associationMembers).length
+            const membersLengtht = associationValidMembers().members.length
             if(membersLengtht <= 10) {
                 number = membersLengtht
             } else {
@@ -99,6 +87,6 @@ export default useManageAssociation = () => {
         return number
     }
 
-    return {getAssociatonAllMembers, getMemberRelationType, formatFonds,votorsNumber,
+    return {getMemberRelationType, formatFonds,votorsNumber,
         formatDate, associationValidMembers, getNewAdhesion, getManagedAssociationFund}
 }

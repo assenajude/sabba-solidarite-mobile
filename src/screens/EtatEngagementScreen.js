@@ -24,17 +24,12 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function EtatEngagementScreen({navigation}) {
     const dispatch = useDispatch()
-    const {getMemberUserCompte, dataSorter} = useAuth()
+    const {getMemberUserCompte, dataSorter, getConnectedMember} = useAuth()
     const {formatFonds, associationValidMembers} = useManageAssociation()
     const {getMemberEngagementInfos, handlePayTranche} = useEngagement()
 
     const isLoading = useSelector(state => state.entities.engagement.loading)
-    const currentUser = useSelector(state => state.auth.user)
-    const connectedMember = useSelector(state => {
-        const listMember = state.entities.association.selectedAssociationMembers
-        const currentMember = listMember.find(item => item.id === currentUser.id)
-        return currentMember
-    })
+
     const engagements = useSelector(state => {
         const list = state.entities.engagement.list
         let validList = list.filter(item => {
@@ -53,7 +48,7 @@ function EtatEngagementScreen({navigation}) {
     }
 
     const handleChangeContent = (value) => {
-        if(value.toLowerCase() === 'member') setMainData(associationValidMembers())
+        if(value.toLowerCase() === 'member') setMainData(associationValidMembers().users)
         else setMainData(engagements)
     }
 
@@ -82,7 +77,7 @@ function EtatEngagementScreen({navigation}) {
             }}>
                 <AppText>Aucun engagements trouvé</AppText>
             </View>}
-           {mainData.length>0 && <FlatList data={pickerValue.toLowerCase() === 'member'?associationValidMembers():engagements}
+           {mainData.length>0 && <FlatList data={pickerValue.toLowerCase() === 'member'?associationValidMembers().users:engagements}
                      keyExtractor={item => item.id.toString()}
                      ItemSeparatorComponent={ListItemSeparator}
                      renderItem={({item}) => {
@@ -92,8 +87,8 @@ function EtatEngagementScreen({navigation}) {
                                    top: 25
                                }}
                                getMemberDetails={() => navigation.navigate(routes.LIST_ENGAGEMENT, item)}>
-                               <AppText style={{marginHorizontal: 20}}>({getMemberEngagementInfos(item).engagementLength})</AppText>
-                               <AppText>{formatFonds(getMemberEngagementInfos(item).engagementAmount)}</AppText>
+                               <AppText style={{marginHorizontal: 20}}>({getMemberEngagementInfos(item.member).engagementLength})</AppText>
+                               <AppText>{formatFonds(getMemberEngagementInfos(item.member).engagementAmount)}</AppText>
                              </MemberListItem>
                          }
 
@@ -101,7 +96,7 @@ function EtatEngagementScreen({navigation}) {
                              getMembersDatails={() => navigation.navigate('Members',{screen: 'MemberDetails', params: getMemberUserCompte(item.Creator)})}
                              getMoreDetails={() => navigation.navigate('MemberEngagementDetail', item)}
                              renderRightActions={(tranche) =>
-                                 connectedMember.id === item.creatorId?<TrancheRightActions
+                                 getConnectedMember()?.id === item.creatorId?<TrancheRightActions
                                  ended={tranche.montant===tranche.solde}
                                  isPaying={tranche.paying}
                                  payingTranche={() => {dispatch(getPayingTranche(tranche))}}

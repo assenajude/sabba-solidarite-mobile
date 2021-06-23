@@ -17,7 +17,7 @@ import EditImagesModal from "../components/member/EditImagesModal";
 
 function MemberCompteScreen({navigation}) {
 
-    const {isModerator, getConnectedMember, getMemberUserCompte, isAdmin} = useAuth()
+    const {isModerator, getConnectedMember,isAdmin} = useAuth()
     const {getMemberCotisations} = useCotisation()
     const {getMemberEngagementInfos} = useEngagement()
     const {formatFonds, formatDate} = useManageAssociation()
@@ -36,7 +36,7 @@ function MemberCompteScreen({navigation}) {
                     showCamera={true}
                 />
                 <View style={styles.statut}>
-                    <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 22, fontWeight: 'bold'}}>{getConnectedMember().statut}</AppText>
+                    <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 22, fontWeight: 'bold'}}>{getConnectedMember()?.statut}</AppText>
                 </View>
                 <View style={{marginTop: 30}}>
                     <AppLabelWithValue label='Fonds' value={formatFonds(getConnectedMember().fonds)}/>

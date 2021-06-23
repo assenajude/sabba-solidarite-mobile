@@ -8,6 +8,7 @@ import FormImagePicker from "../components/form/FormImagePicker";
 import AppUploadModal from "../components/AppUploadModal";
 import useUploadImage from "../hooks/useUploadImage";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import routes from "../navigation/routes";
 
 const newAssociationValidSchema = Yup.object().shape({
     nom: Yup.string(),
@@ -65,9 +66,8 @@ function NewAssociationScreen({navigation, route}) {
         await dispatch(addNewAssociation(newData))
         const error = store.getState().entities.association.error
         if(error !== null) return alert('error adding new association')
-        await dispatch(getAllAssociation())
         alert("success!!!")
-        navigation.goBack()
+        navigation.navigate(routes.ASSOCIATION_LIST, {updated: true})
     }
     return (
         <>

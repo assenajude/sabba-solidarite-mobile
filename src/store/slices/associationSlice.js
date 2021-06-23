@@ -8,7 +8,6 @@ const associationSlice = createSlice({
         error: null,
         list: [],
         selectedAssociation: {},
-        selectedAssociationMembers: [],
         memberRoles: []
     },
     reducers: {
@@ -43,11 +42,6 @@ const associationSlice = createSlice({
         selectedAssociationSet: (state, action) => {
             state.selectedAssociation = action.payload
         },
-        associationMembersReceived: (state, action) => {
-            state.loading = false
-            state.error = null
-            state.selectedAssociationMembers = action.payload
-        },
         associationUpdated: (state, action) => {
             state.loading = false
             state.error = null
@@ -57,14 +51,7 @@ const associationSlice = createSlice({
                 state.selectedAssociation = action.payload
             }
         },
-        connectedMemberUpdated:(state, action) => {
-            state.loading = false
-            state.error = null
-            const memberIndex = state.selectedAssociationMembers.findIndex(member => member.id === action.payload.id)
-            const newMembers = state.selectedAssociationMembers
-            newMembers[memberIndex] = action.payload
-            state.selectedAssociationMembers = newMembers
-        },
+
         memberRolesReceived: (state, action) => {
             state.loading = false
             state.error = null
@@ -82,8 +69,8 @@ const associationSlice = createSlice({
 
 const {associationAdded, associationReceived,
     associationRequested, associationRequestFailed,
-    selectedAssociationSet, associationMembersReceived, memberRolesReceived,
-    rolesEdited, associationUpdated, connectedMemberUpdated} = associationSlice.actions
+    selectedAssociationSet, memberRolesReceived,
+    rolesEdited, associationUpdated} = associationSlice.actions
 
 export default associationSlice.reducer
 
@@ -107,14 +94,6 @@ export const addNewAssociation = (data) => apiRequested({
 })
 
 
-export const getSelectedAssociationMembers = (data) => apiRequested({
-    url:url+'/members',
-    data,
-    method: 'post',
-    onStart: associationRequested.type,
-    onSuccess: associationMembersReceived.type,
-    onError: associationRequestFailed.type
-})
 export const getMemberRoles = (data) => apiRequested({
     url:url+'/members/roles',
     data,
@@ -150,14 +129,7 @@ export const getSelectedAssociation = (data) => apiRequested({
     onError: associationRequestFailed.type
 })
 
-export const getConnectedMember = (data) => apiRequested({
-    url:url+'/connectedMember',
-    data,
-    method: 'post',
-    onStart: associationRequested.type,
-    onSuccess: connectedMemberUpdated.type,
-    onError: associationRequestFailed.type
-})
+
 
 export const getReglementUpdate = (data) => apiRequested({
     url:url+'/updateReglement',

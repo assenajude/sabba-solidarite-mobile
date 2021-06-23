@@ -15,11 +15,6 @@ function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, i
         <View style={styles.container}>
             <View style={{ alignItems: 'center'}}>
                 <Image
-                    onLoad={() =>
-                        <LottieView
-                            source={require('../../../assets/animations/loading')}
-                            style={{height: 100, width: 100}}
-                        loop={true} autoPlay={true}/>}
                     style={styles.associationAvatar}
                     source={association.avatar?{uri: association.avatar} : require('../../../assets/solidariteImg.jpg')}/>
                 <AppText style={styles.nom}>{association.nom}</AppText>

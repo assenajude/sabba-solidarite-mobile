@@ -8,7 +8,6 @@ import {addNewEngagement, getEngagementsByAssociation} from "../store/slices/eng
 import AppTimePicker from "../components/AppTimePicker";
 import FormItemPicker from "../components/form/FormItemPicker";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import useManageAssociation from "../hooks/useManageAssociation";
 import useAuth from "../hooks/useAuth";
 
 const validEngagement = Yup.object().shape({
@@ -64,7 +63,7 @@ function NewEngagementScreen({navigation}) {
                 echeance: new Date()
             }} validationSchema={validEngagement} onSubmit={handleAddEngagement}>
                 <FormItemPicker label='Type engagement: ' data={['remboursable', 'non remboursable']} name='typeEngagement'/>
-                <AppFormField name='libelle' placeholder='libelle'/>
+                <AppFormField name='libelle' placeholder='libelle' maxLength={50}/>
                 <AppFormField keyboardType='numeric' name='montant' placeholder='montant'/>
                 <AppTimePicker label='Echeance' name='echeance'/>
                 <FormSubmitButton title='Ajouter'/>

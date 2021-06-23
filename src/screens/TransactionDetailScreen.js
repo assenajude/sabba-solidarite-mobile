@@ -50,7 +50,7 @@ function TransactionDetailScreen({route, navigation}) {
                 " Veuillez reessayer plutard ou nous contacter si l'erreur persiste.")
         }
         Alert.alert('Félicitation', "Votre transaction a été recue et est en cours de traitement. Cependant nous vous conseillons de consulter la note d'information.",
-            [{text: 'transactions', onPress: () => navigation.navigate(routes.TRANSACTION)}, {text: "informations", onPress: () => setNoteInfoModal(true)}])
+            [{text: 'transactions', onPress: () => navigation.navigate(routes.TRANSACTION, {screen: transactionInfos.isRetrait?'Retrait':'Depot'})}, {text: "informations", onPress: () => setNoteInfoModal(true)}])
     }
 
     useEffect(() => {

@@ -1,5 +1,4 @@
 import {createSlice} from "@reduxjs/toolkit";
-import api from "../middlewares/api";
 import {apiRequested} from "../actionsCreators/apiActionCreator";
 
 const informationSlice = createSlice({

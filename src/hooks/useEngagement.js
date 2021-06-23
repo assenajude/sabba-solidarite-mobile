@@ -1,9 +1,10 @@
 import {useDispatch, useSelector, useStore} from "react-redux";
 import {ToastAndroid} from "react-native";
 import {getEngagementById, getTranchePayed} from "../store/slices/engagementSlice";
-import {getConnectedMember, getSelectedAssociation} from "../store/slices/associationSlice";
+import {getSelectedAssociation} from "../store/slices/associationSlice";
 import useAuth from "./useAuth";
 import {getUserData} from "../store/slices/authSlice";
+import {getConnectedMemberUser} from "../store/slices/memberSlice";
 
 let useEngagement;
 export default useEngagement = () => {
@@ -68,8 +69,8 @@ export default useEngagement = () => {
             return alert("Impossible de procceder au payement, une erreur est apparue. Veuillez reessayer plutard.")
         }
         dispatch(getEngagementById({engagementId: engagementId}))
-        dispatch(getConnectedMember({associationId: currentAssociation.id, memberId: connectedMember().id}))
         dispatch(getSelectedAssociation({associationId: currentAssociation.id}))
+        dispatch(getConnectedMemberUser({associationId: currentAssociation.id}))
         dispatch(getUserData({userId: currentUser.id}))
         ToastAndroid.showWithGravity("Le payement a été effectué avec succès",
             ToastAndroid.CENTER,

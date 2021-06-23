@@ -35,8 +35,7 @@ function NewCotisationScreen(props) {
     })
 
     const handleAddCotisation = async (cotisation, {resetForm}) => {
-
-            const debut = cotisation.dateDebut.getTime()
+        const debut = cotisation.dateDebut.getTime()
             const fin = cotisation.dateFin.getTime()
 
              const data = {
@@ -56,7 +55,7 @@ function NewCotisationScreen(props) {
                  ToastAndroid.CENTER)
              return;
          }
-         ToastAndroid.showWithGravityAndOffset("Succès: cotisation payée",
+         ToastAndroid.showWithGravityAndOffset("Succès: cotisation ajoutée.",
              ToastAndroid.LONG,
              ToastAndroid.BOTTOM,
              40,
@@ -81,10 +80,10 @@ function NewCotisationScreen(props) {
                      onSubmit={handleAddCotisation}>
                 <FormItemPicker label='Type Cotisation: ' name='typeCotisation' data={['mensuel', 'exceptionnel']}/>
                 <AppFormField keyboardType='numeric' textAlign='center' width={200} name='montant' placeholder='montant'/>
-                <AppFormField name='motif'/>
+                <AppFormField name='motif' maxLength={50}/>
                 <AppTimePicker name='dateDebut' label='Date de debut'/>
                 <AppTimePicker name='dateFin' label='Date de fin'/>
-                <FormSubmitButton title='Cotiser'/>
+                <FormSubmitButton title='Ajouter'/>
             </AppForm>
         </ScrollView>
         </>

@@ -27,7 +27,7 @@ function MemberEngagementDetailScreen({route}) {
 
     const isLoading = useSelector(state => state.entities.engagement.loading)
     const creatorMember = useSelector(state => {
-        const membersList = state.entities.association.selectedAssociationMembers
+        const membersList = state.entities.member.list
         const selected = membersList.find(member => member.id === selectedEngagement.Creator.userId)
         return selected
     })

@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {View,TouchableOpacity,StyleSheet, ScrollView} from "react-native";
+import React, {useEffect, useState} from 'react';
+import {View, TouchableOpacity, StyleSheet, ScrollView, Alert} from "react-native";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../components/AppText";
@@ -17,6 +17,7 @@ import AssociationBackImage from "../components/association/AssociationBackImage
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import {getAvatarUpdate} from "../store/slices/associationSlice";
 import AppReglement from "../components/AppReglement";
+import {getLogout} from "../store/slices/authSlice";
 
 function DashboardScreen({navigation}) {
     const dispatch = useDispatch()
@@ -49,6 +50,27 @@ function DashboardScreen({navigation}) {
         }
         alert("Votre association a été mise à jour avec succsès.")
     }
+
+    useEffect(() => {
+        navigation.addListener('beforeRemove', (e) => {
+            // Prevent default behavior of leaving the screen
+            e.preventDefault();
+            Alert.alert(
+                'Alert!',
+                "Etes-vous sûr d'aller à l'accueil?",
+                [
+                    { text: "Non", style: 'cancel', onPress: () => {} },
+                    {
+                        text: 'Oui',
+                        style: 'destructive',
+                        onPress: () => {
+                            navigation.dispatch(e.data.action)
+                        },
+                    },
+                ]
+            );
+        })
+    }, [])
 
     return (
         <>
@@ -143,7 +165,7 @@ function DashboardScreen({navigation}) {
 
                 <View style={styles.linkContainer}>
                     <AppLinkButton label='Members'
-                                   labelLength={associationValidMembers()?.length}
+                                   labelLength={associationValidMembers().members?.length}
                                    onPress={() => navigation.navigate('Members')}/>
                     <AppLinkButton label='Cotisations'
                                    labelLength={getCurrentAssoCotisations()?.cotisLenght}

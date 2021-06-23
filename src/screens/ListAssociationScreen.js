@@ -1,4 +1,4 @@
-import React, {useEffect, useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {View, StyleSheet, FlatList} from "react-native";
 import useAuth from "../hooks/useAuth";
 import AppAddNewButton from "../components/AppAddNewButton";
@@ -9,22 +9,25 @@ import {getAllAssociation} from "../store/slices/associationSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AssociationItem from "../components/association/AssociationItem";
 import useManageAssociation from "../hooks/useManageAssociation";
-import {getMemberAssociations, sendAdhesionMessage} from "../store/slices/memberSlice";
+import {sendAdhesionMessage, getConnectedUserAssociations} from "../store/slices/memberSlice";
 import AppTextInput from "../components/AppTextInput";
 
-function ListAssociationScreen({navigation}) {
+function ListAssociationScreen({navigation, route}) {
+    const shouldUpdate = route.params?.updated
     const store = useStore()
     const {isAdmin} = useAuth()
-    const {getMemberRelationType, getAssociatonAllMembers} = useManageAssociation()
+    const {getMemberRelationType} = useManageAssociation()
     const dispatch = useDispatch()
 
     const connectedMember = useSelector(state => state.auth.user)
     const isLoadding = useSelector(state=> state.entities.association.loading)
     const isMemberLoading = useSelector(state => state.entities.member.loading)
+    const userAssociations = useSelector(state => state.entities.member.userAssociations)
 
     const [selectedList, setSelectedList] = useState([])
     const [searchLabel, setSearchLabel] = useState('')
     const [searching, setSearching] = useState(false)
+    const [updateList, setUpdateList] = useState(false)
 
     const handleSendAdhesionMessage = async(item) => {
         const data = {
@@ -33,34 +36,40 @@ function ListAssociationScreen({navigation}) {
             relation: 'onDemand'
         }
         await dispatch(sendAdhesionMessage(data))
-        await dispatch(getMemberAssociations())
         const error = store.getState().entities.member.error
         if(error !== null) {
            return  alert("Votre message n'a pas été envoyé, veuillez reessayer plutard.")
         }
     }
 
-    const getAssociationList = async () => {
-        if(!searching) {
-        await dispatch(getAllAssociation())
-        }
-        const associationList = store.getState().entities.association.list
-        if(searchLabel.length === 0) {
-            setSelectedList(associationList)
-        } else {
-            const filteredList = associationList.filter(association => {
-                const searchString = association.nom+' '+association.description
-                const normalizeInfos = searchString.toLowerCase()
-                const normalizeTerme = searchLabel.toLowerCase()
-                if(normalizeInfos.search(normalizeTerme) !== -1) return true
-            })
-            setSelectedList(filteredList)
-        }
-    }
+    const getAssociationList = useCallback(async () => {
+            if(!searching || updateList === true) {
+                await dispatch(getAllAssociation())
+                await dispatch(getConnectedUserAssociations())
+                setUpdateList(false)
+            }
+            const associationList = store.getState().entities.association.list
+            if(searchLabel.length === 0) {
+                setSelectedList(associationList)
+            } else {
+                const filteredList = associationList.filter(association => {
+                    const searchString = association.nom+' '+association.description
+                    const normalizeInfos = searchString.toLowerCase()
+                    const normalizeTerme = searchLabel.toLowerCase()
+                    if(normalizeInfos.search(normalizeTerme) !== -1) return true
+                })
+                setSelectedList(filteredList)
+            }
+
+    }, [searchLabel, shouldUpdate])
 
     useEffect(() => {
         getAssociationList()
-    }, [searchLabel])
+        const unsubscribe = navigation.addListener('focus', () => {
+            if(shouldUpdate) setUpdateList(true)
+        })
+        return () => unsubscribe
+    }, [searchLabel, updateList, navigation])
 
     return (
         <>
@@ -69,6 +78,7 @@ function ListAssociationScreen({navigation}) {
                 alignItems: 'center',
             }}>
                 <AppTextInput
+                    placeholder='nom ou description'
                     onChangeText={val => {
                         setSearching(true)
                         setSearchLabel(val)
@@ -93,7 +103,7 @@ function ListAssociationScreen({navigation}) {
                         association={item}
                         onPress={() => navigation.navigate(routes.ASSOCIATION_DETAILS,item)}
                         sendAdhesionMessage={() => handleSendAdhesionMessage(item)}
-                        isMember={getAssociatonAllMembers(item)?.some(member => member.userId === connectedMember.id)}
+                        isMember={userAssociations.some(ass => ass.id === item.id)}
                         relationType={getMemberRelationType(item)}
                     />}
             />}

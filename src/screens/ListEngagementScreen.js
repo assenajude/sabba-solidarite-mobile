@@ -30,7 +30,12 @@ function ListEngagementScreen({route, navigation}) {
     const memberEngagements = useSelector(state => {
         const list = state.entities.engagement.list
         const memberList = list.filter(engagement => engagement.creatorId === selectedMember.member.id)
-        const validList = memberList.filter(item => item.accord === true)
+        const validList = memberList.filter(item => {
+            const isAccord = item.accord === true
+            const isPaying = item.statut.toLowerCase() === 'paying'
+            const isEnded = item.statut.toLowerCase() === 'ended'
+            if(isAccord && isPaying || isEnded) return true
+        })
         return validList
     })
 

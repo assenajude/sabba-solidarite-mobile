@@ -6,6 +6,7 @@ import NewCotisationScreen from "../screens/NewCotisationScreen";
 import MemberCotisationScreen from "../screens/MemberCotisationScreen";
 import ListCotisationScreen from "../screens/ListCotisationScreen";
 import PayementCotisationScreen from "../screens/PayementCotisationScreen";
+import NavigHeaderButton from "../components/NavigHeaderButton";
 
 const CotisationNavig = createStackNavigator()
 
@@ -25,9 +26,12 @@ function CotisationNavigation(props) {
                                         title: 'Nouvelle cotisation'
                                     }}/>
             <CotisationNavig.Screen name='ListCotisation' component={ListCotisationScreen}
-                                    options={{
-                                        title: 'Liste des cotisations'
-                                    }}/>
+                                    options={({route, navigation}) => ({
+                                        title: 'Liste des cotisations',
+                                        headerLeft: () =>
+                                            <NavigHeaderButton
+                                                iconName='arrow-left' onPress={() => navigation.navigate('EtatCotisationScreen')}/>
+                                    })}/>
             <CotisationNavig.Screen name='PayementCotisation' component={PayementCotisationScreen}
                                     options={{
                                         title: 'Payement de cotisation'

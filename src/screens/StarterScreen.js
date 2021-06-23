@@ -1,8 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, StyleSheet, TouchableWithoutFeedback, FlatList, TouchableOpacity} from "react-native";
+import {View, StyleSheet, TouchableWithoutFeedback, FlatList, TouchableOpacity, Alert} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
-import * as Notifications from 'expo-notifications'
-
 import AppText from "../components/AppText";
 import {useDispatch, useSelector} from "react-redux";
 import routes from "../navigation/routes";
@@ -14,7 +12,7 @@ import useAuth from "../hooks/useAuth";
 import ListItemSeparator from "../components/ListItemSeparator";
 import useManageAssociation from "../hooks/useManageAssociation";
 import AppButton from "../components/AppButton";
-import {getNotificationTokenUpdate, getUserAllUsers} from "../store/slices/authSlice";
+import {getLogout, getNotificationTokenUpdate, getUserAllUsers} from "../store/slices/authSlice";
 import {getPopulateReseauList, getUserTransactions} from "../store/slices/transactionSlice";
 import {reseauData} from "../utilities/reseau.data";
 import useNotification from "../hooks/useNotification";
@@ -23,12 +21,12 @@ function StarterScreen({navigation}) {
     const dispatch = useDispatch()
     const {registerForPushNotificationsAsync} = useNotification()
     const {isAdmin, getInitAssociation} = useAuth()
-    const {getMemberRelationType, getAssociatonAllMembers} = useManageAssociation()
+    const {getMemberRelationType} = useManageAssociation()
 
     const currentUser = useSelector(state => state.auth.user)
     const assoLoading = useSelector(state => state.entities.association.loading)
     const memberLoading = useSelector(state => state.entities.member.loading)
-    const memberAssociations = useSelector(state => state.entities.member.memberAssociations)
+    const memberAssociations = useSelector(state => state.entities.member.userAssociations)
 
     const loading = assoLoading || memberLoading
 
@@ -43,13 +41,13 @@ function StarterScreen({navigation}) {
         dispatch(getUserTransactions({userId: currentUser.id}))
     }, [])
 
-    const handleGoToDashboard = (association) => {
+    const handleGoToDashboard = async (association) => {
         const isMember = getMemberRelationType(association).toLowerCase() === 'member'
         const isOnLeave = getMemberRelationType(association).toLowerCase() === 'onleave'
 
         if(isMember || isOnLeave || isAdmin()) {
         dispatch(setSelectedAssociation(association))
-            getInitAssociation(association)
+            await getInitAssociation(association)
             navigation.navigate('BottomTab')
         } else
             alert("Vous n'êtes pas encore membre de cette association")
@@ -69,13 +67,32 @@ function StarterScreen({navigation}) {
 
 
 
+
     useEffect(() => {
         getNotifToken()
         getInit()
         setTimeout(() => {
             setShowLinks(false)
         }, 2000)
-    }, [])
+        navigation.addListener('beforeRemove', (e) => {
+            e.preventDefault();
+            Alert.alert(
+                'Alert!',
+                'Etes-vous sûr de vous deconnecter?',
+                [
+                    { text: "Non", style: 'cancel', onPress: () => {} },
+                    {
+                        text: 'Me deconnecter',
+                        style: 'destructive',
+                        onPress: () => {
+                            dispatch(getLogout())
+                            navigation.dispatch(e.data.action)
+                        },
+                    },
+                ]
+            );
+        })
+    }, [navigation])
 
 
     return (
@@ -145,7 +162,7 @@ function StarterScreen({navigation}) {
             </View>
                 <ListItemSeparator/>
             {!assoLoading && !memberLoading && memberAssociations.length === 0 && <View style={styles.emptyStyle}>
-                <AppText style={{marginBottom: 10}}>Vous n'êtes membre d'aucune association</AppText>
+                <AppText style={{marginBottom: 10}}>Vous n'êtes pas encore membre d'associations.</AppText>
                 <AppButton
                     otherButtonStyle={{
                         width: 'auto',
@@ -165,7 +182,7 @@ function StarterScreen({navigation}) {
                         <AssociationItem
                             association={item}
                             relationType={getMemberRelationType(item)}
-                            isMember={getAssociatonAllMembers(item)?.some(member => member.userId === currentUser.id)}
+                            isMember={memberAssociations.some(association => association.id === item.id)}
                             onPress={() => handleGoToDashboard(item)}
                             nameStyle={{color: defaultStyles.colors.bleuFbi}}
                         />}

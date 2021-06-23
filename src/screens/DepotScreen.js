@@ -5,11 +5,12 @@ import ValidationTransactionItem from "../components/transaction/ValidationTrans
 import useTransaction from "../hooks/useTransaction";
 import ListItemSeparator from "../components/ListItemSeparator";
 import useAuth from "../hooks/useAuth";
-import {getUserTransactions, showTransactionMore} from "../store/slices/transactionSlice";
+import {getPopulateReseauList, getUserTransactions, showTransactionMore} from "../store/slices/transactionSlice";
 import routes from "../navigation/routes";
 import AppErrorOrEmptyScreen from "../components/AppErrorOrEmptyScreen";
 import AppAddNewButton from "../components/AppAddNewButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import {reseauData} from "../utilities/reseau.data";
 
 function DepotScreen({navigation}) {
     const dispatch = useDispatch()
@@ -27,8 +28,10 @@ function DepotScreen({navigation}) {
     const error = useSelector(state => state.entities.transaction.error)
 
     const getInitTransaction = useCallback(async () => {
+        await dispatch(getPopulateReseauList(reseauData))
         await dispatch(getUserTransactions({userId: currentUser.id}))
     }, [])
+
 
     useEffect(() => {
         getInitTransaction()

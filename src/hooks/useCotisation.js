@@ -5,16 +5,8 @@ import useAuth from "./useAuth";
 let useCotisation;
 export default useCotisation = () => {
     const {getConnectedMember} = useAuth()
-    const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const associationCotisations = useSelector(state => state.entities.cotisation.list)
     const listCotisations = useSelector(state => state.entities.member.membersCotisations)
-  /*  const currentMember = useSelector(state => {
-        let selectedMember
-        const list = state.entities.member.list
-        const user = state.auth.user
-         selectedMember = list.find(member => member.userId === user.id && member.associationId === currentAssociation.id)
-        return selectedMember
-    })*/
     const yearCotisations = useSelector(state => state.entities.member.memberYearCotisations)
 
     const getMonthString = (number) => {
@@ -107,9 +99,14 @@ export default useCotisation = () => {
 
     const notPayedCompter = (member) => {
         let compter = 0
-        const memberCotisation = listCotisations[member.id]
-        const notPayedArray = associationCotisations.filter(cotis => !memberCotisation.some(select => select.id === cotis.id))
-        if(notPayedArray && notPayedArray.length>0) compter = notPayedArray.length
+        if(member){
+            const memberCotisation = listCotisations[member.id]
+            if(memberCotisation) {
+            const notPayedArray = associationCotisations.filter(cotis => !memberCotisation.some(select => select.id === cotis.id))
+            if(notPayedArray && notPayedArray.length>0) compter = notPayedArray.length
+            }
+        }
+
         return compter
     }
 

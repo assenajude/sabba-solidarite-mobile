@@ -53,10 +53,10 @@ export const addNewCotisation =(data) => apiRequested({
     onError: cotisationRequestFailed.type
 })
 
-export const getAllCotisations = (associationId) => apiRequested({
-    url: url+'/all',
+export const getAssociationCotisations = (data) => apiRequested({
+    url: url+'/byAssociation',
     method: 'post',
-    data: associationId,
+    data,
     onStart: cotisationRequested.type,
     onSuccess: cotisationReceived.type,
     onError: cotisationRequestFailed.type
