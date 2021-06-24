@@ -31,11 +31,6 @@ const memberSlice = createSlice({
          state.error = null
          state.list = action.payload
         },
-        memberAssociationReceived: (state, action) => {
-            state.loading = false
-            state.error = null
-            state.memberAssociations=  action.payload
-        },
 
         memberAdded: (state, action) => {
             state.loading = false
@@ -117,6 +112,12 @@ const memberSlice = createSlice({
             state.loading = false
             state.error = null
             state.userAssociations = action.payload
+        },
+        memberDeleted: (state, action) => {
+         state.loading = false
+            state.error = null
+            const newState = state.list.filter(member => member.id !== action.payload.userId)
+            state.list = newState
         }
     }
 })
@@ -125,7 +126,7 @@ const {memberRequested, memberRequestFailed, userAssociationsReceived,
     memberAdded,updateOne, memberInfosReceived,
     allMembersReceived, memberCotisationPayed,
     membersCotisationReceived, showCotisationDetails,
-    showMonthDetail, selectYear, initTimeData} = memberSlice.actions
+    showMonthDetail, selectYear, initTimeData, memberDeleted} = memberSlice.actions
 export default memberSlice.reducer
 
 const url = '/members'
@@ -236,6 +237,24 @@ export const getConnectedMemberUser = (data) => apiRequested({
     data,
     onStart: memberRequested.type,
     onSuccess: updateOne.type,
+    onError: memberRequestFailed.type
+})
+
+export const getAssociationLeave = (data) => apiRequested({
+    url: url+'/leaveAssociation',
+    method: 'patch',
+    data,
+    onStart: memberRequested.type,
+    onSuccess: updateOne.type,
+    onError: memberRequestFailed.type
+})
+
+export const getMemberDelete = (data) => apiRequested({
+    url: url+'/deleteMember',
+    method: 'delete',
+    data,
+    onStart: memberRequested.type,
+    onSuccess: memberDeleted.type,
     onError: memberRequestFailed.type
 })
 

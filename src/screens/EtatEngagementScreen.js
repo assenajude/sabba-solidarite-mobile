@@ -26,7 +26,7 @@ function EtatEngagementScreen({navigation}) {
     const dispatch = useDispatch()
     const {getMemberUserCompte, dataSorter, getConnectedMember} = useAuth()
     const {formatFonds, associationValidMembers} = useManageAssociation()
-    const {getMemberEngagementInfos, handlePayTranche} = useEngagement()
+    const {getMemberEngagementInfos, handlePayTranche, getValidEngagementList} = useEngagement()
 
     const isLoading = useSelector(state => state.entities.engagement.loading)
 
@@ -39,7 +39,7 @@ function EtatEngagementScreen({navigation}) {
         return sortedList
     })
     const allTranches = useSelector(state => state.entities.engagement.tranches)
-    const [mainData, setMainData] = useState(engagements)
+    const [mainData, setMainData] = useState(getValidEngagementList())
     const [pickerValue, setPickerValue] = useState('all')
     const [editTrancheMontant, setEditTrancheMontant] = useState('')
 
@@ -49,7 +49,7 @@ function EtatEngagementScreen({navigation}) {
 
     const handleChangeContent = (value) => {
         if(value.toLowerCase() === 'member') setMainData(associationValidMembers().users)
-        else setMainData(engagements)
+        else setMainData(getValidEngagementList())
     }
 
     return (
@@ -77,7 +77,7 @@ function EtatEngagementScreen({navigation}) {
             }}>
                 <AppText>Aucun engagements trouvé</AppText>
             </View>}
-           {mainData.length>0 && <FlatList data={pickerValue.toLowerCase() === 'member'?associationValidMembers().users:engagements}
+           {mainData.length>0 && <FlatList data={pickerValue.toLowerCase() === 'member'?associationValidMembers().users:getValidEngagementList()}
                      keyExtractor={item => item.id.toString()}
                      ItemSeparatorComponent={ListItemSeparator}
                      renderItem={({item}) => {
@@ -111,7 +111,7 @@ function EtatEngagementScreen({navigation}) {
                                  dispatch(showEngagementTranches(item))
                              }}
                              engagement={item}
-                             selectedMember={getMemberUserCompte(item.Creator)}
+                             selectedMember={associationValidMembers().users.find(user => user.id === item.Creator.userId)}
                              engagementDetails={item.showDetail}
                              getEngagementDetails={() => handleEngagementDetails(item)}
                          />

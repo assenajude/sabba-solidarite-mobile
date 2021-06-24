@@ -8,7 +8,8 @@ const associationSlice = createSlice({
         error: null,
         list: [],
         selectedAssociation: {},
-        memberRoles: []
+        memberRoles: [],
+        editedRoleMessage: ''
     },
     reducers: {
         associationRequested: (state) => {
@@ -60,8 +61,7 @@ const associationSlice = createSlice({
         rolesEdited: (state, action) => {
             state.loading = false
             state.error = null
-            const editedIndex = state.memberRoles.findIndex(item => item.id === action.payload.id)
-            state.memberRoles[editedIndex] = action.payload
+            state.editedRoleMessage = action.payload.message
         }
 
     }

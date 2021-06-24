@@ -13,14 +13,15 @@ import useEngagement from "../hooks/useEngagement";
 import BackgroundWithAvatar from "../components/member/BackgroundWithAvatar";
 import useAuth from "../hooks/useAuth";
 import EditImagesModal from "../components/member/EditImagesModal";
+import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
 
 
 function MemberCompteScreen({navigation}) {
 
-    const {isModerator, getConnectedMember,isAdmin} = useAuth()
+    const {isModerator, getConnectedMember,isAdmin, getMemberUserCompte} = useAuth()
     const {getMemberCotisations} = useCotisation()
     const {getMemberEngagementInfos} = useEngagement()
-    const {formatFonds, formatDate} = useManageAssociation()
+    const {formatFonds, formatDate, leaveAssociation} = useManageAssociation()
 
     const [editImages, setEditImages] = useState(false)
 
@@ -32,9 +33,22 @@ function MemberCompteScreen({navigation}) {
                 <BackgroundWithAvatar
                     onChangeImages={() => setEditImages(true)
                     }
-                    selectedMember={getConnectedMember()}
+                    selectedMember={getMemberUserCompte()}
                     showCamera={true}
                 />
+                <View style={{
+                    alignItems: 'flex-end',
+                    marginVertical: 20,
+                    marginTop: 40,
+                    marginHorizontal: 10
+                }}>
+                    <AppIconWithLabelButton
+                        onPress={() => leaveAssociation(getMemberUserCompte())}
+                        labelStyle={{color: defaultStyles.colors.rougeBordeau}}
+                        iconColor={defaultStyles.colors.rougeBordeau}
+                        iconName='account-minus'
+                        label='quitter'/>
+                </View>
                 <View style={styles.statut}>
                     <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 22, fontWeight: 'bold'}}>{getConnectedMember()?.statut}</AppText>
                 </View>

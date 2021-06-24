@@ -63,7 +63,7 @@ function AssociationNavigator(props) {
                     title: 'nouvelle information'
                 }}/>
                 <AssocNavig.Screen name='NouvelleAdhesionScreen' component={NouvelleAdhesionScreen} options={{
-                    title: 'Liste des nouvelles adhesion'
+                    title: 'Etat adhésion membre'
                 }}/>
         </AssocNavig.Navigator>
 

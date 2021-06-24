@@ -16,6 +16,7 @@ import {getLogout, getNotificationTokenUpdate, getUserAllUsers} from "../store/s
 import {getPopulateReseauList, getUserTransactions} from "../store/slices/transactionSlice";
 import {reseauData} from "../utilities/reseau.data";
 import useNotification from "../hooks/useNotification";
+import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
 
 function StarterScreen({navigation}) {
     const dispatch = useDispatch()
@@ -115,48 +116,26 @@ function StarterScreen({navigation}) {
                     marginVertical:20,
                      marginHorizontal: 10
                 }}>
-                    <TouchableWithoutFeedback onPress={() => navigation.navigate(routes.USER_COMPTE, currentUser)}>
-                        <View style={{
-                            flexDirection: 'row',
-                            alignItems: 'center'
-                        }}>
-                            <MaterialCommunityIcons name='account' color="black" size={24}/>
-                        <AppText style={{color: defaultStyles.colors.bleuFbi, marginLeft: 5}}>Mon compte</AppText>
-                        </View>
-                    </TouchableWithoutFeedback>
-                     <TouchableWithoutFeedback onPress={() => navigation.navigate(routes.TRANSACTION)}>
-                         <View style={{
-                             flexDirection: 'row',
-                             alignItems: 'center'
-                         }}>
-                             <MaterialCommunityIcons name="credit-card-multiple" size={24} color="black" />
-                             <AppText style={{color:defaultStyles.colors.bleuFbi, marginLeft: 5}}>Mes transactions</AppText>
+                    <AppIconWithLabelButton
+                        onPress={() => navigation.navigate(routes.USER_COMPTE, currentUser)}
+                        label='Mon compte'/>
 
-                         </View>
-                     </TouchableWithoutFeedback>
+                    <AppIconWithLabelButton
+                        iconName='credit-card-multiple'
+                        onPress={() => navigation.navigate(routes.TRANSACTION)}
+                        label='Transactions'/>
 
                 </View>
                     <View style={{alignItems: 'center',flexDirection: 'row',justifyContent: 'space-between',marginHorizontal:10,marginBottom: 20}}>
-                        <TouchableWithoutFeedback onPress={() => navigation.navigate(routes.ASSOCIATION_LIST)}>
-                            <View style={{
-                                flexDirection: 'row',
-                                alignItems: 'center'
-                            }}>
-                                <MaterialCommunityIcons name='account-group' color="black" size={24}/>
-                                <AppText style={{color: defaultStyles.colors.bleuFbi, marginLeft: 5}}>Associations</AppText>
-                            </View>
-                        </TouchableWithoutFeedback>
+                        <AppIconWithLabelButton
+                            iconName='account-group'
+                            label='Associations'
+                            onPress={() => navigation.navigate(routes.ASSOCIATION_LIST)}/>
 
-                        <TouchableWithoutFeedback onPress={() => navigation.navigate(routes.HELP)}>
-                            <View style={{
-                                flexDirection: 'row',
-                                alignItems: 'center'
-                            }}>
-                                <MaterialCommunityIcons name="help-circle" size={24} color="black" />
-                                <AppText style={{color:defaultStyles.colors.bleuFbi, marginLeft: 5}}>Nous contacter</AppText>
-
-                            </View>
-                        </TouchableWithoutFeedback>
+                        <AppIconWithLabelButton
+                            label='Nous contacter'
+                            onPress={() => navigation.navigate(routes.HELP)}
+                            iconName='help-circle'/>
                     </View>
                 </View>}
             </View>

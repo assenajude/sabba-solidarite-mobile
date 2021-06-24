@@ -12,6 +12,8 @@ import useManageAssociation from "../hooks/useManageAssociation";
 import ListItemSeparator from "../components/ListItemSeparator";
 import useAuth from "../hooks/useAuth";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import {getAssociationCotisations} from "../store/slices/cotisationSlice";
+import {getEngagementsByAssociation} from "../store/slices/engagementSlice";
 
 function NouvelleAdhesionScreen({navigation}) {
     const dispatch = useDispatch()
@@ -19,7 +21,7 @@ function NouvelleAdhesionScreen({navigation}) {
     const {isAdmin, isModerator} = useAuth()
     const isAuthorized = isModerator() || isAdmin()
 
-    const {getNewAdhesion} = useManageAssociation()
+    const {getNewAdhesion, deleteMember} = useManageAssociation()
 
     const selectedAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const associationLoading = useSelector(state => state.entities.association.loading)
@@ -30,14 +32,18 @@ function NouvelleAdhesionScreen({navigation}) {
         await dispatch(respondToAdhesionMessage({
             userId: member.id,
             associationId:  selectedAssociation.id,
-            adminResponse: response
+            adminResponse: response,
+            info: member.member.statut.toLowerCase() === 'new'?"new":'old'
         }))
         const error = store.getState().entities.member.error
         if(error !== null) {
-            return alert("Erreur: impossible d'ajouter le membre")
+            return alert("Erreur: Nous avons rencontré une erreur, veuillez reessayer plutard.")
         }
-        dispatch(getMemberRolesEdited({memberId: member.member.id}))
         dispatch(getSelectedAssociationMembers({associationId: selectedAssociation.id}))
+        if(response === 'rejected') {
+            dispatch(getAssociationCotisations({associationId: selectedAssociation.id}))
+            dispatch(getEngagementsByAssociation({associationId: selectedAssociation.id}))
+        }
         return alert(response === 'member'?"Membre ajouté avec succès." : "La reponse de reject a été envoyée au demandeur.")
     }
 
@@ -61,6 +67,10 @@ function NouvelleAdhesionScreen({navigation}) {
                keyExtractor={item => item.id.toString()}
                renderItem={({item}) =>
                    <MemberListItem
+                       deleteMember={() => deleteMember(item)}
+                       showMemberState={true}
+                       label={item.member.statut?.toLowerCase() === 'new'?"refusé":"quitté"}
+                       notMember={item.member?.relation.toLowerCase() === 'rejected'}
                        getMemberDetails={() => navigation.navigate('Members',{screen: 'MemberDetails', params: item})} selectedMember={item}
                        renderRightActions={() => isAuthorized?<AppSwiper>
                            <TouchableOpacity onPress={() => handleRespondToDemand(item, 'member')}>

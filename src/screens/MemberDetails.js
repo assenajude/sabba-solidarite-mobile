@@ -12,38 +12,61 @@ import useEngagement from "../hooks/useEngagement";
 import useAuth from "../hooks/useAuth";
 import EditRolesModal from "../components/member/EditRolesModal";
 import AppLabelWithValue from "../components/AppLabelWithValue";
+import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
 
 
 function MemberDetails({route, navigation}) {
     const selectedMember = route.params
 
-    const {isAdmin, isModerator} = useAuth()
+    const {isAdmin, isModerator, getMemberUserCompte} = useAuth()
     const {getMemberCotisations} = useCotisation()
     const {getMemberEngagementInfos} = useEngagement()
-    const {formatFonds, formatDate} = useManageAssociation()
+    const {formatFonds, formatDate, leaveAssociation} = useManageAssociation()
 
     const [editRoles, setEditRoles] = useState(false)
 
     const isAuthorized = isAdmin() || isModerator()
-
+    const isTheSameUser = getMemberUserCompte().id === selectedMember.id
+    const canQuitMember = isAuthorized || isTheSameUser
 
     return (
         <>
         <ScrollView contentContainerStyle={{paddingBottom: 20}}>
             <BackgroundWithAvatar selectedMember={selectedMember}/>
-            {isAuthorized && <TouchableWithoutFeedback
-                onPress={() => navigation.navigate(routes.EDIT_MEMBER, selectedMember)}>
-                <View style={styles.editAccount}>
-                    <MaterialCommunityIcons name="account-edit" size={24} color={defaultStyles.colors.rougeBordeau} />
-                </View>
-            </TouchableWithoutFeedback>}
-            {isAdmin() && <TouchableWithoutFeedback
-                onPress={() => setEditRoles(true)}>
-                <View style={[styles.editAccount, {flexDirection: 'row', top: 150}]}>
-                    <MaterialCommunityIcons name="account-edit" size={24} color={defaultStyles.colors.rougeBordeau} />
-                    <AppText style={{color: defaultStyles.colors.rougeBordeau}}>edit roles</AppText>
-                </View>
-            </TouchableWithoutFeedback>}
+            <View
+                style={{
+                    alignItems: 'flex-end',
+                    marginRight: 10
+                }}>
+            {isAuthorized &&
+           <AppIconWithLabelButton
+               buttonContainerStyle={{
+               marginVertical: 10
+               }}
+               labelStyle={{color: defaultStyles.colors.rougeBordeau}}
+               onPress={() => navigation.navigate(routes.EDIT_MEMBER, selectedMember)}
+               iconName='account-edit'
+               iconColor={defaultStyles.colors.rougeBordeau}
+               label='edit member'/>
+            }
+            {isAdmin() &&
+           <AppIconWithLabelButton
+
+               iconColor={defaultStyles.colors.rougeBordeau}
+               label='edit roles'
+               onPress={() => setEditRoles(true)}
+               iconName='account-edit'
+               labelStyle={{color: defaultStyles.colors.rougeBordeau}}/>
+            }
+                {canQuitMember &&
+                <AppIconWithLabelButton
+                    buttonContainerStyle={{marginTop: 10}}
+                    onPress={() => leaveAssociation(selectedMember)}
+                    iconColor={defaultStyles.colors.rougeBordeau}
+                    iconName='account-minus'
+                    label='quitter'
+                    labelStyle={{color: defaultStyles.colors.rougeBordeau}}/>}
+            </View>
             <View style={styles.statut}>
                 <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 20, fontWeight: 'bold'}}>{selectedMember.member.statut}</AppText>
             </View>

@@ -20,7 +20,9 @@ function MembersListScreen({navigation}) {
                       keyExtractor={item => item.id.toString()}
                      ItemSeparatorComponent={ListItemSeparator}
                       renderItem={({item}) =>
-                          <MemberListItem selectedMember={item}
+                          <MemberListItem
+                              showMemberState={true}
+                              selectedMember={item}
                               childrenStyle={{top: 30}}
                               getMemberDetails={() => navigation.navigate('MemberDetails', item)}>
                               <AppText>{item.member.statut}</AppText>

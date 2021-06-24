@@ -53,7 +53,7 @@ function NewEngagementList({navigation}) {
         dispatch(getSelectedAssociation({associationId: currentAssociation.id}))
         dispatch(getConnectedMemberUser({associationId: currentAssociation.id}))
         dispatch(getEngagementsByAssociation({associationId: currentAssociation.id}))
-        dispatch(getUserData({userId: connectedMember().id}))
+        dispatch(getUserData({userId: getMemberUserCompte().id}))
 
     }
 

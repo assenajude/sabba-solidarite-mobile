@@ -5,12 +5,14 @@ import {getSelectedAssociation} from "../store/slices/associationSlice";
 import useAuth from "./useAuth";
 import {getUserData} from "../store/slices/authSlice";
 import {getConnectedMemberUser} from "../store/slices/memberSlice";
+import useManageAssociation from "./useManageAssociation";
 
 let useEngagement;
 export default useEngagement = () => {
     const store = useStore()
     const dispatch = useDispatch()
-    const {getConnectedMember: connectedMember} = useAuth()
+    const {associationValidMembers} = useManageAssociation()
+    const {dataSorter} = useAuth()
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const currentUser = useSelector(state => state.auth.user)
     const listEngagement = useSelector(state => state.entities.engagement.list)
@@ -84,5 +86,16 @@ export default useEngagement = () => {
         return engageTranches
     }
 
-    return {getMemberEngagementInfos, getAssociationEngagementTotal, getEngagementVotesdData, handlePayTranche, getEngagementTranches}
+    const getValidEngagementList = () => {
+        const validList = listEngagement.filter(engage => {
+            const isEngageValid = engage.accord === true && engage.statut === 'paying' || engage.statut === 'ended'
+            const isMemberValid = associationValidMembers().users.some(member => member.id === engage.Creator.userId)
+            if(isEngageValid && isMemberValid) return true
+        })
+        const sortedList = dataSorter(validList)
+        return sortedList
+    }
+
+    return {getMemberEngagementInfos, getAssociationEngagementTotal,
+        getEngagementVotesdData, handlePayTranche, getEngagementTranches, getValidEngagementList}
 }

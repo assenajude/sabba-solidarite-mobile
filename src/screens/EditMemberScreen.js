@@ -7,7 +7,6 @@ import {useDispatch, useSelector, useStore} from "react-redux";
 import {addNewMember, getUpdateOneMember} from "../store/slices/memberSlice";
 import AppTimePicker from "../components/AppTimePicker";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import {getSelectedAssociationMembers} from "../store/slices/associationSlice";
 
 const validMember = Yup.object().shape({
     statut: Yup.string(),
@@ -38,7 +37,6 @@ function EditMemberScreen({route, navigation}) {
         if (error !== null) {
             return alert('error: impossible de sauvegarder vos données.')
         }else {
-            dispatch(getSelectedAssociationMembers({associationId: currentAssociation.id}))
             ToastAndroid.showWithGravityAndOffset(
                 'Données sauvegardées avec succès',
                 ToastAndroid.LONG,

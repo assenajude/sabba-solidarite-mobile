@@ -61,7 +61,7 @@ function ListAssociationScreen({navigation, route}) {
                 setSelectedList(filteredList)
             }
 
-    }, [searchLabel, shouldUpdate])
+    }, [searchLabel, shouldUpdate, navigation])
 
     useEffect(() => {
         getAssociationList()

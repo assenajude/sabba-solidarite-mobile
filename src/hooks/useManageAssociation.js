@@ -1,12 +1,15 @@
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector, useStore} from "react-redux";
 import dayjs from "dayjs";
-import useAuth from "./useAuth";
+import {Alert} from "react-native";
+import {getAssociationLeave, getMemberDelete} from "../store/slices/memberSlice";
+import {getEngagementsByAssociation} from "../store/slices/engagementSlice";
+import {getAssociationCotisations} from "../store/slices/cotisationSlice";
 
 let useManageAssociation;
 export default useManageAssociation = () => {
-    const {validMembers} = useAuth()
+    const store = useStore()
+    const dispatch = useDispatch()
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
-    const connectedMember = useSelector(state => state.auth.user)
         const engagementsList = useSelector(state => state.entities.engagement.list)
     const associationMembers = useSelector(state => state.entities.member.list)
     const userAssociations = useSelector(state => state.entities.member.userAssociations)
@@ -46,9 +49,10 @@ export default useManageAssociation = () => {
             const adhesionList = associationMembers.filter(item => {
                 const isNew = item.member.relation.toLowerCase() === 'ondemand'
                 const isRejected = item.member.relation.toLowerCase() === 'rejected'
-                if(isNew || isRejected) return true
+                const isLeaving = item.member.relation.toLowerCase() === 'onleave'
+                if(isNew || isRejected || isLeaving) return true
             })
-            return adhesionList
+        return adhesionList
     }
 
     const getManagedAssociationFund = () => {
@@ -87,6 +91,39 @@ export default useManageAssociation = () => {
         return number
     }
 
-    return {getMemberRelationType, formatFonds,votorsNumber,
+    const leaveAssociation = (member) => {
+        Alert.alert("Attention!", "Voulez-vous quitter definitivement l'associaiton?", [{
+            text: 'non', onPress: () => {return;}
+        }, {
+            text: 'oui', onPress: async () => {
+                await dispatch(getAssociationLeave({associationId: currentAssociation.id, userId: member.id}))
+                const error = store.getState().entities.member.error
+                if(error !== null) {
+                    return  alert("Une erreur est apparue, veuillez reessayer plutard.")
+                }
+                alert(`votre demande de quitter l'association ${currentAssociation.nom} est en cours de traitement.`)
+            }
+        }] )
+
+    }
+
+    const deleteMember = (member) => {
+        Alert.alert("Attention", "Etes-vous sûr de supprimer definitivement ce membre? Cette operation est irreversible, voulez-vous vraiment?", [{
+            text: 'non', onPress: () => {return;}
+        }, {
+            text: 'oui', onPress: async() => {
+                await dispatch(getMemberDelete({memberId: member.member.id, associationId: currentAssociation.id}))
+                const error = store.getState().entities.member.error
+                if(error !== null)  {
+                    return alert("Impossible de faire la suppression, une erreur est apparue.")
+                }
+                dispatch(getEngagementsByAssociation({associationId: currentAssociation.id}))
+                dispatch(getAssociationCotisations({associationId: currentAssociation.id}))
+                alert("Le membre a été supprimé avec succès.")
+            }
+        }])
+    }
+
+    return {getMemberRelationType, formatFonds,votorsNumber,leaveAssociation, deleteMember,
         formatDate, associationValidMembers, getNewAdhesion, getManagedAssociationFund}
 }
