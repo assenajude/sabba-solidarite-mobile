@@ -62,10 +62,9 @@ export default useNotification = () => {
             if (isUserConnected) {
             const transactionList = store.getState().entities.transaction.list
             const selectedTransaction = transactionList.find(transac => transac.id === data.transactionId)
-                navigation.navigate("Starter", {
-                    screen: 'ValidationTransacDetail',
-                    params: selectedTransaction
-                })
+                navigation.navigate("Starter",{
+                    screen: "ValidationTransacDetail",
+                    params: selectedTransaction})
             }
             else {
                 routeParams = {
@@ -80,7 +79,7 @@ export default useNotification = () => {
         }
         if(notifType === 'cotisation') {
             if(isUserConnected) {
-                const listAssociations = store.getState().entities.member.memberAssociations
+                const listAssociations = store.getState().entities.association.list
                 const currentAssociation = listAssociations.find(asso => asso.id === data.associationId)
                 dispatch(setSelectedAssociation(currentAssociation))
                 await getInitAssociation(currentAssociation)
@@ -95,7 +94,7 @@ export default useNotification = () => {
         }
         if(notifType === 'engagement') {
             if(isUserConnected) {
-                const listAssociations = store.getState().entities.member.memberAssociations
+                const listAssociations = store.getState().entities.association.list
                 const currentAssociation = listAssociations.find(asso => asso.id === data.associationId)
                 dispatch(setSelectedAssociation(currentAssociation))
                await getInitAssociation(currentAssociation)

@@ -8,6 +8,7 @@ import FormItemPicker from "../components/form/FormItemPicker";
 import useManageAssociation from "../hooks/useManageAssociation";
 import {getEngagementUpdate} from "../store/slices/engagementSlice";
 import {getSelectedAssociation} from "../store/slices/associationSlice";
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 const validEngagement = Yup.object().shape({
     libelle: Yup.string(),
@@ -20,6 +21,7 @@ function EditEngagementScreen({route, navigation}) {
     const {formatFonds} = useManageAssociation()
 
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
+    const isLoading = useSelector(state => state.entities.engagement.loading)
 
     const handleUpdateEngagement = async (engagement) => {
         const montant = selectedEngagement.montant
@@ -43,6 +45,8 @@ function EditEngagementScreen({route, navigation}) {
     }
 
     return (
+        <>
+            <AppActivityIndicator visible={isLoading}/>
         <View style={{
             alignItems: 'center',
             marginHorizontal: 20,
@@ -60,6 +64,7 @@ function EditEngagementScreen({route, navigation}) {
                 <FormSubmitButton title='Valider'/>
             </AppForm>
         </View>
+            </>
     );
 }
 

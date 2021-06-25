@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback,  useState} from 'react';
 import {View, ScrollView, StyleSheet, BackHandler} from "react-native";
 import {useFocusEffect} from "@react-navigation/native";
 import AppText from "../components/AppText";
@@ -43,6 +43,9 @@ function ValidationTransacDetailScreen({route, navigation}) {
                 <AppText style={{fontWeight: 'bold'}}>{selectedTransaction.number}</AppText>
             </View>
             </View>
+            <View style={{
+                marginHorizontal: 20
+            }}>
             <AppSimpleLabelWithValue label='Montant' labelValue={formatFonds(selectedTransaction.montant)}/>
             <AppSimpleLabelWithValue label='Numero' labelValue={selectedTransaction.numero}/>
             <AppSimpleLabelWithValue
@@ -52,13 +55,14 @@ function ValidationTransacDetailScreen({route, navigation}) {
                 <AppSimpleLabelWithValue
                     label='Statut'
                     valueStyle={{color: selectedTransaction.statut.toLowerCase() ==='processing'? defaultStyles.colors.leger : selectedTransaction.statut.toLowerCase() === 'succeeded'? defaultStyles.colors.vert : defaultStyles.colors.rougeBordeau}}
-                    labelValue={selectedTransaction.statut.toLowerCase() ==='processing'? 'en cours de traitement' : selectedTransaction.statut.toLowerCase() === 'succeed'?'terminée avec succès' : 'échec'}/>
+                    labelValue={selectedTransaction.statut.toLowerCase() ==='processing'? 'en cours de traitement' : selectedTransaction.statut.toLowerCase() === 'succeeded'?'terminée avec succès' : 'échec'}/>
                 <MemberItem
                     getMemberDetails={() => navigation.navigate(routes.USER_COMPTE, selectedTransaction.user)}
                     avatarStyle={{
                     marginVertical: 20
                 }}
                     selectedMember={selectedTransaction.user} showPhone={true}/>
+            </View>
         </ScrollView>
                 {isAdmin() && <View style={styles.editTransaction}>
                     <AppAddNewButton onPress={() => navigation.navigate(routes.EDITI_TRANSACTION, selectedTransaction)} name='account-edit'/>

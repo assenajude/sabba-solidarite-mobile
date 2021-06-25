@@ -102,7 +102,7 @@ function NewEngagementList({navigation}) {
                    <EngagementItem
                        deleteEngagement={() => handleDeleteEngagement(item)}
                        editEngagement={() => navigation.navigate('EditEngagementScreen', item)}
-                       onWaiting={item.statut === 'pending' || item.statut === 'rejected'}
+                       onWaiting={item.statut.toLowerCase() === 'pending' || item.statut.toLowerCase() === 'rejected'}
                        getMembersDatails={() => navigation.navigate('Members',{screen: 'MemberDetails', params: getMemberUserCompte(item.Creator)})}
                        getMoreDetails={() => dispatch(getEngagementDetail(item))}
                        renderRightActions={() => <View>

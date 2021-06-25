@@ -61,7 +61,7 @@ function LoginScreen({navigation, route}) {
         if(whereToGo) {
             let currentParams
             const currentType = whereToGo.otherParams.type
-            const otherParamId = whereToGo.otherParams
+            const otherParamId = whereToGo.otherParams.id
             if(currentType === 'adhesion'){
                 await dispatch(getAllAssociation())
                 const associationList = store.getState().entities.association.list
@@ -75,8 +75,8 @@ function LoginScreen({navigation, route}) {
                 currentParams = lisTransactions.find(transac => transac.id === otherParamId)
             }
             if(currentType === 'cotisation' || currentType === 'engagement') {
-                await dispatch(getSelectedAssociationMembers({associationId: otherParamId}))
-                const listAssociations = store.getState().entities.member.memberAssociations
+                await dispatch(getAllAssociation())
+                const listAssociations = store.getState().entities.association.list
                 const currentAssociation = listAssociations.find(asso => asso.id === otherParamId)
                 dispatch(setSelectedAssociation(currentAssociation))
                 await getInitAssociation(currentAssociation)
