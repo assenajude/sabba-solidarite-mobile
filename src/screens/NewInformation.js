@@ -1,5 +1,5 @@
 import React from 'react';
-import {ScrollView, Alert, ToastAndroid} from "react-native";
+import {ScrollView, ToastAndroid} from "react-native";
 import * as Yup from 'yup'
 import {AppForm, AppFormField, FormSubmitButton} from "../components/form";
 import AppTimePicker from "../components/AppTimePicker";

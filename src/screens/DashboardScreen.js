@@ -17,7 +17,6 @@ import AssociationBackImage from "../components/association/AssociationBackImage
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import {getAvatarUpdate} from "../store/slices/associationSlice";
 import AppReglement from "../components/AppReglement";
-import {getLogout} from "../store/slices/authSlice";
 
 function DashboardScreen({navigation}) {
     const dispatch = useDispatch()

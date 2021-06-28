@@ -9,7 +9,8 @@ const associationSlice = createSlice({
         list: [],
         selectedAssociation: {},
         memberRoles: [],
-        editedRoleMessage: ''
+        editedRoleMessage: '',
+        deleteSuccess: false
     },
     reducers: {
         associationRequested: (state) => {
@@ -19,6 +20,7 @@ const associationSlice = createSlice({
         associationRequestFailed: (state, action) => {
             state.loading = false
             state.error = action.payload
+            state.deleteSuccess = false
         },
         associationReceived: (state, action) => {
             state.loading = false
@@ -62,6 +64,13 @@ const associationSlice = createSlice({
             state.loading = false
             state.error = null
             state.editedRoleMessage = action.payload.message
+        },
+        associationDeleted : (state, action) => {
+            state.loading = false
+            state.error = null
+            state.deleteSuccess = true
+            const newList = state.list.filter(ass => ass.id !== action.payload.associationId)
+            state.list = newList
         }
 
     }
@@ -70,7 +79,7 @@ const associationSlice = createSlice({
 const {associationAdded, associationReceived,
     associationRequested, associationRequestFailed,
     selectedAssociationSet, memberRolesReceived,
-    rolesEdited, associationUpdated} = associationSlice.actions
+    rolesEdited, associationUpdated, associationDeleted} = associationSlice.actions
 
 export default associationSlice.reducer
 
@@ -137,6 +146,15 @@ export const getReglementUpdate = (data) => apiRequested({
     method: 'post',
     onStart: associationRequested.type,
     onSuccess: associationUpdated.type,
+    onError: associationRequestFailed.type
+})
+
+export const getAssociationDelete = (data) => apiRequested({
+    url:url+'/deleteOne',
+    data,
+    method: 'delete',
+    onStart: associationRequested.type,
+    onSuccess: associationDeleted.type,
     onError: associationRequestFailed.type
 })
 

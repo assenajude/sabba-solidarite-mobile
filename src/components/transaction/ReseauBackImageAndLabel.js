@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, ScrollView, View} from "react-native";
+import {Image, View} from "react-native";
 import AppText from "../AppText";
 
 function ReseauBackImageAndLabel({reseauName, reseauImage}) {

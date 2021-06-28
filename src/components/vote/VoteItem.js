@@ -3,7 +3,6 @@ import {TouchableOpacity, View, StyleSheet} from "react-native";
 import AppText from "../AppText";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import defaultStyles from "../../utilities/styles";
-import {useSelector} from "react-redux";
 import useManageAssociation from "../../hooks/useManageAssociation";
 
 function VoteItem({allVoted, handleVoteUp, upVotes,handleVoteDown, downVotes}) {

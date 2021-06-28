@@ -16,7 +16,6 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function AssociationDetailScreen({route, navigation}) {
     const selectedAssociation = route.params
-    const currentUser = useSelector(state => state.auth.user)
     const store = useStore()
     const dispatch = useDispatch()
     const {formatFonds} = useManageAssociation()

@@ -1,6 +1,11 @@
+import React from 'react'
 import {useDispatch, useSelector, useStore} from "react-redux";
-import {ToastAndroid} from "react-native";
-import {getEngagementById, getTranchePayed} from "../store/slices/engagementSlice";
+import {ToastAndroid, Alert} from "react-native";
+import {
+    getEngagementById,
+    getEngagementDelete,
+    getTranchePayed
+} from "../store/slices/engagementSlice";
 import {getSelectedAssociation} from "../store/slices/associationSlice";
 import useAuth from "./useAuth";
 import {getUserData} from "../store/slices/authSlice";
@@ -96,6 +101,30 @@ export default useEngagement = () => {
         return sortedList
     }
 
-    return {getMemberEngagementInfos, getAssociationEngagementTotal,
+    const deleteEngagement = (engage) => {
+        if(engage.statut.toLowerCase() === 'paying') {
+            return alert("Vous n'êtes pas autorisés à supprimer cet engagement, il est encours de payement.")
+        } else {
+            Alert.alert("Attention!", "Voulez-vous supprimer cet engagement definitivement?", [{
+                text: 'non', onPress: () => {return;}
+            }, {
+                text: 'oui', onPress: async() => {
+                    await dispatch(getEngagementDelete({engagementId: engage.id}))
+                    const error = store.getState().entities.engagement.error
+                    if(error !== null) {
+                        ToastAndroid.showWithGravity("Error: lors de la suppression, veuillez reessayer plutard.",
+                            ToastAndroid.LONG,
+                            ToastAndroid.CENTER)
+                    }else {
+                        ToastAndroid.showWithGravity("Engagement supprimé avec succès.",
+                            ToastAndroid.LONG,
+                            ToastAndroid.CENTER)
+                    }
+                }
+            }])
+        }
+    }
+
+    return {getMemberEngagementInfos, getAssociationEngagementTotal,deleteEngagement,
         getEngagementVotesdData, handlePayTranche, getEngagementTranches, getValidEngagementList}
 }

@@ -15,7 +15,7 @@ import AppErrorOrEmptyScreen from "../components/AppErrorOrEmptyScreen";
 function ListCotisationScreen({navigation}) {
     const dispatch = useDispatch()
     const {isModerator, isAdmin, dataSorter} = useAuth()
-    const {isCotisationPayed} = useCotisation()
+    const {isCotisationPayed, deleteCotisation} = useCotisation()
     const isAuthorized = isAdmin() || isModerator()
     const listCotisations = useSelector(state => {
         let cotisations = []
@@ -26,7 +26,7 @@ function ListCotisationScreen({navigation}) {
         const  cotisationSorted = dataSorter(cotisations)
         return cotisationSorted
     })
-    const isLoading = useSelector(state => state.entities.member.loading)
+    const isLoading = useSelector(state => state.entities.cotisation.loading)
 
 
     const handleShowLessDetails = (cotisation) => {
@@ -44,10 +44,11 @@ function ListCotisationScreen({navigation}) {
                 ItemSeparatorComponent={ListItemSeparator}
                 renderItem={({item}) =>
                     <ListCotisationItem
+                        deleteSelected={() => deleteCotisation(item.id)}
+                        editSelected={() => navigation.navigate(routes.NEW_COTISATION, {...item, editing: true})}
                         isPayed={isCotisationPayed(item)}
                         payCotisation={() => {
                             navigation.navigate('PayementCotisation', item)
-
                         }
                         }
                         showCotisationLessDetail={() => handleShowLessDetails(item)}

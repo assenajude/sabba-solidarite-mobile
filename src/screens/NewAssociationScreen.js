@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {ScrollView,} from "react-native";
 import * as Yup from 'yup'
 import {AppForm, AppFormField, FormSubmitButton} from '../components/form'
-import {addNewAssociation, getAllAssociation} from "../store/slices/associationSlice";
+import {addNewAssociation} from "../store/slices/associationSlice";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import FormImagePicker from "../components/form/FormImagePicker";
 import AppUploadModal from "../components/AppUploadModal";

@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from 'react';
-import {ScrollView, View,FlatList, StyleSheet} from "react-native";
+import {ScrollView, View,FlatList} from "react-native";
 import {useDispatch, useSelector} from "react-redux";
 
 import {initYears} from '../utilities/years'

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {View, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Alert, Image} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../components/AppText";

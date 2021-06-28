@@ -1,6 +1,6 @@
 import React from 'react';
-import routes from "../navigation/routes";
 import {TouchableWithoutFeedback, View} from "react-native";
+
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import defaultStyles from "../utilities/styles";
 import AppText from "./AppText";

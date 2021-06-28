@@ -8,7 +8,6 @@ import AppUploadModal from "../AppUploadModal";
 import useAuth from "../../hooks/useAuth";
 import {useDispatch} from "react-redux";
 import {getSelectedAssociation} from "../../store/slices/associationSlice";
-import {getMemberAssociations} from "../../store/slices/memberSlice";
 function AssociationBackImage({association, cameraContainer,uploadResult, cameraStyle}) {
     const dispatch = useDispatch()
     const {isModerator, isAdmin} = useAuth()
@@ -39,7 +38,7 @@ function AssociationBackImage({association, cameraContainer,uploadResult, camera
         setOnEdit(false)
         setUploadModalVisible(false)
         uploadResult(uploaded)
-        if (uploaded) dispatch(getMemberAssociations())
+        if (uploaded) dispatch(getSelectedAssociation({associationId: association.id}))
         if(!uploaded) setImageUrl(association.avatar)
     }
 

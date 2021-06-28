@@ -23,7 +23,7 @@ function NewEngagementList({navigation}) {
     const  {dataSorter} = useAuth()
     const store = useStore()
     const {getMemberUserCompte, getConnectedMember:connectedMember} = useAuth()
-    const {getEngagementVotesdData} = useEngagement()
+    const {getEngagementVotesdData, deleteEngagement} = useEngagement()
 
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const voting = useSelector(state => state.entities.engagement.votesList)
@@ -34,8 +34,7 @@ function NewEngagementList({navigation}) {
         const list = state.entities.engagement.list
         let selectedList = []
         list.forEach(item => {
-            if(item.accord === false) selectedList.push(item)
-            else if (item.statut === 'pending') selectedList.push(item)
+            if(item.accord === false || item.statut.toLowerCase() === 'pending') selectedList.push(item)
         })
         const sortedList = dataSorter(selectedList)
         return sortedList
@@ -100,7 +99,8 @@ function NewEngagementList({navigation}) {
                ItemSeparatorComponent={ListItemSeparator}
                renderItem={({item}) =>
                    <EngagementItem
-                       deleteEngagement={() => handleDeleteEngagement(item)}
+                       isEditable={true}
+                       deletePending={() => handleDeleteEngagement(item)}
                        editEngagement={() => navigation.navigate('EditEngagementScreen', item)}
                        onWaiting={item.statut.toLowerCase() === 'pending' || item.statut.toLowerCase() === 'rejected'}
                        getMembersDatails={() => navigation.navigate('Members',{screen: 'MemberDetails', params: getMemberUserCompte(item.Creator)})}

@@ -1,5 +1,5 @@
 import React from 'react';
-import {ScrollView, TouchableOpacity, View, StyleSheet} from "react-native";
+import {TouchableOpacity, View, StyleSheet} from "react-native";
 import defaultStyles from "../../utilities/styles";
 import AppText from "../AppText";
 

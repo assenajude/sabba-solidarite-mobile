@@ -8,10 +8,16 @@ import AppSimpleLabelWithValue from "../AppSimpleLabelWithValue";
 import useManageAssociation from "../../hooks/useManageAssociation";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import defaultStyles from '../../utilities/styles'
+import AppIconButton from "../AppIconButton";
+import useAuth from "../../hooks/useAuth";
 
-function ListCotisationItem({cotisation,payCotisation, isPayed, showMore, showCotisationMore, showCotisationLessDetail}) {
+function ListCotisationItem({cotisation,payCotisation, isPayed, showMore,
+                                showCotisationMore, showCotisationLessDetail,
+                            editSelected, deleteSelected}) {
 
     const {formatDate, formatFonds} = useManageAssociation()
+    const {isModerator, isAdmin} = useAuth()
+    const isAuthorized = isAdmin() || isModerator()
 
     return (
         <Swipeable onSwipeableRightOpen={showCotisationLessDetail} renderRightActions={() =><View style={{
@@ -31,7 +37,11 @@ function ListCotisationItem({cotisation,payCotisation, isPayed, showMore, showCo
                     }}>{formatFonds(cotisation.montant)}</AppText>
                 </View>
             </TouchableWithoutFeedback>
-            {showMore && <View style={{marginVertical: 20}}>
+            {showMore && <View
+                style={{
+                    marginVertical: 20,
+                    marginHorizontal: 20
+                }}>
                 <AppSimpleLabelWithValue
                     label='Debut'
                     labelValue={formatDate(cotisation.dateDebut)} />
@@ -43,6 +53,19 @@ function ListCotisationItem({cotisation,payCotisation, isPayed, showMore, showCo
                     <AppSimpleLabelWithValue
                     label='Type'
                     labelValue={cotisation.typeCotisation} />
+                    {isAuthorized && <View style={{
+                        alignItems:'center',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end'
+                    }}>
+                        <AppIconButton onPress={editSelected}
+                            containerStyle={[styles.iconContainer, {marginHorizontal:20}]}
+                            iconName='circle-edit-outline'/>
+                        <AppIconButton onPress={deleteSelected}
+                            containerStyle={styles.iconContainer}
+                            iconColor={defaultStyles.colors.rougeBordeau}
+                            iconName='delete'/>
+                    </View>}
             </View>}
             <View style={styles.showMore}>
                 <TouchableOpacity onPress={showCotisationMore}>
@@ -64,6 +87,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginHorizontal: 20
+    },
+    iconContainer: {
+        paddingHorizontal: 0,
+        height: 50,
+        width: 50,
+        borderRadius: 25,
+        marginVertical: 10
     },
     showMore: {
         backgroundColor: defaultStyles.colors.white,

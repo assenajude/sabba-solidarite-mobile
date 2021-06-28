@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack'
 import DashboardScreen from "../screens/DashboardScreen";
 import AppLabelWithIcon from "../components/AppLabelWithIcon";

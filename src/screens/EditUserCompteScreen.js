@@ -9,14 +9,14 @@ import routes from "../navigation/routes";
 
 
 const validInfo = Yup.object().shape({
-    nom: Yup.string(),
-    prenom: Yup.string(),
-    username: Yup.string(),
+    nom: Yup.string().label("Le nom doit être de type chaine de caractère"),
+    prenom: Yup.string().label("Le prenom doit être de type chaine de caractère"),
+    username: Yup.string().label("Le username doit être de type chaine de caractère"),
     email: Yup.string().email("email invalide"),
-    phone: Yup.string(),
-    profession: Yup.string(),
-    emploi: Yup.string(),
-    adresse: Yup.string()
+    phone: Yup.string().label("Le numero de telephone doit être de type chaine de caractère"),
+    profession: Yup.string().label("La prefession doit être de type chaine de caractère"),
+    emploi: Yup.string().label("L'emploi doit être de type chaine de caractère"),
+    adresse: Yup.string().label("L'adresse doit être de type chaine de caractère")
 })
 function EditUserCompteScreen({navigation}) {
     const dispatch = useDispatch()

@@ -22,15 +22,21 @@ const engagementSlice = createSlice({
         engagementAdded: (state, action) => {
             state.loading = false
             state.error = null
-            state.list.push(action.payload)
-            state.votesList[action.payload.id] = action.payload
+            const addedIndex = state.list.findIndex(item => item.id === action.payload.id)
+            if(addedIndex !== -1) {
+                let newList = state.list
+                newList[addedIndex] = action.payload
+                state.list = newList
+            } else {
+                state.list.push(action.payload)
+            }
         },
         engagementsReceived: (state, action) => {
             state.loading = false
             state.error = null
             const receiveds = action.payload
             state.list = receiveds
-            const newTrancheTab = state.tranches
+            const newTrancheTab = []
             receiveds.forEach(item => {
                 const itemTranches = item.tranches
                 if(itemTranches.length>0) {
@@ -53,9 +59,13 @@ const engagementSlice = createSlice({
           state.loading = false
           state.error = null
             const updatedIndex = state.list.findIndex(engage => engage.id === action.payload.id)
+            if(updatedIndex !== -1) {
             const newEngagements = state.list
             newEngagements[updatedIndex] = action.payload
             state.list = newEngagements
+            } else {
+                state.list.push(action.payload)
+            }
         },
         votesReceived: (state, action) => {
           state.error = null
@@ -89,6 +99,7 @@ const engagementSlice = createSlice({
             state.list = newList
             const newTranchesList = state.tranches.filter(tranche => tranche.engagementId !== action.payload.engagementId)
             state.tranches = newTranchesList
+             delete state.votesList[action.payload.engagementId]
         }
     }
 })

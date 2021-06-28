@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, StyleSheet, TouchableWithoutFeedback, FlatList, TouchableOpacity, Alert} from "react-native";
+import {View, StyleSheet, FlatList, TouchableOpacity, Alert} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../components/AppText";
 import {useDispatch, useSelector} from "react-redux";
@@ -22,7 +22,7 @@ function StarterScreen({navigation}) {
     const dispatch = useDispatch()
     const {registerForPushNotificationsAsync} = useNotification()
     const {isAdmin, getInitAssociation} = useAuth()
-    const {getMemberRelationType} = useManageAssociation()
+    const {getMemberRelationType, deleteAssociation} = useManageAssociation()
 
     const currentUser = useSelector(state => state.auth.user)
     const assoLoading = useSelector(state => state.entities.association.loading)
@@ -159,6 +159,7 @@ function StarterScreen({navigation}) {
                     numColumns={2}
                     renderItem={({item}) =>
                         <AssociationItem
+                            deleteSelected={() => deleteAssociation(item)}
                             association={item}
                             relationType={getMemberRelationType(item)}
                             isMember={memberAssociations.some(association => association.id === item.id)}

@@ -1,9 +1,10 @@
 import {useDispatch, useSelector, useStore} from "react-redux";
 import dayjs from "dayjs";
 import {Alert} from "react-native";
-import {getAssociationLeave, getMemberDelete} from "../store/slices/memberSlice";
+import {getAssociationLeave, getConnectedUserAssociations, getMemberDelete} from "../store/slices/memberSlice";
 import {getEngagementsByAssociation} from "../store/slices/engagementSlice";
 import {getAssociationCotisations} from "../store/slices/cotisationSlice";
+import {getAllAssociation, getAssociationDelete} from "../store/slices/associationSlice";
 
 let useManageAssociation;
 export default useManageAssociation = () => {
@@ -124,6 +125,27 @@ export default useManageAssociation = () => {
         }])
     }
 
+    const deleteAssociation = (association) => {
+        if(association.fondInitial !== 0) {
+            return alert("Vous n'êtes pas autorisé à supprimer cette association.")
+        }
+
+        Alert.alert("Attention", "Etes-vous sûr de supprimer definitivement cette association ? Cette operation est irreversible, voulez-vous vraiment?", [{
+            text: 'non', onPress: () => {return;}
+        }, {
+            text: 'oui', onPress: async() => {
+                await dispatch(getAssociationDelete({associationId: association.id}))
+                const error = store.getState().entities.association.error
+                if(error !== null)  {
+                    return alert("Impossible de faire la suppression, une erreur est apparue.")
+                }
+                dispatch(getAllAssociation())
+                dispatch(getConnectedUserAssociations())
+                alert("L'association a été supprimé avec succès.")
+            }
+        }])
+    }
+
     return {getMemberRelationType, formatFonds,votorsNumber,leaveAssociation, deleteMember,
-        formatDate, associationValidMembers, getNewAdhesion, getManagedAssociationFund}
+        formatDate, associationValidMembers, getNewAdhesion, getManagedAssociationFund, deleteAssociation}
 }

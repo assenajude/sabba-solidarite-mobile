@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView, ToastAndroid} from "react-native";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import * as Yup from 'yup'
@@ -16,24 +16,29 @@ const validEngagement = Yup.object().shape({
     echeance: Yup.date(),
     typeEngagement: Yup.string()
 })
-function NewEngagementScreen({navigation}) {
+function NewEngagementScreen({navigation, route}) {
+    const selectedEngagement = route.params
     const dispatch = useDispatch()
     const store = useStore()
     const {getConnectedMember} = useAuth()
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const isLoading = useSelector(state => state.entities.engagement.loading)
+    const [editing, setEditing] = useState(selectedEngagement?selectedEngagement.editing : false)
+
 
     const handleAddEngagement = async (engagement, {resetForm}) => {
          const montant = Number(engagement.montant)
                 const dateEcheance = engagement.echeance.getTime()
                 const data = {
+                    id: selectedEngagement?selectedEngagement.id : null,
                     libelle: engagement.libelle,
                     typeEngagement: engagement.typeEngagement,
                     montant: montant,
                     echeance: dateEcheance,
                     memberId: getConnectedMember().id,
                     associationId: currentAssociation.id}
-                await dispatch(addNewEngagement(data))
+                    await dispatch(addNewEngagement(data))
+
          const error = store.getState().entities.cotisation.error
          if(error !== null) {
              return alert("Erreur: impossible d'envoyer votre engagement, veuillez reessayer plutard")
@@ -49,6 +54,9 @@ function NewEngagementScreen({navigation}) {
          navigation.navigate('NewEngagementList')
     }
 
+    useEffect(() => {
+    }, [])
+
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
@@ -57,10 +65,10 @@ function NewEngagementScreen({navigation}) {
             marginVertical: 20
         }}>
             <AppForm initialValues={{
-                libelle: '',
-                montant: '',
-                typeEngagement: 'remboursable',
-                echeance: new Date()
+                libelle:selectedEngagement? selectedEngagement.libelle : '',
+                montant:selectedEngagement?String(selectedEngagement.montant) : '',
+                typeEngagement: selectedEngagement?selectedEngagement.typeEngagement : 'remboursable',
+                echeance:selectedEngagement? new Date(selectedEngagement.echeance) : new Date()
             }} validationSchema={validEngagement} onSubmit={handleAddEngagement}>
                 <FormItemPicker label='Type engagement: ' data={['remboursable', 'non remboursable']} name='typeEngagement'/>
                 <AppFormField name='libelle' placeholder='libelle' maxLength={50}/>

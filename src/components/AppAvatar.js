@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {TouchableWithoutFeedback,Image, StyleSheet,View, Alert} from "react-native";
+import React from 'react';
+import {TouchableWithoutFeedback,Image, StyleSheet,View} from "react-native";
 
 
 function AppAvatar({avatarStyle,source,onDelete}) {

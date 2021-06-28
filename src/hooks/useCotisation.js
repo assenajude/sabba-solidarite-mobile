@@ -1,9 +1,13 @@
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector, useStore} from "react-redux";
 import dayjs from "dayjs";
 import useAuth from "./useAuth";
+import {Alert} from "react-native";
+import {getCotisationDelete} from "../store/slices/cotisationSlice";
 
 let useCotisation;
 export default useCotisation = () => {
+    const store = useStore()
+    const dispatch = useDispatch()
     const {getConnectedMember} = useAuth()
     const associationCotisations = useSelector(state => state.entities.cotisation.list)
     const listCotisations = useSelector(state => state.entities.member.membersCotisations)
@@ -110,7 +114,23 @@ export default useCotisation = () => {
         return compter
     }
 
+    const deleteCotisation = (cotisationId) => {
+        Alert.alert("Attention", "voulez-vous supprimer definitivement cette cotisation.", [{
+            text: 'non', onPress: () => {return;}
+        }, {
+            text: 'oui', onPress: async() => {
+                await dispatch(getCotisationDelete({cotisationId}))
+                const error = store.getState().entities.cotisation.error
+                if(error !== null) {
+                    return alert("Erreur lors de la suppression. Veuillez reessayer plutard.")
+                }
+                alert("La cotisation a été supprimée avec succès.")
+            }
+        }])
+
+    }
+
 return {getMonthString, getMonthCotisations,
-    getMonthTotal, getMemberCotisations,
+    getMonthTotal, getMemberCotisations,deleteCotisation,
     getCurrentAssoCotisations, isCotisationPayed, notPayedCompter}
 }

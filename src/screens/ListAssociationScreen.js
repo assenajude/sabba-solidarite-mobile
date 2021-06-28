@@ -16,18 +16,24 @@ function ListAssociationScreen({navigation, route}) {
     const shouldUpdate = route.params?.updated
     const store = useStore()
     const {isAdmin} = useAuth()
-    const {getMemberRelationType} = useManageAssociation()
+    const {getMemberRelationType, deleteAssociation} = useManageAssociation()
     const dispatch = useDispatch()
 
     const connectedMember = useSelector(state => state.auth.user)
     const isLoadding = useSelector(state=> state.entities.association.loading)
     const isMemberLoading = useSelector(state => state.entities.member.loading)
     const userAssociations = useSelector(state => state.entities.member.userAssociations)
+    const deletedSuccess = useSelector(state => state.entities.association.deleteSuccess)
 
     const [selectedList, setSelectedList] = useState([])
     const [searchLabel, setSearchLabel] = useState('')
     const [searching, setSearching] = useState(false)
     const [updateList, setUpdateList] = useState(false)
+    const [deleted, setDeleted] = useState(false)
+
+    const handleDeleteOne = (ass) => {
+        deleteAssociation(ass)
+    }
 
     const handleSendAdhesionMessage = async(item) => {
         const data = {
@@ -61,7 +67,7 @@ function ListAssociationScreen({navigation, route}) {
                 setSelectedList(filteredList)
             }
 
-    }, [searchLabel, shouldUpdate, navigation])
+    }, [searchLabel, updateList, navigation, deleted, deletedSuccess])
 
     useEffect(() => {
         getAssociationList()
@@ -69,7 +75,7 @@ function ListAssociationScreen({navigation, route}) {
             if(shouldUpdate) setUpdateList(true)
         })
         return () => unsubscribe
-    }, [searchLabel, updateList, navigation])
+    }, [searchLabel, shouldUpdate, navigation, deleted, deletedSuccess])
 
     return (
         <>
@@ -100,6 +106,7 @@ function ListAssociationScreen({navigation, route}) {
                 numColumns={2}
                 renderItem={({item}) =>
                     <AssociationItem
+                        deleteSelected={() => handleDeleteOne(item)}
                         association={item}
                         onPress={() => navigation.navigate(routes.ASSOCIATION_DETAILS,item)}
                         sendAdhesionMessage={() => handleSendAdhesionMessage(item)}

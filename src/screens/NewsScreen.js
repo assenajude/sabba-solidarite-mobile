@@ -9,7 +9,6 @@ import {readMemberInfos} from "../store/slices/memberSlice";
 import useInfo from "../hooks/useInfo";
 import {showInfoDetails} from "../store/slices/informationSlice";
 import AppText from "../components/AppText";
-import useAuth from "../hooks/useAuth";
 import useManageAssociation from "../hooks/useManageAssociation";
 
 function NewsScreen({navigation}) {

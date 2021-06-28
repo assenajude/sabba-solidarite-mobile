@@ -18,13 +18,15 @@ const validCotisation = Yup.object().shape({
     dateFin: Yup.date()
 })
 
-function NewCotisationScreen(props) {
+function NewCotisationScreen({route, navigation}) {
+    const selectedCotisation = route.params
     const store = useStore()
     const dispatch = useDispatch()
     const {getMonthString} = useCotisation()
 
     const isLoading = useSelector(state => state.entities.cotisation.loading)
     const selectedAssociation = useSelector(state => state.entities.association.selectedAssociation)
+    const [editing, setEditing] = useState(selectedCotisation?selectedCotisation.editing : false)
 
     const [initMotif, setInitMotif] = useState(() => {
         let motif = ''
@@ -39,6 +41,7 @@ function NewCotisationScreen(props) {
             const fin = cotisation.dateFin.getTime()
 
              const data = {
+                id: editing === true?selectedCotisation.id : null,
                  typeCotisation: cotisation.typeCotisation,
                  montant: cotisation.montant,
                  motif: cotisation.motif,
@@ -62,6 +65,7 @@ function NewCotisationScreen(props) {
              250
          )
          resetForm()
+        navigation.goBack()
     }
 
 
@@ -70,11 +74,11 @@ function NewCotisationScreen(props) {
             <AppActivityIndicator visible={isLoading}/>
         <ScrollView contentContainerStyle={{paddingVertical: 20, paddingHorizontal: 20}}>
             <AppForm initialValues={{
-                typeCotisation: 'mensuel',
-                montant: '',
-                motif: initMotif,
-                dateDebut: new Date(),
-                dateFin: new Date()
+                typeCotisation: selectedCotisation?selectedCotisation.typeCotisation : 'mensuel',
+                montant: selectedCotisation?String(selectedCotisation.montant) : '',
+                motif: selectedCotisation?selectedCotisation.motif : initMotif,
+                dateDebut: selectedCotisation?new Date(selectedCotisation.dateDebut) : new Date(),
+                dateFin: selectedCotisation?new Date(selectedCotisation.dateFin) : new Date()
             }}
                      validationSchema={validCotisation}
                      onSubmit={handleAddCotisation}>

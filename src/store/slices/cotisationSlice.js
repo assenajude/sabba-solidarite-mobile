@@ -1,6 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {apiRequested} from "../actionsCreators/apiActionCreator";
-import dayjs from "dayjs";
 
 const cotisationSlice = createSlice({
     name: 'cotisation',
@@ -21,7 +20,14 @@ const cotisationSlice = createSlice({
         cotisationAdded: (state, action) => {
           state.loading = false
           state.error = null
-            state.list.push(action.payload)
+            const addedIndex = state.list.findIndex(added => added.id === action.payload.id)
+            if(addedIndex !== -1) {
+                state.list[addedIndex] = action.payload
+            } else {
+                const newList = state.list
+                newList.push(action.payload)
+                state.list = newList
+            }
         },
         cotisationReceived: (state, action) => {
           state.loading = false
@@ -33,6 +39,12 @@ const cotisationSlice = createSlice({
             selected.showMore = !selected.showMore
             const others = state.list.filter(cotis => cotis.id !== action.payload.id)
             others.forEach(cotisation => cotisation.showMore = false)
+        },
+        cotisationDeleted: (state, action) => {
+            state.loading = false
+            state.error = null
+            const newList = state.list.filter(cotis => cotis.id !== action.payload.cotisationId)
+            state.list = newList
         }
     }
 })
@@ -40,7 +52,7 @@ const cotisationSlice = createSlice({
 export default cotisationSlice.reducer
 const {
     cotisationAdded, cotisationRequested, cotisationMoreDetail,
-    cotisationRequestFailed, cotisationReceived} = cotisationSlice.actions
+    cotisationRequestFailed, cotisationReceived, cotisationDeleted} = cotisationSlice.actions
 
 const url = '/cotisations'
 
@@ -59,6 +71,15 @@ export const getAssociationCotisations = (data) => apiRequested({
     data,
     onStart: cotisationRequested.type,
     onSuccess: cotisationReceived.type,
+    onError: cotisationRequestFailed.type
+})
+
+export const getCotisationDelete = (data) => apiRequested({
+    url: url+'/deleteOne',
+    method: 'delete',
+    data,
+    onStart: cotisationRequested.type,
+    onSuccess: cotisationDeleted.type,
     onError: cotisationRequestFailed.type
 })
 

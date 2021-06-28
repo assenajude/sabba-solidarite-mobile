@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Image, StyleSheet, View, TouchableOpacity, Alert} from "react-native";
 import AppImagePicker from "../AppImagePicker";
 import {useFormikContext} from "formik";

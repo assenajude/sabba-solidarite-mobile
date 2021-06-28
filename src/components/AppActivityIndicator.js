@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, ActivityIndicator} from "react-native";
+import {View, StyleSheet} from "react-native";
 import defaultStyles from "../utilities/styles";
 import LottieView from "lottie-react-native";
 
@@ -11,7 +11,6 @@ function AppActivityIndicator({visible}) {
         return (
             <View style={styles.container}>
                 <LottieView style={{ width: 200}} autoPlay={true} loop={true} source={require('../../assets/animations/loading')}/>
-                {/*<ActivityIndicator size='large' color={colors.rougeBordeau}/>*/}
             </View>
         );
     }

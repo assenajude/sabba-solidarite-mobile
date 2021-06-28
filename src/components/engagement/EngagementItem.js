@@ -12,15 +12,27 @@ import {getPayingTranche} from "../../store/slices/engagementSlice";
 import {useDispatch} from "react-redux";
 import * as Progress from "react-native-progress";
 import AppIconButton from "../AppIconButton";
+import useAuth from "../../hooks/useAuth";
+import routes from "../../navigation/routes";
+import {useNavigation} from '@react-navigation/native'
+import useEngagement from "../../hooks/useEngagement";
 
 
-function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,engagement,tranches,renderRightActions,
+function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,engagement,tranches,renderRightActions,isEditable=false,
                             onWaiting, engagementDetails, handleVoteUp, handleVoteDown, showAvatar=true,getMoreDetails,
                             allVoted, downVotes, upVotes, isVoting, validationDate, showTranches, getTranchesShown,
-                            handlePayTranche, onChangeTrancheMontant, editTrancheMontant, deleteEngagement, editEngagement}) {
+                            handlePayTranche, onChangeTrancheMontant, editTrancheMontant, editEngagement, deletePending}) {
+    const navigation = useNavigation()
 
     const dispatch = useDispatch()
     const {formatFonds, formatDate} = useManageAssociation()
+    const {deleteEngagement} = useEngagement()
+    const {isAdmin, isModerator} = useAuth()
+    const isAuthorized = isModerator() || isAdmin()
+
+    const handleDeleteEngagement = async (engage) => {
+        await deleteEngagement(engage)
+    }
 
     return (
         <View>
@@ -50,6 +62,7 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                     <AppSimpleLabelWithValue label='Date demande' labelValue={formatDate(engagement.createdAt)}/>
                     {validationDate && <AppSimpleLabelWithValue label='Date Validation' labelValue={formatDate(validationDate)}/>}
                     <AppSimpleLabelWithValue label='Date écheance' labelValue={formatDate(engagement.echeance)}/>
+
                     <View>
                         <View style={styles.trancheIcon}>
                             <AppIconButton iconSize={24}
@@ -84,6 +97,19 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                         {tranches.length === 0 && <AppText>aucune tranche de payement</AppText>}
                     </View>}
                     </View>
+                    {isAuthorized && <View style={{
+                        alignItems:'center',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end'
+                    }}>
+                       {isEditable && <AppIconButton onPress={() => navigation.navigate(routes.NEW_ENGAGEMENT, {...engagement, editing: true})}
+                                       containerStyle={[styles.iconContainer, {marginHorizontal:20}]}
+                                       iconName='circle-edit-outline'/>}
+                        <AppIconButton onPress={() => handleDeleteEngagement(engagement)}
+                                       containerStyle={styles.iconContainer}
+                                       iconColor={defaultStyles.colors.rougeBordeau}
+                                       iconName='delete'/>
+                    </View>}
                     <AppIconButton
                         containerStyle={{alignSelf: 'center', marginLeft: 40}}
                         iconName='chevron-up'
@@ -131,7 +157,7 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                             borderRadius: 30,
                             height: 60
                         }}
-                        onPress={deleteEngagement}
+                        onPress={deletePending}
                         iconColor={defaultStyles.colors.rougeBordeau}
                         iconName='delete-circle'/>
 
@@ -161,7 +187,7 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                             height: 60
                         }}
                         iconColor={defaultStyles.colors.rougeBordeau}
-                        onPress={deleteEngagement}
+                        onPress={deletePending}
                         iconName='delete-circle'/>
                 </View>}
                 </View>
@@ -199,6 +225,13 @@ const styles = StyleSheet.create({
       bottom: -30,
         backgroundColor: defaultStyles.colors.white,
         paddingHorizontal: 10
+    },
+    iconContainer: {
+        paddingHorizontal: 0,
+        height: 50,
+        width: 50,
+        borderRadius: 25,
+        marginVertical: 10
     },
     label: {
       fontWeight: '900'

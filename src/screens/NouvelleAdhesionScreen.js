@@ -6,7 +6,6 @@ import {MaterialCommunityIcons} from '@expo/vector-icons'
 import defaultStyles from '../utilities/styles'
 import AppSwiper from "../components/AppSwiper";
 import {getSelectedAssociationMembers, respondToAdhesionMessage} from "../store/slices/memberSlice";
-import {getMemberRolesEdited} from "../store/slices/associationSlice";
 import AppText from "../components/AppText";
 import useManageAssociation from "../hooks/useManageAssociation";
 import ListItemSeparator from "../components/ListItemSeparator";
