@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {View,  ScrollView, StyleSheet} from "react-native";
 import * as Yup from 'yup'
 
@@ -32,6 +32,10 @@ function RegisterScreen({navigation}) {
     const dispatch = useDispatch()
     const isLoading = useSelector(state => state.auth.loading)
 
+    const emailRef = useRef()
+    const passRef = useRef()
+    const confirmRef = useRef()
+
     const handleRegister = async (data, {resetForm}) => {
         await dispatch(register(data))
         const error = store.getState().auth.error
@@ -63,6 +67,7 @@ function RegisterScreen({navigation}) {
                     placeholder='pseudo'
                     icon='account'
                     returnKeyType='next'
+                    onSubmitEditing={() => emailRef.current.focus()}
                 />
                 <AppFormField
                     autoCapitalize='none'
@@ -71,6 +76,8 @@ function RegisterScreen({navigation}) {
                     icon='email'
                     keyboardType='email-address'
                     returnKeyType='next'
+                    formFielRef={emailRef}
+                    onSubmitEditing={() => passRef.current.focus()}
                 />
                 <AppFormField
                     autoCapitalize='none'
@@ -79,6 +86,8 @@ function RegisterScreen({navigation}) {
                     icon='lock'
                     secureTextEntry
                     returnKeyType='next'
+                    formFielRef={passRef}
+                    onSubmitEditing={() => confirmRef.current.focus()}
                 />
                 <AppFormField
                     autoCapitalize='none'
@@ -86,6 +95,7 @@ function RegisterScreen({navigation}) {
                     placeholder='confirm password'
                     icon='lock'
                     secureTextEntry
+                    formFielRef={confirmRef}
                 />
                 <FormSubmitButton title='Valider'/>
             </AppForm>

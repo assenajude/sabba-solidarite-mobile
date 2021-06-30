@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {ScrollView,} from "react-native";
 import * as Yup from 'yup'
 import {AppForm, AppFormField, FormSubmitButton} from '../components/form'
@@ -32,6 +32,14 @@ function NewAssociationScreen({navigation, route}) {
 
     const [progress, setProgresss] = useState(0)
     const [uploadModal, setUploadModal] = useState(false)
+
+    const descripRef = useRef()
+    const cotisRef = useRef()
+    const freqRef = useRef()
+    const fondRef = useRef()
+    const seuilRef = useRef()
+    const interetRef = useRef()
+    const validatorRef = useRef()
 
     const handleNewAssociation = async(data) => {
         const avatarArray = [data.avatar]
@@ -92,14 +100,43 @@ function NewAssociationScreen({navigation, route}) {
                 onSubmit={handleNewAssociation}
             >
                 <FormImagePicker name='avatar'/>
-                <AppFormField name='nom' placeholder='nom'/>
-                <AppFormField name='description' placeholder='description'/>
-                <AppFormField name='cotisationMensuelle' placeholder='montant cotisation'/>
-                <AppFormField name='frequenceCotisation' placeholder='frequence cotisation'/>
-                <AppFormField name='fondInitial' placeholder='fonds initial'/>
-                <AppFormField name='seuilSecurite' placeholder='Seuil de securité'/>
-                <AppFormField name='interetCredit' placeholder='taux de credit'/>
-                <AppFormField name='validatorsNumber' placeholder='Nombre validateurs'/>
+                <AppFormField
+                    returnKeyType='next'
+                    onSubmitEditing={() => descripRef.current.focus()}
+                    name='nom' placeholder='nom'/>
+                <AppFormField
+                    returnKeyType='next'
+                    onSubmitEditing={() => cotisRef.current.focus()}
+                    formFielRef={descripRef}
+                    name='description' placeholder='description'/>
+                <AppFormField
+                    returnKeyType='next'
+                    onSubmitEditing={() => freqRef.current.focus()}
+                    formFielRef={cotisRef}
+                    name='cotisationMensuelle' placeholder='montant cotisation'/>
+                <AppFormField
+                    returnKeyType='next'
+                    onSubmitEditing={() => fondRef.current.focus()}
+                    formFielRef={freqRef}
+                    name='frequenceCotisation' placeholder='frequence cotisation'/>
+                <AppFormField
+                    returnKeyType='next'
+                    onSubmitEditing={() => seuilRef.current.focus()}
+                    formFielRef={fondRef}
+                    name='fondInitial' placeholder='fonds initial'/>
+                <AppFormField
+                    returnKeyType='next'
+                    onSubmitEditing={() => interetRef.current.focus()}
+                    formFielRef={seuilRef}
+                    name='seuilSecurite' placeholder='Seuil de securité'/>
+                <AppFormField
+                    returnKeyType='next'
+                    onSubmitEditing={() => validatorRef.current.focus()}
+                    formFielRef={interetRef}
+                    name='interetCredit' placeholder='taux de credit'/>
+                <AppFormField
+                    formFielRef={validatorRef}
+                    name='validatorsNumber' placeholder='Nombre validateurs'/>
                 <FormSubmitButton title='Ajouter'/>
             </AppForm>
         </ScrollView>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import { StyleSheet, ScrollView, View} from "react-native";
 
 import AppForm from "../components/form/AppForm";
@@ -17,7 +17,7 @@ import {getAllAssociation, setSelectedAssociation} from "../store/slices/associa
 import {getPopulateReseauList, getUserTransactions} from "../store/slices/transactionSlice";
 import {reseauData} from "../utilities/reseau.data";
 import useAuth from "../hooks/useAuth";
-import {getConnectedUserAssociations, getSelectedAssociationMembers} from "../store/slices/memberSlice";
+import {getConnectedUserAssociations} from "../store/slices/memberSlice";
 
 const loginValidSchema = Yup.object().shape({
     info: Yup.string().required('Entrez votre adresse mail ou votre nom utilisateur'),
@@ -32,6 +32,9 @@ function LoginScreen({navigation, route}) {
     const isLoading = useSelector(state => state.auth.loading)
     const assoLoading = useSelector(state => state.entities.association.loading)
     const transacLoading = useSelector(state => state.entities.transaction.loading)
+
+    const passRef = useRef()
+
 
     const  validateEmail = (email) => {
         const re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+([^<>()\.,;:\s@\"]{2,}|[\d\.]+))$/
@@ -114,8 +117,10 @@ function LoginScreen({navigation, route}) {
                     placeholder='email ou username'
                     returnKeyType='next'
                     autoCapitalize='none'
+                    onSubmitEditing={() => passRef.current.focus()}
                 />
                 <AppFormField
+                    formFielRef={passRef}
                     autoCapitalize='none'
                     name='password'
                     icon='lock'

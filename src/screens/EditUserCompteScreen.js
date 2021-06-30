@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {ScrollView, Alert} from "react-native";
 import * as Yup from 'yup'
 import {AppForm, AppFormField, FormSubmitButton} from "../components/form";
@@ -24,6 +24,13 @@ function EditUserCompteScreen({navigation}) {
 
     const currentUser = useSelector(state => state.auth.user)
     const isLoading = useSelector(state => state.auth.loading)
+    const nameRef = useRef()
+    const userNameRef = useRef()
+    const emailRef = useRef()
+    const phoneRef = useRef()
+    const professionRef = useRef()
+    const emploiRef = useRef()
+    const adresseRef = useRef()
 
     const saveUserEdit = async (userInfo) => {
         const data = {...userInfo, id: currentUser.id}
@@ -59,14 +66,28 @@ function EditUserCompteScreen({navigation}) {
                    emploi: currentUser.emploi,
                    adresse: currentUser.adresse
                }} onSubmit={saveUserEdit}>
-               <AppFormField name='nom' placeholder='nom'/>
-               <AppFormField name='prenom' placeholder='prenom'/>
-               <AppFormField name='username' placeholder='pseudo'/>
-               <AppFormField name='email' placeholder='email'/>
-               <AppFormField name='phone' placeholder='telephone'/>
-               <AppFormField name='profession' placeholder='profession'/>
-               <AppFormField name='emploi' placeholder='emploi'/>
-               <AppFormField name='adresse' placeholder='autres adresses (ville-quartier)'/>
+               <AppFormField
+                   onSubmitEditing={() => nameRef.current.focus()}
+                   returnKeyType='next'  name='nom' placeholder='nom'/>
+               <AppFormField
+                   onSubmitEditing={() => userNameRef.current.focus()}
+                   returnKeyType='next' formFielRef={nameRef} name='prenom' placeholder='prenom'/>
+               <AppFormField
+                   onSubmitEditing={() => emailRef.current.focus()}
+                   returnKeyType='next' formFielRef={userNameRef} name='username' placeholder='pseudo'/>
+               <AppFormField
+                   onSubmitEditing={() => phoneRef.current.focus()}
+                   returnKeyType='next' formFielRef={emailRef} name='email' placeholder='email'/>
+               <AppFormField
+                   onSubmitEditing={() => professionRef.current.focus()}
+                   returnKeyType='next' formFielRef={phoneRef} name='phone'  placeholder='telephone'/>
+               <AppFormField
+                   onSubmitEditing={() => emploiRef.current.focus()}
+                   returnKeyType='next' formFielRef={professionRef} name='profession' placeholder='profession'/>
+               <AppFormField
+                   onSubmitEditing={() => adresseRef.current.focus()}
+                   returnKeyType='next' formFielRef={emploiRef} name='emploi' placeholder='emploi'/>
+               <AppFormField name='adresse' formFielRef={adresseRef} placeholder='autres adresses (ville-quartier)'/>
                <FormSubmitButton title='Valider'/>
            </AppForm>
         </ScrollView>

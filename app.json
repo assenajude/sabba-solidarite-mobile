@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "sabba-solidarite",
-    "slug": "sabba-solidarite",
+    "name": "sabbat-solidarite",
+    "slug": "sabbat-solidarite",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,7 +22,7 @@
         "NSPhotoLibraryUsageDescription": "Autoriser $(PRODUCT_NAME) à acceder à vos photos",
         "NSCameraUsageDescription": "Autoriser $(PRODUCT_NAME) à acceder à votre camera",
         "NSMicrophoneUsageDescription": "Autoriser $(PRODUCT_NAME) à acceder à votre microphone",
-        "NSPhotoLibraryAddUsageDescription": "Allow $(PRODUCT_NAME) to save photos"
+        "NSPhotoLibraryAddUsageDescription": "Autoriser $(PRODUCT_NAME) à sauvegarder des images"
       }
     },
     "androidStatusBar": {

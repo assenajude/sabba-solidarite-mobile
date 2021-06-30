@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
     },
     slogan:{
         color: defaultStyles.colors.or,
-        fontWeight: 'bold'
     },
 })
 export default AppLogoInfo;
