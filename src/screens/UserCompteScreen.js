@@ -168,10 +168,10 @@ function UserCompteScreen({navigation, route}) {
                    <AppText style={{fontSize: 12}}>Choisir pièce recto</AppText>
                  </View>}
                     {pieceRecto !== null && <TouchableWithoutFeedback onPress={() => {
-                        const url = selectedUser.piece?selectedUser.piece[0] : pieceRecto.url
+                        const url = pieceRecto.piece?pieceRecto.piece[0] : pieceRecto.url
                         handleShowImage(url)
                     }}>
-                    <Image source={{uri: selectedUser.piece?pieceRecto.piece[0] : pieceRecto.url}} style={styles.pieceContent}/>
+                    <Image source={{uri:pieceRecto.piece? pieceRecto.piece[0] : pieceRecto.url}} style={styles.pieceContent}/>
                     </TouchableWithoutFeedback>
                     }
                     <View style={styles.rectoCamera}>
@@ -183,10 +183,10 @@ function UserCompteScreen({navigation, route}) {
                   <AppText style={{fontSize: 12}}>Choisir pièce verso</AppText>
                   </View>}
                   {pieceVerso !== null && <TouchableWithoutFeedback onPress={() => {
-                      const url = selectedUser.piece?selectedUser.piece[1] : pieceVerso.url
+                      const url = pieceVerso.piece?pieceVerso.piece[1] : pieceVerso.url
                       handleShowImage(url)
                   }}>
-                  <Image source={{uri: selectedUser.piece?selectedUser.piece[1] : pieceVerso.url}} style={styles.pieceContent}/>
+                  <Image source={{uri:pieceVerso.piece? pieceVerso.piece[1] : pieceVerso.url}} style={styles.pieceContent}/>
                   </TouchableWithoutFeedback>
                   }
                     <View style={styles.versoCamera}>

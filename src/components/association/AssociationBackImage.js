@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Image, StyleSheet} from "react-native";
+import {View, Image, StyleSheet, TouchableWithoutFeedback, Alert} from "react-native";
 import AppImagePicker from "../AppImagePicker";
 import AppText from "../AppText";
 import AppButton from "../AppButton";
@@ -42,13 +42,23 @@ function AssociationBackImage({association, cameraContainer,uploadResult, camera
         if(!uploaded) setImageUrl(association.avatar)
     }
 
+    const editImage = () => {
+        Alert.alert("Alert", "voulez-vous supprimer l'image?", [{
+            text: 'supprimer', onPress: () => {setImageUrl(association.avatar)}
+        }, {
+            text: 'retour', onPress: () => {return;}
+        }])
+    }
+
     useEffect(() => {
         setImageUrl(association.avatar)
     }, [association])
 
     return (
         <View>
+            <TouchableWithoutFeedback onPress={editImage}>
             <Image style={styles.image} source={isImage?{uri: imageUrl}:require('../../../assets/solidariteImg.jpg')}/>
+            </TouchableWithoutFeedback>
             <View style={styles.nom}>
                 <AppText style={{fontWeight: 'bold'}}>{association.nom}</AppText>
             </View>

@@ -6,12 +6,12 @@ import AppText from "../AppText";
 
 function FormImagePicker({name, label}) {
     const {values, setFieldValue} = useFormikContext()
-    const isImage = values[name].url !== undefined && values[name] !=='' && values[name] !== undefined && values[name] !== null && Object.keys(values[name]).length>0
+    const isImage =  values[name].url !== undefined && values[name] !=='' && values[name] !== null && Object.keys(values[name]).length>0
 
     const handleDeleteImage = () => {
         Alert.alert("Attention", "voulez-vous supprimer l'image?",
             [{text: 'oui', onPress: () => {
-                setFieldValue(name, null)
+                setFieldValue(name, {})
                 }}, {text: 'non', onPress: () => {return;}}])
     }
 

@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {ScrollView, ToastAndroid} from "react-native";
 import * as Yup from 'yup'
 
 import {AppForm, AppFormField, FormSubmitButton} from "../components/form";
 import {useDispatch, useSelector, useStore} from "react-redux";
-import {addNewMember, getUpdateOneMember} from "../store/slices/memberSlice";
+import {getUpdateOneMember} from "../store/slices/memberSlice";
 import AppTimePicker from "../components/AppTimePicker";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 
@@ -17,22 +17,19 @@ function EditMemberScreen({route, navigation}) {
     const store = useStore()
     const selectEdited = route.params
     const dispatch = useDispatch()
-    const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const isLoading = useSelector(state => state.entities.member.loading)
-    const [edit, setEdit] = useState(selectEdited?true:false)
 
     const handleAddMember = async (member) => {
         let data;
-        if (edit) {
-            data = {...member, currentMemberId: selectEdited.member.id}
-            await dispatch(getUpdateOneMember(data))
-        } else {
+        const dateAdhesion = member.adhesionDate
             data = {
-                ...member,
-                associationId: currentAssociation.id
-            }
-            await dispatch(addNewMember(data))
+                statut: member.statut,
+                relation: member.relation,
+                adhesionDate:dateAdhesion.getTime(),
+                currentMemberId: selectEdited.member.id
         }
+            await dispatch(getUpdateOneMember(data))
+
         const error = store.getState().entities.member.error
         if (error !== null) {
             return alert('error: impossible de sauvegarder vos données.')
@@ -56,7 +53,7 @@ function EditMemberScreen({route, navigation}) {
                 initialValues={{
                     statut: selectEdited? selectEdited.member.statut : '',
                     relation: selectEdited?selectEdited.member.relation: '',
-                    adhesionDate: selectEdited?selectEdited.adhesionDate:new Date()
+                    adhesionDate: selectEdited?new Date(selectEdited.member.adhesionDate):new Date()
                 }}
                 validationSchema={validMember}
                 onSubmit={handleAddMember}

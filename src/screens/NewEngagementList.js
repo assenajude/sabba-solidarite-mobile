@@ -17,13 +17,15 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 import {getSelectedAssociation} from "../store/slices/associationSlice";
 import {getUserData} from "../store/slices/authSlice";
 import {getConnectedMemberUser} from "../store/slices/memberSlice";
+import useManageAssociation from "../hooks/useManageAssociation";
 
 function NewEngagementList({navigation}) {
     const dispatch = useDispatch()
     const  {dataSorter} = useAuth()
     const store = useStore()
     const {getMemberUserCompte, getConnectedMember:connectedMember} = useAuth()
-    const {getEngagementVotesdData, deleteEngagement} = useEngagement()
+    const {getEngagementVotesdData} = useEngagement()
+    const {associationValidMembers} = useManageAssociation()
 
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const voting = useSelector(state => state.entities.engagement.votesList)
@@ -120,7 +122,7 @@ function NewEngagementList({navigation}) {
                        handleVoteDown={() => voteDown(item)}
                        getEngagementDetails={() => dispatch(getEngagementDetail(item))}
                        engagementDetails={item.showDetail}
-                   selectedMember={getMemberUserCompte(item.Creator)}
+                   selectedMember={associationValidMembers().users.find(member => member.id === item.Creator.userId)}
                    />}/>}
         </>
     );

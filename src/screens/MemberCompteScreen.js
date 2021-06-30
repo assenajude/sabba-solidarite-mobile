@@ -65,7 +65,7 @@ function MemberCompteScreen({navigation}) {
                                        navigation.navigate('Cotisations', {
                                            screen: 'MemberCotisationScreen',
                                            initial: false,
-                                           params:getConnectedMember()
+                                           params:getMemberUserCompte()
                                        })}
                                    labelLength={getMemberCotisations(getConnectedMember()).cotisationLenght}
                                    totalAmount={getMemberCotisations(getConnectedMember()).totalCotisation}/>
@@ -73,7 +73,7 @@ function MemberCompteScreen({navigation}) {
                                     onPress={() => navigation.navigate('Engagements', {
                                         screen : routes.LIST_ENGAGEMENT,
                                         initial: false,
-                                        params:getConnectedMember()
+                                        params:getMemberUserCompte()
                                     })}
                                     labelLength={getMemberEngagementInfos(getConnectedMember()).engagementLength}
                                     totalAmount={getMemberEngagementInfos(getConnectedMember()).engagementAmount}/>
@@ -83,7 +83,7 @@ function MemberCompteScreen({navigation}) {
                 <AppAddNewButton name='account-edit'
                                  onPress={() => navigation.navigate('Members',{
                                      screen : routes.EDIT_MEMBER,
-                                     params: getConnectedMember()
+                                     params: getMemberUserCompte()
                                  })}/>
             </View>}
 

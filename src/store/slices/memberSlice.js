@@ -31,18 +31,6 @@ const memberSlice = createSlice({
          state.error = null
          state.list = action.payload
         },
-
-        memberAdded: (state, action) => {
-            state.loading = false
-            state.error = null
-            const newAdded = action.payload
-            state.list.push(newAdded.new)
-            const random = {
-                email: newAdded.new.email,
-                password: newAdded.randomPass
-            }
-            state.randomIdentity = random
-        },
         updateOne: (state, action) => {
             state.loading = false
             state.error = null
@@ -123,7 +111,7 @@ const memberSlice = createSlice({
 })
 
 const {memberRequested, memberRequestFailed, userAssociationsReceived,
-    memberAdded,updateOne, memberInfosReceived,
+    updateOne, memberInfosReceived,
     allMembersReceived, memberCotisationPayed,
     membersCotisationReceived, showCotisationDetails,
     showMonthDetail, selectYear, initTimeData, memberDeleted} = memberSlice.actions
@@ -145,16 +133,6 @@ export const getSelectedAssociationMembers = (data) => apiRequested({
     method: 'post',
     onStart: memberRequested.type,
     onSuccess: allMembersReceived.type,
-    onError: memberRequestFailed.type
-})
-
-
-export const addNewMember = (data) => apiRequested({
-    url,
-    data,
-    method: 'post',
-    onStart: memberRequested.type,
-    onSuccess: memberAdded.type,
     onError: memberRequestFailed.type
 })
 
