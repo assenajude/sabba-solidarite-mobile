@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import { StyleSheet, ScrollView, View} from "react-native";
 
 import AppForm from "../components/form/AppForm";
@@ -6,6 +6,7 @@ import AppFormField from "../components/form/AppFormField";
 import * as Yup from 'yup'
 import FormSubmitButton from "../components/form/FormSubmitButton";
 import {useDispatch, useSelector, useStore} from "react-redux";
+import * as Linkin from 'expo-linking'
 import {signin} from "../store/slices/authSlice";
 
 import defaultStyles from '../utilities/styles'
@@ -13,33 +14,32 @@ import AppText from "../components/AppText";
 import routes from "../navigation/routes";
 import AppLogoInfo from "../components/AppLogoInfo";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import {getAllAssociation, setSelectedAssociation} from "../store/slices/associationSlice";
-import {getPopulateReseauList, getUserTransactions} from "../store/slices/transactionSlice";
-import {reseauData} from "../utilities/reseau.data";
+import {getAllAssociation} from "../store/slices/associationSlice";
 import useAuth from "../hooks/useAuth";
 import {getConnectedUserAssociations} from "../store/slices/memberSlice";
+import LoginFailedModal from "../components/user/LoginFailedModal";
+import GradientScreen from "../components/GradientScreen";
 
 const loginValidSchema = Yup.object().shape({
     info: Yup.string().required('Entrez votre adresse mail ou votre nom utilisateur'),
-    password: Yup.string().min(5, 'Le mot de passe doit être de 5 caractères au moins').required("Le mot de passe est requis")
+    password: Yup.string().min(4, 'Le mot de passe doit être de 4 caractères au moins').required("Le mot de passe est requis")
 })
 
 function LoginScreen({navigation, route}) {
     const whereToGo = route.params
     const store = useStore()
     const dispatch = useDispatch()
-    const {getInitAssociation} = useAuth()
+    const {isValidEmail, notifNavig} = useAuth()
     const isLoading = useSelector(state => state.auth.loading)
     const assoLoading = useSelector(state => state.entities.association.loading)
     const transacLoading = useSelector(state => state.entities.transaction.loading)
 
+    const [loginFailed, setLoginFailed] = useState(false)
+
     const passRef = useRef()
 
 
-    const  validateEmail = (email) => {
-        const re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+([^<>()\.,;:\s@\"]{2,}|[\d\.]+))$/
-        return re.test(email);
-    }
+    const  validateEmail = (email) => isValidEmail(email)
 
     const handleLogin = async (userData, {resetForm}) => {
             const valid = validateEmail(userData.info)
@@ -57,34 +57,15 @@ function LoginScreen({navigation, route}) {
             }
         await dispatch(signin(data))
         const error = store.getState().auth.error
-        if(error !== null) return alert("Le mot de passe et/ou le pseudo n'est pas correct. Veuillez reessayer.")
+        if(error !== null) {
+         setLoginFailed(true)
+            return;
+        }
         dispatch(getAllAssociation())
          dispatch(getConnectedUserAssociations())
         resetForm()
         if(whereToGo) {
-            let currentParams
-            const currentType = whereToGo.otherParams.type
-            const otherParamId = whereToGo.otherParams.id
-            if(currentType === 'adhesion'){
-                await dispatch(getAllAssociation())
-                const associationList = store.getState().entities.association.list
-                currentParams = associationList.find(asso => asso.id === otherParamId)
-            }
-            if(currentType === 'transaction') {
-                const justConnected = store.getState().auth.user
-                dispatch(getPopulateReseauList(reseauData))
-                await dispatch(getUserTransactions({userId: justConnected.id}))
-                const lisTransactions = store.getState().entities.transaction.list
-                currentParams = lisTransactions.find(transac => transac.id === otherParamId)
-            }
-            if(currentType === 'cotisation' || currentType === 'engagement') {
-                await dispatch(getAllAssociation())
-                const listAssociations = store.getState().entities.association.list
-                const currentAssociation = listAssociations.find(asso => asso.id === otherParamId)
-                dispatch(setSelectedAssociation(currentAssociation))
-                await getInitAssociation(currentAssociation)
-                currentParams = {screen: whereToGo.otherParams.screen}
-            }
+          const currentParams =  await notifNavig(whereToGo)
             navigation.navigate(whereToGo.mainNavig, {screen: whereToGo.nestedNavig,params:currentParams})
         } else {
             navigation.navigate(routes.STARTER)
@@ -92,7 +73,7 @@ function LoginScreen({navigation, route}) {
     }
 
     return (
-        <>
+        <GradientScreen>
             <AppActivityIndicator visible={isLoading || assoLoading || transacLoading}/>
             <View style={styles.logoInfoContainer}>
                 <AppLogoInfo/>
@@ -130,18 +111,36 @@ function LoginScreen({navigation, route}) {
                 <FormSubmitButton title='Envoyer' iconName='login'/>
             </AppForm>
             <View style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginVertical: 20,
-                marginHorizontal: 40
+                marginTop: 20
             }}>
-                <AppText>Vous n'avez pas de compte? </AppText>
+                <AppText style={{color: defaultStyles.colors.bleuFbi}} onPress={() => {
+                    if(whereToGo) {
+                        navigation.navigate(routes.CODE_LOGIN, whereToGo)
+                    }else {
+                        navigation.navigate(routes.CODE_LOGIN)
+                    }
+                }}>Se connecter avec code secret</AppText>
+            </View>
+            <View style={{
+                marginVertical: 10,
+            }}>
+                <AppText>Vous n'avez pas de compte EMAIL?</AppText>
                 <AppText
                     style={{color: defaultStyles.colors.bleuFbi}}
                     onPress={() => navigation.navigate(routes.REGISTER)}>Créez un</AppText>
             </View>
+            <View style={{marginBottom: 20}}>
+                <AppText>Mot de passe oublié?</AppText>
+                <AppText
+                    onPress={() => Linkin.openURL('tel:0708525827')}
+                    style={{
+                        color: defaultStyles.colors.bleuFbi
+                    }}
+                >Contactez nous.</AppText>
+            </View>
         </ScrollView>
-        </>
+            <LoginFailedModal failModal={loginFailed} dismissModal={() => setLoginFailed(false)}/>
+        </GradientScreen>
     );
 }
 

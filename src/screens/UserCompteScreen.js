@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {View, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Alert, Image} from "react-native";
+import React, {useEffect, useState} from 'react';
+import {View, ScrollView, StyleSheet,BackHandler, TouchableOpacity, TouchableWithoutFeedback, Alert, Image} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../components/AppText";
 import AppAvatar from "../components/AppAvatar";
@@ -7,7 +7,6 @@ import {useDispatch, useStore} from "react-redux";
 import defaultStyles from '../utilities/styles'
 import LottieView from "lottie-react-native";
 import useManageAssociation from "../hooks/useManageAssociation";
-import AppButton from "../components/AppButton";
 import AppSimpleLabelWithValue from "../components/AppSimpleLabelWithValue";
 import routes from "../navigation/routes";
 import AppImagePicker from "../components/AppImagePicker";
@@ -19,33 +18,59 @@ import useUploadImage from "../hooks/useUploadImage";
 import {getUserImagesEdit} from "../store/slices/authSlice";
 import AppUploadModal from "../components/AppUploadModal";
 import AppShowImage from "../components/AppShowImage";
+import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
+import AppImageValidator from "../components/AppImageValidator";
 
 
 function UserCompteScreen({navigation, route}) {
     let selectedUser = route.params
-
     const store = useStore()
     const dispatch = useDispatch()
     const {isAdmin} = useAuth()
     const {formatFonds} = useManageAssociation()
     const {directUpload, dataTransformer} = useUploadImage()
+    const initRecto = {imageData: null, url:selectedUser.piece? selectedUser.piece[0]:null}
+    const initVerso = {imageData: null, url:selectedUser.piece? selectedUser.piece[1]:null}
 
-    const [avatarImage, setAvatarImage] = useState(selectedUser)
-    const [pieceRecto, setPieceRecto] = useState(selectedUser)
-    const [pieceVerso, setPieceVerso] = useState(selectedUser)
+    const [currentUser, setCurrentUser] = useState(selectedUser)
+    const [avatarImage, setAvatarImage] = useState({imageData: null, url: selectedUser.avatar?selectedUser.avatar:null})
+    const [pieceRecto, setPieceRecto] = useState(initRecto)
+    const [pieceVerso, setPieceVerso] = useState(initVerso)
     const [editFund, setEditFund] = useState(false)
     const [progress, setProgress] = useState(0)
     const [uploadModal, setUploadModal] = useState(false)
-    const [editing, setEditing] = useState(false)
     const [imageUrl, setImageUrl] = useState('')
     const [imageModal, setImageModal] = useState(false)
+    const [selectedAvatarLoading, setSelectedAvatarLoading]= useState(selectedUser.avatarLoading)
+    const [selectedRectoLoading, setSelectedRectoLoading]= useState(true)
+    const [selectedVersoLoading, setSelectedVersoLoading]= useState(true)
+    const [editingAvatar, setEditingAvatar] = useState(false)
+    const [editingPiece, setEditingPiece] = useState(false)
 
-    const isNotPieceRecto = pieceRecto?.piece === null || Object.keys(pieceRecto).length === 0
-    const isNotPieceVerso = pieceVerso?.piece === null || Object.keys(pieceVerso).length === 0
+    const [changingAvatar, setChangingAvatar] = useState(false)
+    const [changingRecto, setChangingRecto] = useState(false)
+    const [editingRecto, setEditingRecto] = useState(false)
+    const [editingVerso, setEditingVerso] = useState(false)
+    const [changingVerso, setChangingVerso] = useState(false)
+
 
     const onChangeAvatar = (image) => {
+        setChangingAvatar(false)
         setAvatarImage(image)
-        setEditing(true)
+        setEditingAvatar(true)
+    }
+
+    const handleCancelAvatar = () => {
+        setAvatarImage(selectedUser)
+        setEditingAvatar(false)
+    }
+
+    const handleCancelPiece = () => {
+        setEditingPiece(false)
+        setEditingVerso(false)
+        setEditingRecto(false)
+        setPieceRecto(initRecto)
+        setPieceVerso(initVerso)
     }
 
     const deleteAvatarImage = () => {
@@ -63,18 +88,32 @@ function UserCompteScreen({navigation, route}) {
 
     const selectPieceRecto = (image) => {
         setPieceRecto(image)
-        setEditing(true)
+        setEditingRecto(true)
+        setChangingRecto(false)
     }
 
     const selectPieceVerso = (image) => {
         setPieceVerso(image)
-        setEditing(true)
+        setEditingVerso(true)
+        setChangingVerso(false)
+
     }
 
     const handleSaveImages = async () => {
-        const validPiece = Object.keys(pieceRecto).length >0 && Object.keys(pieceVerso).length>0
-        const validAvatar = Object.keys(avatarImage).length>0
-        const imagesArray = [avatarImage, pieceRecto, pieceVerso]
+        const isPieceRecto = pieceRecto.url !== null
+        const isPieceVerso = pieceVerso.url !== null
+        const validPiece = isPieceRecto && isPieceVerso
+        const validAvatar = avatarImage.url !== null
+        let imagesArray = []
+        if(validPiece && editingPiece && validAvatar && editingAvatar) {
+            imagesArray = [avatarImage, pieceRecto, pieceVerso]
+        } else if (validAvatar && editingAvatar && !editingPiece) {
+            imagesArray = [avatarImage]
+        } else if(validPiece && editingPiece && !editingAvatar) {
+            imagesArray = [pieceRecto, pieceVerso]
+        }else {
+           return alert('Veuillez choisir des images correctes.')
+        }
         const transformedArray = dataTransformer(imagesArray)
         setProgress(0)
         setUploadModal(true)
@@ -82,30 +121,68 @@ function UserCompteScreen({navigation, route}) {
             setProgress(progress)
         })
         setUploadModal(false)
-        if(!result) {
+        if(result) {
+            const signedUrlArray = store.getState().uploadImage.signedRequestArray
+            let newData;
+            let data = {userId: selectedUser.id};
+            if(editingAvatar && validAvatar && editingPiece && validPiece) {
+                 newData = {
+                    ...data,
+                    avatarUrl:signedUrlArray[0].url,
+                    pieces: [signedUrlArray[1].url, signedUrlArray[2].url]
+                }
+                data = newData
+            }
+           if(validPiece && editingPiece  && !editingAvatar) {
+               newData = {
+                    ...data,
+                   pieces: [signedUrlArray[0].url, signedUrlArray[1].url]
+               }
+
+               data = newData
+            }
+           if(editingAvatar && validAvatar && !editingPiece) {
+               newData = {
+                    ...data,
+                   avatarUrl:signedUrlArray[0].url
+               }
+               data = newData
+            }
+            await dispatch(getUserImagesEdit(data))
+            setEditingAvatar(false)
+            setEditingPiece(false)
+            const error = store.getState().auth.error
+            if(error !== null) {
+                return alert("Erreur lors de la mise à jour de vos images. Veuillez reessayer plutard.")
+            }
+            const updatedUser = store.getState().auth.user
+            selectedUser = updatedUser
+            alert("Vos images ont été editées avec succès.")
+        }else {
             return alert("Nous n'avons pas pu valider les images, veuillez reessayer plutard.")
         }
-        const signedUrlArray = store.getState().uploadImage.signedRequestArray
-        const data = {
-            userId: selectedUser.id,
-            avatarUrl: validAvatar?signedUrlArray[0].url : '',
-            pieces: validPiece?[signedUrlArray[1].url, signedUrlArray[2].url] : []
-        }
-        await dispatch(getUserImagesEdit(data))
-        const error = store.getState().auth.error
-        if(error !== null) {
-            return alert("Nous n'avons pas pu valider les images, veuillez reessayer plutard")
-        }
-        const updatedUser = store.getState().auth.user
-        selectedUser = updatedUser
-        alert("Vos images ont été editées avec succès.")
+
     }
 
     const handleShowImage = (url) => {
-        setImageUrl(url)
-        setImageModal(true)
+        if(url) {
+            setImageUrl(url)
+            setImageModal(true)
+        }
     }
 
+    const backAction = () => {
+        navigation.navigate(routes.STARTER)
+    }
+
+    useEffect(() => {
+        if(editingRecto && editingVerso) {
+            setEditingPiece(true)
+        }
+        setCurrentUser(selectedUser)
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+        return () => backHandler.remove();
+    }, [editingRecto, editingVerso, selectedUser])
 
     return (
         <>
@@ -113,35 +190,49 @@ function UserCompteScreen({navigation, route}) {
             <LinearGradient
                 colors={['#860432', 'transparent']}
                 style={styles.background}
-            />
-            <View>
-            <View style={styles.header}>
-                <View>
-                    <AppAvatar source={{uri: avatarImage.avatar || avatarImage.url}} avatarStyle={styles.avatarStyle} user={selectedUser} onDelete={deleteAvatarImage}/>
+            >
+                <View style={[styles.headerContainer, {backgroundColor:selectedAvatarLoading?defaultStyles.colors.lightGrey: defaultStyles.colors.white}]}>
+                        <AppAvatar
+                            onAvatarLoadEnd={() => setSelectedAvatarLoading(false)}
+                            avatarLoading={selectedAvatarLoading}
+                            source={{uri: avatarImage.url}} avatarStyle={styles.avatarStyle} user={currentUser} onDelete={deleteAvatarImage}/>
+                </View>
+                <View style={{
+                    position: 'absolute',
+                    top: 10,
+                    right:editingAvatar? 10:50
+                }}>
                     <AppImagePicker
+                        cancelImage={handleCancelAvatar}
+                        saveImage={handleSaveImages}
+                        selectingImage={changingAvatar}
+                        onImageEditing={editingAvatar}
+                        onPressCloseButton={() => setChangingAvatar(false)}
+                        onPressCamera={() => setChangingAvatar(true)}
                         iconSize={20}
                         cameraStyle={{height: 40, width: 40}}
-                        cameraContainer={{
-                            position: 'absolute',
-                            right: -20,
-                            bottom: 10
-                        }}
                         onSelectImage={onChangeAvatar}/>
                 </View>
-                <View style={{marginBottom: 30}}>
-                    <AppText>{selectedUser.username}</AppText>
-                    <AppText>{selectedUser.email}</AppText>
+                <View
+                    style={{
+                        alignSelf:'center',
+                        marginBottom: 30,
+                        marginTop: 10,
+                        marginLeft: 50
+                    }}>
+                    <AppText>{currentUser.username}</AppText>
+                    <AppText>{currentUser.email}</AppText>
+                    <AppText>{currentUser.phone}</AppText>
                 </View>
+            </LinearGradient>
 
-            </View>
-            </View>
             <View style={styles.walletContent}>
             <View style={styles.wallet}>
                 <LottieView style={{ width: 150}} autoPlay={true} loop={true} source={require('../../assets/animations/wallet-animation')}/>
-                <AppText style={styles.walletText}>{formatFonds(selectedUser.wallet)}</AppText>
+                <AppText style={styles.walletText}>{formatFonds(currentUser.wallet)}</AppText>
             </View>
                 <TouchableOpacity onPress={() => {
-                    if (selectedUser.wallet <= 0) {
+                    if (currentUser.wallet <= 0) {
                         return alert("Vous n'avez pas fonds à retirer.")
                     }
                     navigation.navigate(routes.NEW_TRANSACTION, {typeTrans: 'Retrait de fonds'})
@@ -162,37 +253,64 @@ function UserCompteScreen({navigation, route}) {
                     </TouchableOpacity>
                 </View>
             </View>
+            <View>
             <View style={styles.piece}>
                  <View>
-                    {isNotPieceRecto &&  <View style={styles.pieceContent}>
+                    {pieceRecto.url === null &&  <View style={styles.pieceContent}>
                    <AppText style={{fontSize: 12}}>Choisir pièce recto</AppText>
                  </View>}
-                    {pieceRecto !== null && <TouchableWithoutFeedback onPress={() => {
-                        const url = pieceRecto.piece?pieceRecto.piece[0] : pieceRecto.url
-                        handleShowImage(url)
-                    }}>
-                    <Image source={{uri:pieceRecto.piece? pieceRecto.piece[0] : pieceRecto.url}} style={styles.pieceContent}/>
+                    {pieceRecto.url !== null && <TouchableWithoutFeedback
+                        onPress={() => handleShowImage(pieceRecto.url)}>
+                    <Image
+                        onLoadEnd={() => setSelectedRectoLoading(false)}
+                        source={{uri:pieceRecto.url}}
+                        style={styles.pieceContent}/>
                     </TouchableWithoutFeedback>
                     }
+                    {pieceRecto.url !== null && selectedRectoLoading && <View style={styles.pieceLoadingContainer}>
+                        <LottieView
+                            style={styles.pieceLoading}
+                            source={require('../../assets/animations/image-loading')}
+                            loop={true} autoPlay={true}/>
+                    </View>}
                     <View style={styles.rectoCamera}>
-                        <AppImagePicker cameraStyle={styles.cameraStyle} onSelectImage={selectPieceRecto}/>
+                        <AppImagePicker
+                            iconSize={20}
+                            onPressCloseButton={() => setChangingRecto(false)}
+                            onPressCamera={() => setChangingRecto(true)}
+                            selectingImage={changingRecto}
+                            cameraStyle={styles.cameraStyle}
+                            onSelectImage={selectPieceRecto}/>
                     </View>
                 </View>
                 <View>
-                    {isNotPieceVerso && <View  style={styles.pieceContent}>
+                    {pieceVerso.url === null && <View  style={styles.pieceContent}>
                   <AppText style={{fontSize: 12}}>Choisir pièce verso</AppText>
                   </View>}
-                  {pieceVerso !== null && <TouchableWithoutFeedback onPress={() => {
-                      const url = pieceVerso.piece?pieceVerso.piece[1] : pieceVerso.url
-                      handleShowImage(url)
-                  }}>
-                  <Image source={{uri:pieceVerso.piece? pieceVerso.piece[1] : pieceVerso.url}} style={styles.pieceContent}/>
+                  {pieceVerso.url !== null && <TouchableWithoutFeedback onPress={() => handleShowImage(pieceVerso.url)}>
+                  <Image
+                      onLoadEnd={() => setSelectedVersoLoading(false)}
+                      source={{uri: pieceVerso.url}}
+                      style={styles.pieceContent}/>
                   </TouchableWithoutFeedback>
                   }
+                    {pieceVerso.url !== null && selectedVersoLoading && <View style={styles.pieceLoadingContainer}>
+                        <LottieView
+                            style={styles.pieceLoading}
+                            source={require('../../assets/animations/image-loading')}
+                            loop={true} autoPlay={true}/>
+                    </View>}
                     <View style={styles.versoCamera}>
-                        <AppImagePicker cameraStyle={styles.cameraStyle} onSelectImage={selectPieceVerso}/>
+                        <AppImagePicker iconSize={20}
+                            selectingImage={changingVerso}
+                            onPressCamera={() => setChangingVerso(true)}
+                            onPressCloseButton={() => setChangingVerso(false)}
+                            cameraStyle={styles.cameraStyle} onSelectImage={selectPieceVerso}/>
                     </View>
                 </View>
+            </View>
+                {editingPiece && <AppImageValidator
+                    saveImage={handleSaveImages} cancelImage={handleCancelPiece}/>}
             </View>
             <View style={{marginVertical: 10}}>
                 <ListItemSeparator/>
@@ -200,31 +318,34 @@ function UserCompteScreen({navigation, route}) {
             <View style={{
                 marginHorizontal: 20
             }}>
-            <AppSimpleLabelWithValue label='Nom' labelValue={selectedUser.nom?selectedUser.nom:'renseignez votre nom'}/>
-            <AppSimpleLabelWithValue label='Prenom' labelValue={selectedUser.prenom?selectedUser.prenom:'renseignez votre prenom'}/>
-            <AppSimpleLabelWithValue label='Phone' labelValue={selectedUser.phone?selectedUser.phone:'renseignez votre phone'}/>
-            <AppSimpleLabelWithValue label='Profession' labelValue={selectedUser.phone?selectedUser.phone:'renseignez votre profession ou formation'}/>
-            <AppSimpleLabelWithValue label='Emploi' labelValue={selectedUser.phone?selectedUser.phone:'renseignez votre emploi'}/>
-            <AppSimpleLabelWithValue label='Adresse' labelValue={selectedUser.adresse?selectedUser.adresse:'renseignez votre adresse'}/>
+            <AppSimpleLabelWithValue label='Nom' labelValue={currentUser.nom?currentUser.nom:'renseignez votre nom'}/>
+            <AppSimpleLabelWithValue label='Prenom' labelValue={currentUser.prenom?currentUser.prenom:'renseignez votre prenom'}/>
+            <AppSimpleLabelWithValue label='Phone' labelValue={currentUser.phone?currentUser.phone:'renseignez votre phone'}/>
+            <AppSimpleLabelWithValue label='Profession' labelValue={currentUser.profession?currentUser.profession:'renseignez votre profession ou formation'}/>
+            <AppSimpleLabelWithValue label='Emploi' labelValue={currentUser.emploi?currentUser.emploi:'renseignez votre emploi'}/>
+            <AppSimpleLabelWithValue label='Adresse' labelValue={currentUser.adresse?currentUser.adresse:'renseignez votre adresse'}/>
             </View>
+            <View style={styles.params}>
+                <AppIconWithLabelButton
+                    onPress={() => navigation.navigate('Transaction')}
+                    label='Transactions'
+                    iconName='wallet-outline'/>
+                    <View>
+                        <AppIconWithLabelButton
+                            label='Edit Infos'
+                            onPress={() => navigation.navigate(routes.EDIT_USER_COMPTE)}
+                            iconName='account-edit'/>
+                        <AppIconWithLabelButton
+                            buttonContainerStyle={{
+                                marginVertical: 10,
+                                marginBottom: 10
+                            }}
+                            label='Paramètres'
+                            onPress={() => navigation.navigate(routes.PARAMS)}
+                            iconName='account-settings'/>
+                    </View>
 
-            <TouchableWithoutFeedback onPress={() => navigation.navigate(routes.EDIT_USER_COMPTE)}>
-                <View elevation={10} style={styles.editInfo}>
-                    <MaterialCommunityIcons name='account-edit' size={30} color={defaultStyles.colors.bleuFbi}/>
-                    <AppText style={styles.editInfoButton}>Editer</AppText>
-                </View>
-            </TouchableWithoutFeedback>
-            {editing && <View style={styles.editImage}>
-                <AppButton onPress={handleSaveImages}
-                    iconSize={20} title='Valider les images'
-                    otherButtonStyle={styles.editImageButton}
-                    iconName='content-save-edit'/>
-            </View>}
-
-            <TouchableOpacity onPress={() => navigation.navigate('Transaction')} style={styles.transaction}>
-                <MaterialCommunityIcons name="wallet-outline" size={24} color="black" />
-                <AppText style={{color: defaultStyles.colors.bleuFbi, fontWeight: 'bold', marginLeft: 5}}>Transactions</AppText>
-            </TouchableOpacity>
+            </View>
 
         </ScrollView>
             <EditFundModal
@@ -250,25 +371,16 @@ const styles = StyleSheet.create({
     },
     avatarStyle:{
         height: 200,
-        width: 130,
-        marginTop: -50,
-        marginHorizontal: 10,
-        borderRadius: 10
+        width: 200,
+        borderRadius: 100,
     },
     background: {
-        height: 100,
+        height: 300,
         width: '100%',
     },
     cameraStyle: {
-      height: 45,
-      width: 45
-    },
-    editInfo:{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        marginVertical: 20,
-        marginHorizontal: 20
+      height: 40,
+      width: 40
     },
     editInfoButton: {
         color: defaultStyles.colors.bleuFbi,
@@ -298,15 +410,38 @@ const styles = StyleSheet.create({
         paddingVertical: 20
     },
     header: {
-        flexDirection: 'row',
-        alignItems: 'center'
+        position: 'absolute',
+        alignSelf: 'center',
+        top: 40
     },
-    transaction: {
-        marginBottom: 20,
-        marginHorizontal: 20,
-        flexDirection: 'row',
-        alignItems: 'center'
+    headerContainer: {
+        height: 200,
+        width: 200,
+        marginVertical: 10,
+        marginHorizontal: 10,
+        borderRadius:100,
+        alignSelf: 'center',
+        alignItems: 'center',
     },
+    params:{
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'space-around',
+        marginVertical: 10
+    },
+    pieceLoading: {
+      height: 100,
+      width: 100
+    },
+    pieceLoadingContainer: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: defaultStyles.colors.lightGrey
+    },
+
     versoCamera: {
         position: 'absolute',
         bottom: -20,
@@ -343,7 +478,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        height: 50,
+        height: 80,
         width: 150,
         backgroundColor: defaultStyles.colors.white
     },

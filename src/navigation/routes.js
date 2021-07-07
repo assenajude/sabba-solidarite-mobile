@@ -22,5 +22,8 @@ export default Object.freeze({
     EDITI_TRANSACTION: 'EditTransaction',
     HELP: 'HelpScreen',
     LIST_COTISATION: 'ListCotisation',
-    PAYEMENT_COTISATION: 'PayementCotisation'
+    PAYEMENT_COTISATION: 'PayementCotisation',
+    CODE_LOGIN: 'CodeLogin',
+    CODE_REGISTER: 'CodeRegister',
+    PARAMS: 'ParamScreen'
 })

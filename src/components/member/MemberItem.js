@@ -1,15 +1,29 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, StyleSheet, TouchableWithoutFeedback} from "react-native";
 import AppText from "../AppText";
 import defaultStyles from '../../utilities/styles'
 import AppAvatar from "../AppAvatar";
+import {selectedMemberAvatarLoaded} from "../../store/slices/memberSlice";
+import {useDispatch} from "react-redux";
 
 function MemberItem({getMemberDetails, avatarStyle, selectedMember,deleteAvatar, showPhone=false}) {
+
+    const dispatch = useDispatch()
+
+    const handleImageLoadEnd = () => {
+            if(selectedMember.avatarLoading){
+                dispatch(selectedMemberAvatarLoaded(selectedMember))
+            }
+    }
 
     return (
         <TouchableWithoutFeedback onPress={getMemberDetails}>
         <View style={styles.container}>
-            <AppAvatar source={{uri: selectedMember.member?selectedMember.member.avatar : selectedMember.avatar}} avatarStyle={avatarStyle} onDelete={deleteAvatar}/>
+            <AppAvatar
+                avatarLoading={selectedMember.avatarLoading}
+                onAvatarLoadEnd={() => handleImageLoadEnd()}
+                source={{uri: selectedMember.member?selectedMember.member.avatar : selectedMember.avatar}}
+                avatarStyle={avatarStyle} onDelete={deleteAvatar}/>
             <View style={styles.addressContainer}>
                 <AppText style={styles.addressText}>{selectedMember.username}</AppText>
                 <AppText style={styles.addressText}>{selectedMember.email?selectedMember.email:selectedMember.phone}</AppText>
@@ -40,6 +54,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginLeft: 10
     }
 })
 export default MemberItem;

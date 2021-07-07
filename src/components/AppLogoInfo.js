@@ -5,18 +5,21 @@ import defaultStyles from "../utilities/styles";
 
 function AppLogoInfo(props) {
     return (
-        <>
+        <View style={{
+            alignItems: 'center'
+        }}>
             <Image
                 source={require('../../assets/icon.png')}
                 style={styles.image}/>
             <View style={{
                 position: 'absolute',
-                bottom:5,
-                alignSelf: 'center'
+                bottom:-10,
+                alignSelf: 'center',
+                marginTop: 20
             }}>
-                <AppText style={styles.slogan}>Ensemble nous sommes plut fort.</AppText>
+                <AppText style={styles.slogan}>Ensemble nous sommes plut forts.</AppText>
             </View>
-        </>
+        </View>
     );
 }
 const styles = StyleSheet.create({
@@ -25,7 +28,7 @@ const styles = StyleSheet.create({
         width: 120
     },
     slogan:{
-        color: defaultStyles.colors.or,
+        color: defaultStyles.colors.dark
     },
 })
 export default AppLogoInfo;

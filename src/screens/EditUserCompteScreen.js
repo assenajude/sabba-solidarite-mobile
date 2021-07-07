@@ -76,6 +76,7 @@ function EditUserCompteScreen({navigation}) {
                    onSubmitEditing={() => emailRef.current.focus()}
                    returnKeyType='next' formFielRef={userNameRef} name='username' placeholder='pseudo'/>
                <AppFormField
+                   keyboardType='email-address'
                    onSubmitEditing={() => phoneRef.current.focus()}
                    returnKeyType='next' formFielRef={emailRef} name='email' placeholder='email'/>
                <AppFormField

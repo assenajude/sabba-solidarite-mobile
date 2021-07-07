@@ -1,28 +1,74 @@
 import React from 'react';
 import {Image, View, StyleSheet} from "react-native";
+import LottieView from 'lottie-react-native'
 import {LinearGradient} from "expo-linear-gradient";
 import MemberItem from "./MemberItem";
-import AppCamera from "../AppCamera";
+import AppImagePicker from "../AppImagePicker";
+import colors from "../../utilities/colors";
 
-function BackgroundWithAvatar({getCompteDetails, fondStyle, selectedMember,onChangeImages, avatarStyle, showCamera}) {
+function BackgroundWithAvatar({getCompteDetails,allowCamera=false, fondStyle,cancelAvatarChanging, saveAvatar,
+                                  selectedMember,onSaveBackImage,onCancelBackImage,onBackImageEditing,onCloseBackModal,
+                                 onChangeMemberAvatar, avatarStyle,onSelectBackImage,selectingBackImage,onSelectingBackImage,
+                                  onCloseSelectingModal, onSelectingAvatar, selectingAvatar, onAvatarEditing, onBackImageLoading, onBackImageLoadEnd}) {
+
 
     return (
         <View>
             {!selectedMember.backImage && <LinearGradient
                 colors={['#860432', 'transparent']}
-                style={styles.background}
+                style={[styles.background, {height: selectedMember.member.backImage?20:100}]}
             />}
-            {selectedMember.member.backImage && <Image
+
+            {selectedMember.member.backImage && <View>
+            <Image
+                onLoadEnd={onBackImageLoadEnd}
                 style={[styles.fontImage, fondStyle]}
-                source={{uri: selectedMember.member.backImage}}/>}
-            <MemberItem selectedMember={selectedMember} avatarStyle={avatarStyle} getMemberDetails={getCompteDetails}/>
-            {showCamera &&
-                <AppCamera
-                    onPress={onChangeImages}
-                    iconSize={20}
-                    cameraStyle={{width:40, height: 40}}
-                    cameraContainer={styles.camera}/>
+                source={{uri: selectedMember.member.backImage}}/>
+
+                {onBackImageLoading && <View style={styles.backLoadingStyle}>
+                    <LottieView style={{
+                        height: 150,
+                        width: 200
+                    }}
+                        loop={true}
+                        autoPlay={true}
+                        source={require('../../../assets/animations/image-loading')}/>
+                </View>}
+
+            </View>
             }
+            {allowCamera && <View style={[styles.backImagePicker, {top:selectedMember.member.backImage?0:-10}]}>
+                <AppImagePicker
+                    cameraStyle={styles.backCameraStyle}
+                    iconSize={15}
+                    saveImage={onSaveBackImage}
+                    cancelImage={onCancelBackImage}
+                    onImageEditing={onBackImageEditing}
+                    selectingImage={selectingBackImage}
+                    onPressCamera={onSelectingBackImage}
+                    onPressCloseButton={onCloseBackModal}
+                    onSelectImage={onSelectBackImage}/>
+            </View>}
+            <View>
+                <MemberItem  selectedMember={selectedMember} avatarStyle={avatarStyle} getMemberDetails={getCompteDetails}/>
+                {allowCamera && <View style={{
+                    position: 'absolute',
+                    left: 50,
+                    bottom:onAvatarEditing?-40: -30
+                }}>
+                    <AppImagePicker
+                        onSelectImage={onChangeMemberAvatar}
+                        cameraStyle={styles.backCameraStyle}
+                        iconSize={15}
+                        onPressCloseButton={onCloseSelectingModal}
+                        onPressCamera={onSelectingAvatar}
+                        selectingImage={selectingAvatar}
+                        onImageEditing={onAvatarEditing}
+                        cancelImage={cancelAvatarChanging}
+                        saveImage={saveAvatar}/>
+                </View>}
+
+            </View>
         </View>
     );
 }
@@ -39,6 +85,25 @@ const styles = StyleSheet.create({
         height: 100,
         width: '100%',
     },
+    backImagePicker: {
+      position: 'absolute',
+      right: 5,
+    },
+    backCameraStyle: {
+        height:30,
+        width: 30,
+        padding: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    backLoadingStyle:{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor:colors.lightGrey
+    },
     cameraContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between'
@@ -51,7 +116,7 @@ const styles = StyleSheet.create({
         width: 50
     },
     fontImage: {
-        height: 150
+        height: 200
     },
     mainInfo: {
         marginLeft:'25%',

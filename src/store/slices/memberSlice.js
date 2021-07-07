@@ -29,13 +29,27 @@ const memberSlice = createSlice({
         allMembersReceived: (state, action) => {
          state.loading = false
          state.error = null
-         state.list = action.payload
+            const allMembers = action.payload
+            allMembers.forEach(member => {
+                member.avatarLoading = true
+                member.backImageLoading = true
+            })
+            state.list = allMembers
         },
         updateOne: (state, action) => {
             state.loading = false
             state.error = null
             const updatedIndex = state.list.findIndex(item => item.id === action.payload.id)
-            state.list[updatedIndex] = action.payload
+            let selected = state.list[updatedIndex]
+            let updated = action.payload
+            if(selected.avatar !== action.payload.avatar){
+                updated.avatarLoading = true
+            }
+            if(selected.backImage !== updated.backImage) {
+                updated.backImageLoading = true
+            }
+            state.list[updatedIndex] = updated
+
         },
         memberInfosReceived: (state, action) => {
             state.loading = false
@@ -99,13 +113,59 @@ const memberSlice = createSlice({
         userAssociationsReceived: (state, action) => {
             state.loading = false
             state.error = null
+            const newAssociations = action.payload
+            newAssociations.forEach(ass => {
+                if(ass.avatar.length>0) {
+                    ass.imageLoading = true
+                }else {
+                    ass.imageLoading = false
+                }
+
+            })
             state.userAssociations = action.payload
+
         },
         memberDeleted: (state, action) => {
          state.loading = false
             state.error = null
             const newState = state.list.filter(member => member.id !== action.payload.userId)
             state.list = newState
+        },
+        imageLoaded: (state, action) => {
+            const selectedIndex = state.userAssociations.findIndex(ass => ass.id === action.payload.id)
+            state.userAssociations[selectedIndex].imageLoading = false
+        },
+        memberAvatarLoaded: (state, action) => {
+            let selectedMember = state.list.find(member => member.id === action.payload.id)
+            selectedMember.avatarLoading = false
+        },
+        memberBackImageLoaded: (state, action) => {
+            let selectedMember = state.list.find(member => member.id === action.payload.id)
+            selectedMember.backImageLoading = false
+        },
+        imageChanged:(state, action) => {
+            let selectedMember = state.list.find(item => item.id === action.payload.id)
+            if(action.payload.newAvatar) {
+                selectedMember.member.oldAvatar = selectedMember.member.avatar
+                selectedMember.member.avatar = action.payload.newAvatar
+                selectedMember.avatarLoading = true
+            } else {
+                selectedMember.member.oldBackImage = selectedMember.member.backImage
+                selectedMember.member.backImage = action.payload.backImage
+                selectedMember.backImageLoading = true
+            }
+
+        },
+        imageChangingCanceled:(state, action) => {
+            let selectedMember = state.list.find(item => item.id === action.payload.id)
+            if(action.payload.label === 'avatar') {
+                selectedMember.member.avatar = selectedMember.member.oldAvatar
+                selectedMember.avatarLoading = true
+
+            }else {
+                selectedMember.member.backImage = selectedMember.member.oldBackImage
+                selectedMember.backImageLoading = true
+            }
         }
     }
 })
@@ -113,8 +173,8 @@ const memberSlice = createSlice({
 const {memberRequested, memberRequestFailed, userAssociationsReceived,
     updateOne, memberInfosReceived,
     allMembersReceived, memberCotisationPayed,
-    membersCotisationReceived, showCotisationDetails,
-    showMonthDetail, selectYear, initTimeData, memberDeleted} = memberSlice.actions
+    membersCotisationReceived, showCotisationDetails, imageChanged, imageChangingCanceled, memberBackImageLoaded,
+    showMonthDetail, selectYear, initTimeData, memberDeleted, imageLoaded, memberAvatarLoaded} = memberSlice.actions
 export default memberSlice.reducer
 
 const url = '/members'
@@ -252,3 +312,22 @@ export const getCotisationDetails = (cotisation) => dispatch => {
     dispatch(showCotisationDetails(cotisation))
 }
 
+export const associationImageLoaded = (association) => dispatch => {
+    dispatch(imageLoaded(association))
+}
+
+export const selectedMemberAvatarLoaded = (member) => dispatch =>{
+    dispatch(memberAvatarLoaded(member))
+}
+
+export const selectedMemberBackImageLoaded = (member) => dispatch =>{
+    dispatch(memberBackImageLoaded(member))
+}
+
+export const changeMemberImage = (data) => dispatch => {
+    dispatch(imageChanged(data))
+}
+
+export const cancelChangingImage = (data) => dispatch => {
+    dispatch(imageChangingCanceled(data))
+}

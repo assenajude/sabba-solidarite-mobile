@@ -76,7 +76,7 @@ function ValidationTransactionItem({reseau,getEditTransaction, transaction, crea
                 </View>}
             </View>
             <View style={styles.creator}>
-                <AppText>par</AppText>
+                <AppText style={{marginHorizontal: 5}}>par</AppText>
                 <MemberItem getMemberDetails={getCreatorDetails} showPhone={true} selectedMember={creatorUser}/>
             </View>
             <View style={{marginTop: 20}}>

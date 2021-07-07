@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, ScrollView, StyleSheet} from "react-native";
 
 import AppText from "../components/AppText";
@@ -12,43 +12,139 @@ import useCotisation from "../hooks/useCotisation";
 import useEngagement from "../hooks/useEngagement";
 import BackgroundWithAvatar from "../components/member/BackgroundWithAvatar";
 import useAuth from "../hooks/useAuth";
-import EditImagesModal from "../components/member/EditImagesModal";
-import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
+import {useDispatch,useStore} from "react-redux";
+import {
+    cancelChangingImage,
+    changeMemberImage,
+    getImagesEdit
+} from "../store/slices/memberSlice";
+import useUploadImage from "../hooks/useUploadImage";
+import AppUploadModal from "../components/AppUploadModal";
 
 
 function MemberCompteScreen({navigation}) {
-
+    const store = useStore()
+    const dispatch = useDispatch()
+    const {dataTransformer, directUpload} = useUploadImage()
     const {isModerator, getConnectedMember,isAdmin, getMemberUserCompte} = useAuth()
     const {getMemberCotisations} = useCotisation()
     const {getMemberEngagementInfos} = useEngagement()
     const {formatFonds, formatDate, leaveAssociation} = useManageAssociation()
 
-    const [editImages, setEditImages] = useState(false)
+    let currentMember = getMemberUserCompte()
+
+    const [progress, setProgress] = useState(0)
+    const [uploadModal, setUploadModal] = useState(false)
+    let [connectedMember, setConnectedMember] = useState(currentMember)
+    const [editingAvatar, setEditingAvatar] = useState(false)
+    const [avatarImage, setAvatarImage] = useState(null)
+    const [backImage, setBackImage] = useState(null)
+    const [editingBackImage, setEditingBackImage] = useState(false)
+
+
+    const [selectingModal, setSelectingModal] = useState(false)
+    const [selectingBackModal, setSelectingBackModal] = useState(false)
+
+    const [backImageLoading, setBackImageLoading] = useState(currentMember.backImageLoading)
 
     const isAuthorized = isAdmin() || isModerator()
 
+    const handleChangeAvatar = (image) => {
+        setSelectingModal(false)
+        setEditingAvatar(true)
+        setAvatarImage(image)
+        dispatch(changeMemberImage({...connectedMember, newAvatar: image.url}))
+    }
+
+    const handleChangeBackImage = (image) => {
+        setSelectingBackModal(false)
+        setEditingBackImage(true)
+        setBackImage(image)
+        dispatch(changeMemberImage({...connectedMember, backImage: image.url}))
+    }
+
+    const handleSaveImage = async (label) => {
+        let imagesArray = []
+        if(label === 'avatar') {
+            imagesArray = [avatarImage]
+        }
+        if(label === 'backImage') {
+            imagesArray = [backImage]
+        }
+        if(!imagesArray || imagesArray.length === 0) {
+            return alert("Aucune image selectionnée.")
+        }
+        const transformedArray = dataTransformer(imagesArray)
+        setProgress(0)
+        setUploadModal(true)
+        const result = await directUpload(transformedArray, imagesArray, (progress) => {
+            setProgress(progress)
+        })
+        setUploadModal(false)
+        if(result) {
+            const signedArray = store.getState().uploadImage.signedRequestArray
+            let data;
+            if (label === 'backImage') {
+                data = {
+                    memberId: getConnectedMember().id,
+                    backImageUrl: signedArray[0].url
+                }
+            }
+            if (label === 'avatar') {
+                data = {
+                    memberId: getConnectedMember().id,
+                    avatarUrl: signedArray[0].url,
+                }
+            }
+            await dispatch(getImagesEdit(data))
+            const error = store.getState().entities.member.error
+            if(error !== null) {
+                return alert("Nous n'avons pas pu mettre à jour vos images, veuillez reessayer plutard.")
+            }
+            setEditingAvatar(false)
+            setEditingBackImage(false)
+            const allMember = store.getState().entities.member.list
+            const updated = allMember.find(item => item.id === connectedMember.id)
+            currentMember = updated
+            alert("Les images ont été modifiées avec succès")
+        }else {
+            return alert("Les images n'ont pu être validées veuillez reessayer plutard.")
+        }
+    }
+
+
+    useEffect(() => {
+            setConnectedMember(currentMember)
+    }, [currentMember, getMemberUserCompte().avatarLoading, getMemberUserCompte().backImageLoading])
     return (
         <>
             <ScrollView contentContainerStyle={{paddingBottom: 20}}>
                 <BackgroundWithAvatar
-                    onChangeImages={() => setEditImages(true)
-                    }
-                    selectedMember={getMemberUserCompte()}
-                    showCamera={true}
+                    onBackImageLoadEnd={() => setBackImageLoading(false)}
+                    onBackImageLoading={backImageLoading}
+                    selectingBackImage={selectingBackModal}
+                    onSelectingBackImage={() => setSelectingBackModal(true)}
+                    onBackImageEditing={editingBackImage}
+                    selectingAvatar={selectingModal}
+                    onAvatarEditing={editingAvatar}
+                    onCloseBackModal={() => setSelectingBackModal(false)}
+                    onSelectingAvatar={() => setSelectingModal(true)}
+                    onCloseSelectingModal={() => setSelectingModal(false)}
+                    allowCamera={true}
+                    onSaveBackImage={() => handleSaveImage('backImage')}
+                    onSelectBackImage={handleChangeBackImage}
+                    onCancelBackImage={() => {
+                        dispatch(cancelChangingImage(connectedMember))
+                        setEditingBackImage(false)
+                    }}
+                    saveAvatar={() => handleSaveImage('avatar')}
+                    cancelAvatarChanging={() => {
+                        dispatch(cancelChangingImage({...connectedMember, label:'avatar'}))
+                        setEditingAvatar(false)
+                    }}
+                    onChangeMemberAvatar={handleChangeAvatar}
+                    selectedMember={connectedMember}
                 />
-                <View style={{
-                    alignItems: 'flex-end',
-                    marginVertical: 20,
-                    marginTop: 40,
-                    marginHorizontal: 10
-                }}>
-                    <AppIconWithLabelButton
-                        onPress={() => leaveAssociation(getMemberUserCompte())}
-                        labelStyle={{color: defaultStyles.colors.rougeBordeau}}
-                        iconColor={defaultStyles.colors.rougeBordeau}
-                        iconName='account-minus'
-                        label='quitter'/>
-                </View>
                 <View style={styles.statut}>
                     <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 22, fontWeight: 'bold'}}>{getConnectedMember()?.statut}</AppText>
                 </View>
@@ -85,11 +181,19 @@ function MemberCompteScreen({navigation}) {
                                      screen : routes.EDIT_MEMBER,
                                      params: getMemberUserCompte()
                                  })}/>
+                <AppAddNewButton
+                    buttonContainerStyle={{
+                        backgroundColor: defaultStyles.colors.rougeBordeau,
+                        marginVertical: 10
+                    }}
+                    name='account-minus'
+                    onPress={() => leaveAssociation(getMemberUserCompte())}/>
             </View>}
 
-            <EditImagesModal
-                closeModal={() => setEditImages(false)}
-                editImagesModalVisible={editImages}/>
+          <AppUploadModal
+              closeModal={() => setUploadModal(false)}
+              progress={progress}
+              uploadModalVisible={uploadModal}/>
         </>
     );
 }
@@ -116,7 +220,8 @@ const styles = StyleSheet.create({
     edit: {
       position: 'absolute',
         right: 5,
-        bottom: 5
+        bottom: 5,
+        alignItems: 'center'
     },
     fontImage: {
         height: 200

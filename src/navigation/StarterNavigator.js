@@ -21,6 +21,7 @@ import {getLogout} from "../store/slices/authSlice";
 import HelpScreen from "../screens/HelpScreen";
 import NavigHeaderButton from "../components/NavigHeaderButton";
 import SelectedTransactionReseauScreen from "../screens/SelectedTransactionReseauScreen";
+import ParamScreen from "../screens/ParamScreen";
 
 const StarterNavig = createStackNavigator()
 
@@ -104,6 +105,12 @@ function StarterNavigator() {
                 component={EditTransactionScreen}
                 options={({route}) => ({
                     title: 'Edition '+ route.params.number
+                })}/>
+                <StarterNavig.Screen
+                name='ParamScreen'
+                component={ParamScreen}
+                options={({route}) => ({
+                    title: 'Paramètres'
                 })}/>
             <StarterNavig.Screen name='Transaction' component={TransactionNavigator} options={({navigation}) =>({
                 title: '',

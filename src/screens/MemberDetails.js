@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, ScrollView, StyleSheet, TouchableWithoutFeedback} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 
@@ -13,6 +13,7 @@ import useAuth from "../hooks/useAuth";
 import EditRolesModal from "../components/member/EditRolesModal";
 import AppLabelWithValue from "../components/AppLabelWithValue";
 import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
+import {useSelector} from "react-redux";
 
 
 function MemberDetails({route, navigation}) {
@@ -22,6 +23,12 @@ function MemberDetails({route, navigation}) {
     const {getMemberCotisations} = useCotisation()
     const {getMemberEngagementInfos} = useEngagement()
     const {formatFonds, formatDate, leaveAssociation} = useManageAssociation()
+    const currentMember = useSelector(state => {
+        const list = state.entities.member.list
+        const selected = list.find(item => item.id === selectedMember.id)
+        return selected
+    })
+    const [currentMemberState, setCurrentMemberState] = useState(selectedMember)
 
     const [editRoles, setEditRoles] = useState(false)
 
@@ -29,10 +36,14 @@ function MemberDetails({route, navigation}) {
     const isTheSameUser = getMemberUserCompte().id === selectedMember.id
     const canQuitMember = isAuthorized || isTheSameUser
 
+    useEffect(() => {
+        setCurrentMemberState(currentMember)
+    }, [currentMember.backImageLoading])
+
     return (
         <>
         <ScrollView contentContainerStyle={{paddingBottom: 20}}>
-            <BackgroundWithAvatar selectedMember={selectedMember}/>
+            <BackgroundWithAvatar  selectedMember={currentMemberState}/>
             <View
                 style={{
                     alignItems: 'flex-end',
@@ -44,7 +55,7 @@ function MemberDetails({route, navigation}) {
                marginVertical: 10
                }}
                labelStyle={{color: defaultStyles.colors.rougeBordeau}}
-               onPress={() => navigation.navigate(routes.EDIT_MEMBER, selectedMember)}
+               onPress={() => navigation.navigate(routes.EDIT_MEMBER, currentMemberState)}
                iconName='account-edit'
                iconColor={defaultStyles.colors.rougeBordeau}
                label='edit member'/>
@@ -61,25 +72,25 @@ function MemberDetails({route, navigation}) {
                 {canQuitMember &&
                 <AppIconWithLabelButton
                     buttonContainerStyle={{marginTop: 10}}
-                    onPress={() => leaveAssociation(selectedMember)}
+                    onPress={() => leaveAssociation(currentMemberState)}
                     iconColor={defaultStyles.colors.rougeBordeau}
                     iconName='account-minus'
                     label='quitter'
                     labelStyle={{color: defaultStyles.colors.rougeBordeau}}/>}
             </View>
             <View style={styles.statut}>
-                <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 20, fontWeight: 'bold'}}>{selectedMember.member.statut}</AppText>
+                <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 20, fontWeight: 'bold'}}>{currentMemberState.member.statut}</AppText>
             </View>
             <View style={{marginTop: 30}}>
 
-                <AppLabelWithValue label='Fonds' value={formatFonds(selectedMember.member.fonds)}/>
-                <AppLabelWithValue label='Nom' value={selectedMember.nom || "ajoutez votre nom"}/>
-                <AppLabelWithValue label='Prenoms' value={selectedMember.prenom || "ajoutez votre prenom"}/>
-                <AppLabelWithValue label='Telephone' value={selectedMember.phone || "ajoutez un numero de telephone"}/>
-                <AppLabelWithValue label='Profession' value={selectedMember.profession || "Quelle est votre profession?"}/>
-                <AppLabelWithValue label='Statut emploi' value={selectedMember.emploi || "Avez-vous un emploi?"}/>
-                <AppLabelWithValue label='Autres adresses' value={selectedMember.adresse || "ajoutez une adresse (ex: votre ville)"}/>
-                <AppLabelWithValue label="Date d'adhésion" value={formatDate(selectedMember.member.adhesionDate)}/>
+                <AppLabelWithValue label='Fonds' value={formatFonds(currentMemberState.member.fonds)}/>
+                <AppLabelWithValue label='Nom' value={currentMemberState.nom || "ajoutez votre nom"}/>
+                <AppLabelWithValue label='Prenoms' value={currentMemberState.prenom || "ajoutez votre prenom"}/>
+                <AppLabelWithValue label='Telephone' value={currentMemberState.phone || "ajoutez un numero de telephone"}/>
+                <AppLabelWithValue label='Profession' value={currentMemberState.profession || "Quelle est votre profession?"}/>
+                <AppLabelWithValue label='Statut emploi' value={currentMemberState.emploi || "Avez-vous un emploi?"}/>
+                <AppLabelWithValue label='Autres adresses' value={currentMemberState.adresse || "ajoutez une adresse (ex: votre ville)"}/>
+                <AppLabelWithValue label="Date d'adhésion" value={formatDate(currentMemberState.member.adhesionDate)}/>
 
             </View>
             <View>
@@ -88,12 +99,12 @@ function MemberDetails({route, navigation}) {
                         navigation.navigate('Cotisations', {
                             screen: 'MemberCotisationScreen',
                             initial: false,
-                            params:selectedMember
+                            params:currentMemberState
                         })}>
                     <View style={styles.cotisation}>
                         <AppText style={{color: defaultStyles.colors.bleuFbi}}>Cotisations</AppText>
-                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>({getMemberCotisations(selectedMember).cotisationLenght})</AppText>
-                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>{formatFonds(getMemberCotisations(selectedMember).totalCotisation)}</AppText>
+                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>({getMemberCotisations(currentMemberState).cotisationLenght})</AppText>
+                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>{formatFonds(getMemberCotisations(currentMemberState).totalCotisation)}</AppText>
                         <MaterialCommunityIcons name="clipboard-play-multiple" size={24} color="black" />
                     </View>
                 </TouchableWithoutFeedback>
@@ -101,19 +112,19 @@ function MemberDetails({route, navigation}) {
                     onPress={() => navigation.navigate('Engagements', {
                     screen : routes.LIST_ENGAGEMENT,
                     initial: false,
-                    params:selectedMember
+                    params:currentMemberState
                 })}>
                     <View style={styles.cotisation}>
                         <AppText style={{color: defaultStyles.colors.bleuFbi}}>Engagements</AppText>
-                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>({getMemberEngagementInfos(selectedMember).engagementLength})</AppText>
-                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>{formatFonds(getMemberEngagementInfos(selectedMember).engagementAmount)}</AppText>
+                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>({getMemberEngagementInfos(currentMemberState).engagementLength})</AppText>
+                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>{formatFonds(getMemberEngagementInfos(currentMemberState).engagementAmount)}</AppText>
                         <MaterialCommunityIcons name="clipboard-play-multiple" size={24} color="black" />
                     </View>
                  </TouchableWithoutFeedback>
             </View>
         </ScrollView>
             <EditRolesModal
-                member={selectedMember.member}
+                member={currentMemberState.member}
                 editRoles={editRoles}
                 dismissModal={() => setEditRoles(false)}/>
         </>

@@ -46,7 +46,7 @@ const initMonth = [
     },
     {
         label: 'Octobre',
-        nunber: 9,
+        number: 9,
         showDetail: false
     },
     {

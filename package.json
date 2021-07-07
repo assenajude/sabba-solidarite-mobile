@@ -46,7 +46,8 @@
     "react-redux": "^7.2.4",
     "redux": "^4.1.0",
     "sentry-expo": "^3.1.0",
-    "yup": "^0.32.9"
+    "yup": "^0.32.9",
+    "expo-linking": "~2.2.3"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0"

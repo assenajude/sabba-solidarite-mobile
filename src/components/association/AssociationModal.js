@@ -5,10 +5,12 @@ import defaultStyles from '../../utilities/styles'
 import AssociationItem from "./AssociationItem";
 import AppText from "../AppText";
 import {useSelector} from "react-redux";
+import useManageAssociation from "../../hooks/useManageAssociation";
 
 function AssociationModal({visible, closeModal, associations, selectAssociation}) {
 
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
+    const {deleteAssociation} = useManageAssociation()
 
     return (
         <Modal visible={visible} transparent>
@@ -30,13 +32,14 @@ function AssociationModal({visible, closeModal, associations, selectAssociation}
                     alignItems: "center",
                     justifyContent: "center"
                 }}>
-                    <AppText>Vous netes pas encore membre d'associations.</AppText>
+                    <AppText>Vous n'êtes pas encore membre d'associations.</AppText>
                 </View>}
                 {associations.length > 0 && <FlatList data={associations}
                           keyExtractor={item => item.id.toString()}
                           numColumns={2}
                           renderItem={({item}) =>
                               <AssociationItem
+                                  deleteSelected={() => deleteAssociation(item)}
                                   borderStyle={item.id === currentAssociation.id?{borderWidth: 1, borderColor: defaultStyles.colors.bleuFbi}:{}}
                                   association={item}
                                   nom={item.nom} showState={false}

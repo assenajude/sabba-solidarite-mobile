@@ -27,18 +27,41 @@ function EditImagesModal({editImagesModalVisible,closeModal, member}) {
     const [error, setError] = useState(null)
     const [progress, setProgress] = useState(0)
     const [uploadModal, setUploadModal] = useState(false)
+    const [editingAvatar, setEditingAvatar] = useState(false)
+    const [editingBackImage, setEditingBackImage] = useState(false)
 
     const handleValidateImages = async (images) => {
-        if (Object.keys(images.avatar).length === 0 && Object.keys(images.backImage).length === 0) {
+        console.log('avatar url',images.avatar.url);
+        console.log('backimage url',images.backImage.url);
+        const avatarKeys = Object.keys(images.avatar)
+        const backImageKeys = Object.keys(images.backImage)
+        const editAvatar = avatarKeys.indexOf('imageData') !== -1
+        const editBackImage = backImageKeys.indexOf('imageData') !== -1
+        if(editAvatar) setEditingAvatar(true)
+        if(editBackImage) setEditingBackImage(true)
+        const isNotAvatarAndBackImage = Object.keys(images.avatar).length === 0 && Object.keys(images.backImage).length === 0 && editingAvatar===false && editingBackImage === false
+        const isOnlyAvatar = Object.keys(images.avatar).length > 0 && Object.keys(images.backImage).length === 0
+        const isOnlyBackImage = Object.keys(images.avatar).length === 0 && Object.keys(images.backImage).length>0
+        let imagesArray = []
+        if (isNotAvatarAndBackImage) {
             setError('Veuillez selectionner au moins une image')
             return;
         }
+        if(isOnlyAvatar && editingAvatar) {
+            console.log("editing only avatar......................")
+            imagesArray = [images.avatar]
+        } else if(isOnlyBackImage && editingBackImage) {
+            console.log("editing only backimage.....................")
+            imagesArray = [images.backImage]
+        }else if(editingBackImage && editingAvatar){
+            console.log("editing avatar and backimage.....................")
+            imagesArray = [images.avatar, images.backImage]
+        }
         editImagesModalVisible = false
-        const array = [images.avatar, images.backImage]
         setProgress(0)
         setUploadModal(true)
-        const transformedArray = dataTransformer(array)
-        const result = await directUpload(transformedArray, array, (progress) => {
+        const transformedArray = dataTransformer(imagesArray)
+        const result = await directUpload(transformedArray, imagesArray, (progress) => {
             setProgress(progress)
         })
         setUploadModal(false)
@@ -46,11 +69,28 @@ function EditImagesModal({editImagesModalVisible,closeModal, member}) {
             return alert("Impossible de faire la mise à jour. Les images n'ont pas été telechargées.")
         }
         const signedArray = store.getState().uploadImage.signedRequestArray
-        const data = {
-            memberId: getConnectedMember().id,
-            avatarUrl: signedArray[0].url,
-            backImageUrl: signedArray[1].url
+        let data;
+        if(editingAvatar === true && editingBackImage === true) {
+            console.log("data for both only.......................")
+            data = {
+                memberId: getConnectedMember().id,
+                avatarUrl: signedArray[0].url,
+                backImageUrl: signedArray[1].url
+            }
+        } else if(editingBackImage) {
+            console.log("data for backimage only.......................")
+            data = {
+                memberId: getConnectedMember().id,
+                backImageUrl: signedArray[0].url
+            }
+        }else {
+            console.log("data for avatar only.......................")
+            data = {
+                memberId: getConnectedMember().id,
+                avatarUrl: signedArray[0].url,
+            }
         }
+
         await dispatch(getImagesEdit(data))
         const error = store.getState().entities.member.error
         if(error !== null) {

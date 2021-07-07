@@ -5,7 +5,7 @@ import AppAddNewButton from "../components/AppAddNewButton";
 import routes from "../navigation/routes";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import AppText from "../components/AppText";
-import {getAllAssociation} from "../store/slices/associationSlice";
+import {getAllAssociation, mainAssociationImageLoaded} from "../store/slices/associationSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AssociationItem from "../components/association/AssociationItem";
 import useManageAssociation from "../hooks/useManageAssociation";
@@ -69,6 +69,19 @@ function ListAssociationScreen({navigation, route}) {
 
     }, [searchLabel, updateList, navigation, deleted, deletedSuccess])
 
+
+    const handleImageLoaded = async (asso) => {
+        if(asso.imageLoading) {
+            await dispatch(mainAssociationImageLoaded(asso))
+            const newAssoState = store.getState().entities.association.list
+            const selected = newAssoState.find(association => association.id == asso.id)
+            const oldArray = selectedList.filter(item => item.id !== asso.id)
+            const newArray = [...oldArray, selected]
+            setSelectedList(newArray)
+        }
+    }
+
+
     useEffect(() => {
         getAssociationList()
         const unsubscribe = navigation.addListener('focus', () => {
@@ -106,6 +119,8 @@ function ListAssociationScreen({navigation, route}) {
                 numColumns={2}
                 renderItem={({item}) =>
                     <AssociationItem
+                        onImageLoadEnd={() => handleImageLoaded(item)}
+                        imageLoading={item.imageLoading}
                         deleteSelected={() => handleDeleteOne(item)}
                         association={item}
                         onPress={() => navigation.navigate(routes.ASSOCIATION_DETAILS,item)}

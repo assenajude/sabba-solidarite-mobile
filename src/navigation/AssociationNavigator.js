@@ -29,9 +29,9 @@ function AssociationNavigator(props) {
         setAssociationModalVisible(!associationModalVisible)
     }
 
-    const handleSelectAssociation = async(item) => {
-        dispatch(setSelectedAssociation(item))
+    const handleSelectAssociation = (item) => {
         getInitAssociation(item)
+        dispatch(setSelectedAssociation(item))
         setAssociationModalVisible(false)
     }
 
@@ -70,7 +70,7 @@ function AssociationNavigator(props) {
             <AssociationModal visible={associationModalVisible}
                               closeModal={() => setAssociationModalVisible(false)}
                               associations={memberAssociations}
-                              selectAssociation={val=>handleSelectAssociation(val)}
+                              selectAssociation={val=> handleSelectAssociation(val)}
             />
             </>
     );

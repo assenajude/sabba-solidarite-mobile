@@ -27,7 +27,7 @@ function WelcomeScreen({navigation}) {
     return (
         <>
             <AppHeaderGradient/>
-        <ImageBackground blurRadius={1} style={styles.container} source={require('../../assets/solidariteImg.jpg')}>
+        <ImageBackground style={styles.container} source={require('../../assets/backImage.png')}>
             <View style={styles.buttonStyle}>
                 <AppButton title='Se connecter' onPress={() => navigation.navigate(routes.LOGIN)}/>
                 <AppButton color1='#FFA500' color2='#ff7f00' color3='#efd807'

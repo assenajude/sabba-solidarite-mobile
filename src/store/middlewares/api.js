@@ -14,9 +14,11 @@ const api = store => next => async action => {
         method,
         headers: {'x-access-token':authToken}
     })
-        store.dispatch({type: onSuccess, payload: response.data})
+        store.dispatch(actions.apiRequestSuccess(response.data))
+        if (onSuccess) store.dispatch({type: onSuccess, payload: response.data})
     } catch (e) {
-        store.dispatch({type: onError, payload: e.message})
+        store.dispatch(actions.apiRequestFailed(e.message))
+        if (onError) store.dispatch({type: onError, payload: e.message})
     }
 
 }

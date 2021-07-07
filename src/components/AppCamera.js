@@ -2,8 +2,13 @@ import React from 'react';
 import {TouchableOpacity, View, StyleSheet} from "react-native";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import defaultStyles from "../utilities/styles";
+import AppImageValidator from "./AppImageValidator";
 
-function AppCamera({cameraStyle,cameraContainer, iconSize=30, onPress}) {
+function AppCamera({cameraStyle,cameraContainer, iconSize=30, onImageEditing=false,onPress, saveImage, cancelImage}) {
+
+    if(onImageEditing) {
+        return <AppImageValidator saveImage={saveImage} cancelImage={cancelImage}/>
+    }
     return (
         <View style={cameraContainer}>
         <TouchableOpacity onPress={onPress}>

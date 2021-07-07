@@ -6,9 +6,8 @@ import defaultStyles from '../utilities/styles'
 import AppText from "./AppText";
 import AppIconButton from "./AppIconButton";
 
-function AppImagePicker({onSelectImage, cameraStyle, cameraContainer, iconSize}) {
-
-    const [changeImage, setChangeImage] = useState(false)
+function AppImagePicker({onSelectImage, cameraStyle, cameraContainer, iconSize, onImageEditing,
+                            selectingImage, onPressCamera, onPressCloseButton, saveImage, cancelImage}) {
 
     const selectImage = async () => {
         try {
@@ -25,7 +24,6 @@ function AppImagePicker({onSelectImage, cameraStyle, cameraContainer, iconSize})
                 return;
             }
             onSelectImage({url: result.uri, imageData: result.base64})
-            setChangeImage(false)
         } catch (e) {
             throw new Error(e)
         }
@@ -46,7 +44,6 @@ function AppImagePicker({onSelectImage, cameraStyle, cameraContainer, iconSize})
                 return;
             }
             onSelectImage({url: result.uri, imageData: result.base64})
-            setChangeImage(false)
         } catch (e) {
             throw new Error(e)
         }
@@ -54,16 +51,31 @@ function AppImagePicker({onSelectImage, cameraStyle, cameraContainer, iconSize})
 
     return (
         <>
-        <AppCamera iconSize={iconSize} cameraContainer={cameraContainer} cameraStyle={cameraStyle} onPress={() => setChangeImage(true)}/>
-            <Modal visible={changeImage} transparent>
+        <AppCamera
+            cancelImage={cancelImage}
+            saveImage={saveImage}
+            onImageEditing={onImageEditing}
+            iconSize={iconSize}
+            cameraContainer={cameraContainer}
+            cameraStyle={cameraStyle}
+            onPress={onPressCamera}/>
+            <Modal visible={selectingImage} transparent>
                 <View style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: defaultStyles.colors.dark,
+                    opacity: 0.5
+                }}>
+                </View>
+                <View style={{
+                    position: 'absolute',
                     backgroundColor:  defaultStyles.colors.white,
                     height: 300,
                     width: '100%',
                     top: '70%'
                 }}>
                     <AppIconButton
-                        onPress={() => setChangeImage(false)}
+                        onPress={onPressCloseButton}
                         containerStyle={{
                             alignSelf: 'flex-end',
                             marginVertical: 10

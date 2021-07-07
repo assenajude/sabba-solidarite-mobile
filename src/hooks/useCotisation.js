@@ -48,7 +48,7 @@ export default useCotisation = () => {
 
     const getMonthCotisations = (month) => {
         const monthCotisations = yearCotisations.filter(cotisation => {
-            const cotisationdate = cotisation.datePayement
+            const cotisationdate = cotisation.member_cotisation.paymentDate
             const cotisationMonth = dayjs(cotisationdate).month()
             if(cotisationMonth === month.number) return true
             return false

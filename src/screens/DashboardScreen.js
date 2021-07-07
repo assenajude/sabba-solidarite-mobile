@@ -77,6 +77,7 @@ function DashboardScreen({navigation}) {
             <ScrollView>
             <AppHeaderGradient/>
             <AssociationBackImage
+                imageLoading={currentAssociation.imageLoading}
                 association={currentAssociation}
                 uploadResult={handleChangeImage}/>
                 <View style={styles.descriptionContainer}>

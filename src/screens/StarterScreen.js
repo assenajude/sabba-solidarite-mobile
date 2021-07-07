@@ -17,6 +17,7 @@ import {getPopulateReseauList, getUserTransactions} from "../store/slices/transa
 import {reseauData} from "../utilities/reseau.data";
 import useNotification from "../hooks/useNotification";
 import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
+import {associationImageLoaded} from "../store/slices/memberSlice";
 
 function StarterScreen({navigation}) {
     const dispatch = useDispatch()
@@ -28,6 +29,10 @@ function StarterScreen({navigation}) {
     const assoLoading = useSelector(state => state.entities.association.loading)
     const memberLoading = useSelector(state => state.entities.member.loading)
     const memberAssociations = useSelector(state => state.entities.member.userAssociations)
+
+    const [image1Loading, setImage1Loading] = useState(false)
+    const [image2Loading, setImage2Loading] = useState(false)
+    const [image3Loading, setImage3Loading] = useState(false)
 
     const loading = assoLoading || memberLoading
 
@@ -159,6 +164,12 @@ function StarterScreen({navigation}) {
                     numColumns={2}
                     renderItem={({item}) =>
                         <AssociationItem
+                            imageLoading={item.imageLoading}
+                            onImageLoadEnd={() => {
+                                if(item.imageLoading) {
+                                    dispatch(associationImageLoaded(item))
+                                }
+                            }}
                             deleteSelected={() => deleteAssociation(item)}
                             association={item}
                             relationType={getMemberRelationType(item)}

@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {ScrollView, View, StyleSheet, BackHandler} from "react-native";
 import {useFocusEffect} from '@react-navigation/native'
 import AssociationBackImage from "../components/association/AssociationBackImage";
@@ -21,7 +21,14 @@ function AssociationDetailScreen({route, navigation}) {
     const {formatFonds} = useManageAssociation()
     const {isAdmin}= useAuth()
 
+    const [associationState, setAssociationState] = useState(selectedAssociation)
+
     const isLoading = useSelector(state => state.entities.association.loading)
+    const currentAssociation = useSelector(state => {
+        const allAssociation = state.entities.association.list
+        const selected = allAssociation.find(item => item.id === selectedAssociation.id)
+        return selected
+    })
 
    const handleSaveChanged = async (uploadResult) => {
         if(uploadResult) {
@@ -31,7 +38,7 @@ function AssociationDetailScreen({route, navigation}) {
                 avatarUrl: imageUrlArray[0].url
             }
             await dispatch(getAvatarUpdate(data))
-            const error = store.getState().association.error
+            const error = store.getState().entities.association.error
             if(error !== null) {
                 return alert("Impossible de faire la mise à jour.")
             }
@@ -52,16 +59,22 @@ function AssociationDetailScreen({route, navigation}) {
        }, [])
    )
 
+    useEffect(() => {
+        setAssociationState(currentAssociation)
+    }, [currentAssociation.imageLoading])
+
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
             <ScrollView>
-              <AssociationBackImage  uploadResult={handleSaveChanged} association={selectedAssociation}/>
+              <AssociationBackImage
+                  imageLoading={associationState.imageLoading}
+                  uploadResult={handleSaveChanged} association={associationState}/>
               <View style={styles.info}>
-                <AppSimpleLabelWithValue label='Cotisation' labelValue={formatFonds(selectedAssociation.cotisationMensuelle)}/>
-                <AppSimpleLabelWithValue label='Frequence' labelValue={selectedAssociation.frequenceCotisation}/>
-                  <AppReglement association={selectedAssociation}/>
-                <AppLabelWithValue showLimit={false} label='Description' value={selectedAssociation.description}/>
+                <AppSimpleLabelWithValue label='Cotisation' labelValue={formatFonds(associationState.cotisationMensuelle)}/>
+                <AppSimpleLabelWithValue label='Frequence' labelValue={associationState.frequenceCotisation}/>
+                  <AppReglement association={associationState}/>
+                <AppLabelWithValue showLimit={false} label='Description' value={associationState.description}/>
               </View>
               </ScrollView>
                 {isAdmin() && <View style={{
@@ -71,7 +84,7 @@ function AssociationDetailScreen({route, navigation}) {
                 }}>
                     <AppAddNewButton
                         name='file-document-edit'
-                        onPress={() => navigation.navigate(routes.NEW_ASSOCIATION, {selectedAssociation, edit: true})}/>
+                        onPress={() => navigation.navigate(routes.NEW_ASSOCIATION, {associationState, edit: true})}/>
                 </View>}
         </>
     );

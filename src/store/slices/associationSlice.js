@@ -25,22 +25,27 @@ const associationSlice = createSlice({
         associationReceived: (state, action) => {
             state.loading = false
             state.error = null
-            state.list = action.payload
+            const allAssociation = action.payload
+            allAssociation.forEach(ass => ass.imageLoading = true)
+            state.list = allAssociation
         },
         associationAdded: (state, action) => {
             state.loading = false
             state.error = null
             const addedIndex = state.list.findIndex(ass => ass.id === action.payload.id)
             if(addedIndex !== -1) {
-                const newTab = state.list
+                let newTab = state.list
                 newTab[addedIndex] = action.payload
+                newTab[addedIndex].imageLoading = true
                 state.list = newTab
                 if(state.selectedAssociation.id === action.payload.id) {
                     state.selectedAssociation = action.payload
                 }
+            }else {
+                const newAdded = action.payload
+                state.list.push(newAdded)
+
             }
-            const newAdded = action.payload
-            state.list.push(newAdded)
         },
         selectedAssociationSet: (state, action) => {
             state.selectedAssociation = action.payload
@@ -50,6 +55,7 @@ const associationSlice = createSlice({
             state.error = null
             const updateIndex = state.list.findIndex(asso => asso.id === action.payload.id)
             state.list[updateIndex] = action.payload
+            state.list[updateIndex].imageLoading = true
             if(state.selectedAssociation.id === action.payload.id) {
                 state.selectedAssociation = action.payload
             }
@@ -71,6 +77,13 @@ const associationSlice = createSlice({
             state.deleteSuccess = true
             const newList = state.list.filter(ass => ass.id !== action.payload.associationId)
             state.list = newList
+        },
+        imageLoaded: (state, action) => {
+            let selected = state.list.find(ass => ass.id === action.payload.id)
+            selected.imageLoading = false
+            if(selected.id === state.selectedAssociation.id) {
+                state.selectedAssociation = selected
+            }
         }
 
     }
@@ -79,7 +92,7 @@ const associationSlice = createSlice({
 const {associationAdded, associationReceived,
     associationRequested, associationRequestFailed,
     selectedAssociationSet, memberRolesReceived,
-    rolesEdited, associationUpdated, associationDeleted} = associationSlice.actions
+    rolesEdited, associationUpdated, associationDeleted, imageLoaded} = associationSlice.actions
 
 export default associationSlice.reducer
 
@@ -161,4 +174,8 @@ export const getAssociationDelete = (data) => apiRequested({
 
 export const setSelectedAssociation = (association) => dispatch => {
     dispatch(selectedAssociationSet(association))
+}
+
+export const mainAssociationImageLoaded = (association) => dispatch => {
+    dispatch(imageLoaded(association))
 }

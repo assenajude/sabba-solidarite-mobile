@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {View, Image, StyleSheet, TouchableWithoutFeedback, Alert} from "react-native";
+import LottieView from "lottie-react-native";
 import AppImagePicker from "../AppImagePicker";
 import AppText from "../AppText";
 import AppButton from "../AppButton";
@@ -7,8 +8,12 @@ import useUploadImage from "../../hooks/useUploadImage";
 import AppUploadModal from "../AppUploadModal";
 import useAuth from "../../hooks/useAuth";
 import {useDispatch} from "react-redux";
-import {getSelectedAssociation} from "../../store/slices/associationSlice";
-function AssociationBackImage({association, cameraContainer,uploadResult, cameraStyle}) {
+import {getSelectedAssociation, mainAssociationImageLoaded} from "../../store/slices/associationSlice";
+import {associationImageLoaded, getConnectedUserAssociations} from "../../store/slices/memberSlice";
+import colors from "../../utilities/colors";
+import AppImageValidator from "../AppImageValidator";
+
+function AssociationBackImage({association, cameraContainer,uploadResult, cameraStyle, imageLoading}) {
     const dispatch = useDispatch()
     const {isModerator, isAdmin} = useAuth()
     const {dataTransformer, directUpload} = useUploadImage()
@@ -17,19 +22,26 @@ function AssociationBackImage({association, cameraContainer,uploadResult, camera
     const [imageUrl, setImageUrl] = useState(association.avatar)
     const [imageData, setImageData] = useState([])
     const [onEdit, setOnEdit] = useState(false)
+    const [selectingImage, setSelectingImage] = useState(false)
 
     const isImage = imageUrl !== null && imageUrl !== ''
     const isAuthorized = isAdmin() || isModerator()
 
     const handleChangeImage = (image) => {
+        setSelectingImage(false)
         setImageUrl(image.url)
         setImageData([image])
         setOnEdit(true)
     }
 
+    const handleCancelImage = () => {
+        setImageUrl(association.avatar)
+        setImageData([])
+        setOnEdit(false)
+    }
+
     const handleSaveImage = async() => {
         const result = dataTransformer(imageData)
-
         setUploadModalVisible(true)
         setProgress(0)
         const uploaded = await directUpload(result, imageData, (progress) => {
@@ -38,8 +50,12 @@ function AssociationBackImage({association, cameraContainer,uploadResult, camera
         setOnEdit(false)
         setUploadModalVisible(false)
         uploadResult(uploaded)
-        if (uploaded) dispatch(getSelectedAssociation({associationId: association.id}))
+        if (uploaded) {
+            dispatch(getSelectedAssociation({associationId: association.id}))
+            dispatch(getConnectedUserAssociations())
+        }
         if(!uploaded) setImageUrl(association.avatar)
+        setOnEdit(false)
     }
 
     const editImage = () => {
@@ -50,41 +66,58 @@ function AssociationBackImage({association, cameraContainer,uploadResult, camera
         }])
     }
 
+
+
     useEffect(() => {
         setImageUrl(association.avatar)
-    }, [association])
+    }, [association, association.imageLoading])
 
     return (
         <View>
             <TouchableWithoutFeedback onPress={editImage}>
-            <Image style={styles.image} source={isImage?{uri: imageUrl}:require('../../../assets/solidariteImg.jpg')}/>
+                <View>
+                    <Image
+                    onLoadEnd={() => {
+                        if(association.imageLoading) {
+                            dispatch(associationImageLoaded(association))
+                            dispatch(mainAssociationImageLoaded(association))
+                        }
+                        }}
+                    style={styles.image} source={isImage?{uri: imageUrl}:require('../../../assets/solidariteImg.jpg')}/>
+                    {imageLoading && <View style={styles.loading}>
+                        <LottieView
+                            autoPlay={true}
+                            loop={true}
+                            style={{
+                                position: 'absolute',
+                                width: '100%',
+                                height: 200
+                            }}
+                            source={require('../../../assets/animations/image-loading')}/>
+                    </View>}
+
+                </View>
             </TouchableWithoutFeedback>
             <View style={styles.nom}>
                 <AppText style={{fontWeight: 'bold'}}>{association.nom}</AppText>
             </View>
-            {isAuthorized && <View style={styles.camera}>
-                <AppImagePicker iconSize={20}
-                    cameraContainer={[cameraContainer]}
-                    onSelectImage={handleChangeImage}
-                    cameraStyle={[cameraStyle, {height: 40, width: 40}]}/>
-            </View>}
-           {onEdit && <View style={{
+           {isAuthorized && <View style={{
                 position: 'absolute',
-                top: 10,
-                right: 10
+                top: onEdit?10:-20,
+                right: 5
             }}>
-                <AppButton
-                    onPress={handleSaveImage}
-                    iconName='content-save-edit' iconSize={20}
-                    title='save'
-                    otherButtonStyle={{
-                        height: 30,
-                        padding: 5
-                    }}
-                    textStyle={{
-                    }}/>
+                <AppImagePicker
+                    cameraStyle={[cameraStyle, {height: 40, width: 40}]}
+                    iconSize={20}
+                    cameraContainer={cameraContainer}
+                    onPressCamera={() => setSelectingImage(true)}
+                    cancelImage={handleCancelImage}
+                    onPressCloseButton={() => setSelectingImage(false)}
+                    onSelectImage={handleChangeImage}
+                    onImageEditing={onEdit}
+                    selectingImage={selectingImage}
+                    saveImage={handleSaveImage}/>
             </View>}
-
             <AppUploadModal
                 closeModal={() => setUploadModalVisible(false)}
                 progress={progress}
@@ -102,6 +135,12 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right:15,
         bottom: 20
+    },
+    loading: {
+        position: 'absolute',
+      width: "100%",
+      height: '100%',
+        backgroundColor:colors.lightGrey
     },
     nom: {
         alignItems: 'center',

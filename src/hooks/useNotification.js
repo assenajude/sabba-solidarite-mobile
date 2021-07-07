@@ -6,6 +6,7 @@ import navigation from '../navigation/routeNavigation'
 import {useDispatch, useStore} from "react-redux";
 import {setSelectedAssociation} from "../store/slices/associationSlice";
 import useAuth from "./useAuth";
+import {getLogout} from "../store/slices/authSlice";
 let useNotification;
 export default useNotification = () => {
     const store = useStore()
@@ -74,8 +75,20 @@ export default useNotification = () => {
                 navigation.navigate("Auth", routeParams)
             }
         }
+        if(notifType === 'param') {
+            navigation.navigate("Auth")
+        }
         if(notifType === 'userCompte') {
+            if(isUserConnected) {
                 navigation.navigate('Starter',{screen: 'UserCompte', params: currentUser})
+
+            }else {
+                routeParams = {
+                    screen: routes.LOGIN,
+                    params: {mainNavig: 'Starter', nestedNavig: routes.USER_COMPTE, otherParams: {type: data.notifType}}
+                }
+                navigation.navigate("Auth", routeParams)
+            }
         }
         if(notifType === 'cotisation') {
             if(isUserConnected) {

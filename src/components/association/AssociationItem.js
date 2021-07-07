@@ -6,23 +6,46 @@ import AppText from "../AppText";
 import AppButton from "../AppButton";
 import defaultStyles from '../../utilities/styles'
 import AppIconButton from "../AppIconButton";
+import useAuth from "../../hooks/useAuth";
+import LottieView from 'lottie-react-native'
+import {associationImageLoaded} from "../../store/slices/memberSlice";
+import {useDispatch} from "react-redux";
 
 
-function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, isMember, relationType,
+function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, isMember,
+                             relationType,onImageLoadEnd,imageLoading,
                              showState=true, deleteSelected}) {
-
-
-
-
+    const {isAdmin} = useAuth()
     return (
         <View style={[{width: '50%', marginVertical: 10}, borderStyle]}>
         <View style={styles.container}>
         <TouchableWithoutFeedback onPress={onPress}>
-            <View style={{ alignItems: 'center'}}>
+            <View style={{
+                alignItems: 'center',
+                borderWidth: imageLoading?0.5:0
+            }}>
                 <Image
+                    onLoadEnd={onImageLoadEnd}
+                    loadingIndicatorSource={require('../../../assets/solidariteImg.jpg')}
                     style={styles.associationAvatar}
-                    source={association.avatar?{uri: association.avatar} : require('../../../assets/solidariteImg.jpg')}/>
-                <AppText style={styles.nom}>{association.nom}</AppText>
+                    source={association.avatar.length>0?{uri: association.avatar} : require('../../../assets/solidariteImg.jpg')}/>
+                {imageLoading && <View style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    alignItems: 'flex-start',
+                    backgroundColor: defaultStyles.colors.lightGrey
+
+                }}>
+                <LottieView style={{
+                    height: 180,
+                    width: 180,
+                }}
+                    source={require("../../../assets/animations/image-loading")}
+                    loop={true}
+                    autoPlay={true}/>
+                </View>}
+                <AppText style={[styles.nom, {marginTop: imageLoading?30:0, marginVertical: imageLoading?0:10}]}>{association.nom}</AppText>
             </View>
         </TouchableWithoutFeedback>
         </View>
@@ -43,7 +66,7 @@ function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, i
                 </View>
                 }
             </View>}
-            <View style={styles.deleteButton}>
+            {isAdmin() && <View style={styles.deleteButton}>
                <AppIconButton
                    onPress={deleteSelected}
                    iconColor={defaultStyles.colors.rougeBordeau}
@@ -55,7 +78,7 @@ function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, i
                        borderRadius: 20
                    }}
                    iconName='delete'/>
-            </View>
+            </View>}
             </View>
     );
 }
@@ -90,7 +113,6 @@ const styles = StyleSheet.create({
     },
     nom: {
         textAlign: 'center',
-        marginVertical: 10,
         fontWeight: 'bold'
     }
 })

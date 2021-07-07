@@ -12,12 +12,13 @@ import routes from "../navigation/routes";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import {register} from "../store/slices/authSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import GradientScreen from "../components/GradientScreen";
 
 
 const registerValidSchema = Yup.object().shape({
     username: Yup.string(),
     email: Yup.string().email("Email invalide").required("Email requis"),
-    password: Yup.string().min(5,"Le mot de passe doit contenir au moins 5 caractères").required('le mot de passe est requis'),
+    password: Yup.string().min(4,"Le mot de passe doit contenir au moins 4 caractères").required('le mot de passe est requis'),
     confirm:Yup.string().when("password", {
         is: val => (val && val.length > 0 ? true : false),
         then: Yup.string().oneOf(
@@ -45,7 +46,7 @@ function RegisterScreen({navigation}) {
     }
 
     return (
-        <>
+        <GradientScreen>
             <AppActivityIndicator visible={isLoading}/>
             <View style={styles.logoInfoContainer}>
                <AppLogoInfo/>
@@ -103,15 +104,26 @@ function RegisterScreen({navigation}) {
             <View style={{
                 marginVertical: 20
             }}>
-                <AppText>Vous avez deja un compte? </AppText>
+                <AppText>Vous avez deja un compte EMAIL? </AppText>
                 <AppText
                     style={{color: defaultStyles.colors.bleuFbi}}
                     onPress={() => navigation.navigate(routes.LOGIN)}
                 >
                     Connectez-vous</AppText>
             </View>
+
+            <View style={{
+                marginBottom: 20
+            }}>
+                <AppText>Vous preferez un compte PIN? </AppText>
+                <AppText
+                    style={{color: defaultStyles.colors.bleuFbi}}
+                    onPress={() => navigation.navigate(routes.CODE_REGISTER)}
+                >
+                    Créer un</AppText>
+            </View>
         </ScrollView>
-            </>
+            </GradientScreen>
     );
 }
 

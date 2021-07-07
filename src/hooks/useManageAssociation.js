@@ -146,6 +146,7 @@ export default useManageAssociation = () => {
         }])
     }
 
+
     return {getMemberRelationType, formatFonds,votorsNumber,leaveAssociation, deleteMember,
         formatDate, associationValidMembers, getNewAdhesion, getManagedAssociationFund, deleteAssociation}
 }
