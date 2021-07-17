@@ -49,10 +49,12 @@ const engagementSlice = createSlice({
             state.tranches = newTrancheTab
         },
         engagementVoted: (state, action) => {
-          state.votesList[action.payload.engagement.id] = action.payload.engagements
-            const updatedIndex = state.list.findIndex(engage => engage.id === action.payload.engagement.id)
+          state.loading = false
+            state.error = null
+            state.votesList[action.payload.justVoted.id] = action.payload.engagementVotes
+            const updatedIndex = state.list.findIndex(engage => engage.id === action.payload.justVoted.id)
             const newEngagements = state.list
-            newEngagements[updatedIndex] = action.payload.engagement
+            newEngagements[updatedIndex] = action.payload.justVoted
             state.list = newEngagements
         },
         engagementUpdated: (state, action) => {

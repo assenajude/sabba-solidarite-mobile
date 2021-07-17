@@ -14,11 +14,11 @@ import EditRolesModal from "../components/member/EditRolesModal";
 import AppLabelWithValue from "../components/AppLabelWithValue";
 import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
 import {useSelector} from "react-redux";
+import AppAddNewButton from "../components/AppAddNewButton";
 
 
 function MemberDetails({route, navigation}) {
     const selectedMember = route.params
-
     const {isAdmin, isModerator, getMemberUserCompte} = useAuth()
     const {getMemberCotisations} = useCotisation()
     const {getMemberEngagementInfos} = useEngagement()
@@ -31,19 +31,23 @@ function MemberDetails({route, navigation}) {
     const [currentMemberState, setCurrentMemberState] = useState(selectedMember)
 
     const [editRoles, setEditRoles] = useState(false)
+    const [backImageLoading, setBackImageLoading] = useState(true)
 
     const isAuthorized = isAdmin() || isModerator()
     const isTheSameUser = getMemberUserCompte().id === selectedMember.id
     const canQuitMember = isAuthorized || isTheSameUser
 
     useEffect(() => {
-        setCurrentMemberState(currentMember)
-    }, [currentMember.backImageLoading])
+        setCurrentMemberState(selectedMember)
+    }, [selectedMember])
 
     return (
         <>
         <ScrollView contentContainerStyle={{paddingBottom: 20}}>
-            <BackgroundWithAvatar  selectedMember={currentMemberState}/>
+            <BackgroundWithAvatar
+                onBackImageLoadEnd={() => setBackImageLoading(false)}
+                onBackImageLoading={backImageLoading}
+                selectedMember={currentMemberState}/>
             <View
                 style={{
                     alignItems: 'flex-end',
@@ -69,17 +73,9 @@ function MemberDetails({route, navigation}) {
                iconName='account-edit'
                labelStyle={{color: defaultStyles.colors.rougeBordeau}}/>
             }
-                {canQuitMember &&
-                <AppIconWithLabelButton
-                    buttonContainerStyle={{marginTop: 10}}
-                    onPress={() => leaveAssociation(currentMemberState)}
-                    iconColor={defaultStyles.colors.rougeBordeau}
-                    iconName='account-minus'
-                    label='quitter'
-                    labelStyle={{color: defaultStyles.colors.rougeBordeau}}/>}
             </View>
             <View style={styles.statut}>
-                <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 20, fontWeight: 'bold'}}>{currentMemberState.member.statut}</AppText>
+                <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 20, fontWeight: 'bold'}}>{currentMemberState?.member?.statut}</AppText>
             </View>
             <View style={{marginTop: 30}}>
 
@@ -123,6 +119,17 @@ function MemberDetails({route, navigation}) {
                  </TouchableWithoutFeedback>
             </View>
         </ScrollView>
+            {canQuitMember &&
+            <AppAddNewButton
+                buttonContainerStyle={{
+                    backgroundColor: defaultStyles.colors.rougeBordeau,
+                    marginVertical: 10,
+                    position: 'absolute',
+                    bottom: -5,
+                    right: 10
+                }}
+                name='account-minus'
+                onPress={() => leaveAssociation(currentMemberState)}/>}
             <EditRolesModal
                 member={currentMemberState.member}
                 editRoles={editRoles}

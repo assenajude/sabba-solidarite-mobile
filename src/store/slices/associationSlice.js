@@ -10,7 +10,8 @@ const associationSlice = createSlice({
         selectedAssociation: {},
         memberRoles: [],
         editedRoleMessage: '',
-        deleteSuccess: false
+        deleteSuccess: false,
+        updated: false
     },
     reducers: {
         associationRequested: (state) => {
@@ -46,6 +47,7 @@ const associationSlice = createSlice({
                 state.list.push(newAdded)
 
             }
+            state.updated = true
         },
         selectedAssociationSet: (state, action) => {
             state.selectedAssociation = action.payload
@@ -59,6 +61,7 @@ const associationSlice = createSlice({
             if(state.selectedAssociation.id === action.payload.id) {
                 state.selectedAssociation = action.payload
             }
+            state.updated = true
         },
 
         memberRolesReceived: (state, action) => {
@@ -77,6 +80,7 @@ const associationSlice = createSlice({
             state.deleteSuccess = true
             const newList = state.list.filter(ass => ass.id !== action.payload.associationId)
             state.list = newList
+            state.updated = true
         },
         imageLoaded: (state, action) => {
             let selected = state.list.find(ass => ass.id === action.payload.id)
@@ -84,6 +88,7 @@ const associationSlice = createSlice({
             if(selected.id === state.selectedAssociation.id) {
                 state.selectedAssociation = selected
             }
+            state.updated = true
         }
 
     }

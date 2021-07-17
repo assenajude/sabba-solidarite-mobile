@@ -1,4 +1,3 @@
-import {Platform} from 'react-native'
 import Constants from "expo-constants/src/Constants";
 import * as Notifications from 'expo-notifications'
 import routes from "../navigation/routes";
@@ -6,7 +5,6 @@ import navigation from '../navigation/routeNavigation'
 import {useDispatch, useStore} from "react-redux";
 import {setSelectedAssociation} from "../store/slices/associationSlice";
 import useAuth from "./useAuth";
-import {getLogout} from "../store/slices/authSlice";
 let useNotification;
 export default useNotification = () => {
     const store = useStore()
@@ -31,14 +29,14 @@ export default useNotification = () => {
             alert('Must use physical device for Push Notifications');
         }
 
-        if (Platform.OS === 'android') {
+       /* if (Platform.OS === 'android') {
             Notifications.setNotificationChannelAsync('default', {
                 name: 'default',
                 importance: Notifications.AndroidImportance.MAX,
                 vibrationPattern: [0, 250, 250, 250],
                 lightColor: '#FF231F7C',
             });
-        }
+        }*/
         return token
     };
 

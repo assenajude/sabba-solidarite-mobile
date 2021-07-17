@@ -46,12 +46,17 @@ function RegisterScreen({navigation}) {
     }
 
     return (
-        <GradientScreen>
+        <>
             <AppActivityIndicator visible={isLoading}/>
+        <GradientScreen>
+            <ScrollView>
             <View style={styles.logoInfoContainer}>
                <AppLogoInfo/>
             </View>
-        <ScrollView contentContainerStyle={styles.container}>
+        <View contentContainerStyle={styles.container}>
+            <View style={{
+                marginHorizontal: 20
+            }}>
             <AppForm
                 initialValues={{
                 username: '',
@@ -100,9 +105,11 @@ function RegisterScreen({navigation}) {
                 />
                 <FormSubmitButton title='Valider'/>
             </AppForm>
+            </View>
 
             <View style={{
-                marginVertical: 20
+                marginVertical: 20,
+                marginHorizontal: 20
             }}>
                 <AppText>Vous avez deja un compte EMAIL? </AppText>
                 <AppText
@@ -113,7 +120,8 @@ function RegisterScreen({navigation}) {
             </View>
 
             <View style={{
-                marginBottom: 20
+                marginBottom: 20,
+                marginHorizontal: 20
             }}>
                 <AppText>Vous preferez un compte PIN? </AppText>
                 <AppText
@@ -122,8 +130,10 @@ function RegisterScreen({navigation}) {
                 >
                     Créer un</AppText>
             </View>
-        </ScrollView>
+        </View>
+            </ScrollView>
             </GradientScreen>
+            </>
     );
 }
 

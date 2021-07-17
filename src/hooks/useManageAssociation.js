@@ -1,10 +1,16 @@
 import {useDispatch, useSelector, useStore} from "react-redux";
 import dayjs from "dayjs";
 import {Alert} from "react-native";
-import {getAssociationLeave, getConnectedUserAssociations, getMemberDelete} from "../store/slices/memberSlice";
+import {
+    getAssociationLeave,
+    getConnectedUserAssociations,
+    getMemberDelete,
+    sendAdhesionMessage
+} from "../store/slices/memberSlice";
 import {getEngagementsByAssociation} from "../store/slices/engagementSlice";
 import {getAssociationCotisations} from "../store/slices/cotisationSlice";
 import {getAllAssociation, getAssociationDelete} from "../store/slices/associationSlice";
+import useAuth from "./useAuth";
 
 let useManageAssociation;
 export default useManageAssociation = () => {
@@ -14,6 +20,7 @@ export default useManageAssociation = () => {
         const engagementsList = useSelector(state => state.entities.engagement.list)
     const associationMembers = useSelector(state => state.entities.member.list)
     const userAssociations = useSelector(state => state.entities.member.userAssociations)
+    const connectedUser = useSelector(state => state.auth.user)
 
 
     const getMemberRelationType = (association) => {
@@ -60,6 +67,9 @@ export default useManageAssociation = () => {
         let investAmount = 0
         let depenseAmount = 0
         let gain = 0
+        let quotite = 0
+        const securityFund = currentAssociation.fondInitial * currentAssociation.seuilSecurite / 100
+        quotite = currentAssociation.fondInitial - securityFund
         const validList = engagementsList.filter(engage => engage.accord === true)
         if(validList.length>0) {
         validList.forEach(item => {
@@ -73,7 +83,7 @@ export default useManageAssociation = () => {
             } else depenseAmount += item.montant
         })
         }
-        return {investAmount, depenseAmount, gain}
+        return {investAmount, depenseAmount, gain, quotite}
     }
 
     const votorsNumber = () => {
@@ -146,7 +156,36 @@ export default useManageAssociation = () => {
         }])
     }
 
+    const sendAdhesionMessageToAssociation = (association) => {
+        Alert.alert("Alert", "Voulez-vous adherer à cette association?", [{
+            text: 'oui', onPress: async() => {
+                const data = {
+                    associationId: association.id,
+                    userId: connectedUser.id,
+                    relation: 'onDemand'
+                }
+                await dispatch(sendAdhesionMessage(data))
+                const error = store.getState().entities.member.error
+                if(error !== null) {
+                    return  alert("Votre message n'a pas été envoyé, veuillez reessayer plutard.")
+                }
+            }
+        }, {
+            text: 'non', onPress: () => {return;}
+        }])
 
-    return {getMemberRelationType, formatFonds,votorsNumber,leaveAssociation, deleteMember,
-        formatDate, associationValidMembers, getNewAdhesion, getManagedAssociationFund, deleteAssociation}
+    }
+
+    const memberQuotite = () => {
+        let quotite = 0
+        if(currentAssociation.individualQuotite > 0) {
+            quotite = getManagedAssociationFund().quotite * currentAssociation.individualQuotite / 100
+        }else{
+            quotite = getManagedAssociationFund().quotite
+        }
+        return quotite
+    }
+
+    return {getMemberRelationType, formatFonds,votorsNumber,leaveAssociation, deleteMember,sendAdhesionMessageToAssociation,
+        formatDate, associationValidMembers, getNewAdhesion, getManagedAssociationFund, deleteAssociation, memberQuotite}
 }

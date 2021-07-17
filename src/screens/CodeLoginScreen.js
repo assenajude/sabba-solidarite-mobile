@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, KeyboardAvoidingView, Platform} from "react-native";
+import {View, ScrollView} from "react-native";
 import AppLogoInfo from "../components/AppLogoInfo";
 import AppKeyboard from "../components/AppKeyboard";
 import AppCodeInput from "../components/AppCodeInput";
@@ -15,6 +15,7 @@ import GradientScreen from "../components/GradientScreen";
 import useAuth from "../hooks/useAuth";
 import {getAllAssociation} from "../store/slices/associationSlice";
 import {getConnectedUserAssociations} from "../store/slices/memberSlice";
+import AppTextInput from "../components/AppTextInput";
 
 function CodeLoginScreen({navigation, route}) {
     const whereToGo = route.params
@@ -25,10 +26,18 @@ function CodeLoginScreen({navigation, route}) {
     const [codeArray, setCodeArray] = useState([])
     const isLoading = useSelector(state => state.auth.loading)
     const [loginFailed, setLoginFailed] = useState(false)
+    const [phoneNumber, setPhoneNumber] = useState('')
+    const [numberError, setNumberError] = useState(false)
 
     const handleLogin = async () => {
+        if(phoneNumber.length === 0) {
+             alert('Veuillez entrer votre numero de telephone svp.')
+            setCodeArray([])
+            return;
+        }
         const stringNumber = codeArray.join('')
-        await dispatch(signinByPin({codePin: stringNumber}))
+        await dispatch(signinByPin({codePin: stringNumber, phone: phoneNumber}))
+        setCodeArray([])
         const error = store.getState().auth.error
         if(error !== null) {
            setLoginFailed(true)
@@ -50,17 +59,42 @@ function CodeLoginScreen({navigation, route}) {
     }, [codeArray])
 
     return (
+        <>
         <GradientScreen>
             <AppActivityIndicator visible={isLoading}/>
-        <KeyboardAvoidingView style={{
-            flex: 1,
-            marginVertical: 40
-        }}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <ScrollView contentContainerStyle={{
+            paddingBottom: 40
+        }}>
             <View style={{
                 marginVertical: 20
             }}>
             <AppLogoInfo/>
+            </View>
+            <View style={{
+                alignItems: 'center',
+                marginHorizontal: 40,
+                marginVertical: 40
+            }}>
+                <AppTextInput
+                    onBlur={() => {
+                        if(phoneNumber.length !== 10) {
+                            setNumberError(true)
+                        }else {
+                            setNumberError(false)
+                        }
+                    }}
+                    maxLength={10}
+                    keyboardType='numeric'
+                    placeholder='Entrez votre numero de telephone'
+                    icon='cellphone'
+                    value={phoneNumber}
+                    onChangeText={val => setPhoneNumber(val)
+                    }/>
+                    {numberError && <AppText
+                        style={{
+                            color: defaultStyles.colors.rougeBordeau,
+                            padding: 5,
+                            backgroundColor: defaultStyles.colors.white}}>Le numero n'est pas correct</AppText>}
             </View>
             <View style={{
                 flex: 1,
@@ -103,9 +137,7 @@ function CodeLoginScreen({navigation, route}) {
                 />
             </View>
             <View style={{
-                position: 'absolute',
-                left: 10,
-                bottom: 10
+                marginHorizontal: 20,
             }}>
                 <View>
                     <AppText>Code PIN oublié?</AppText>
@@ -122,11 +154,12 @@ function CodeLoginScreen({navigation, route}) {
                         style={{color: defaultStyles.colors.bleuFbi}}>Créer un.</AppText>
                 </View>
             </View>
-        </KeyboardAvoidingView>
+        </ScrollView>
             <LoginFailedModal
                 dismissModal={() => setLoginFailed(false)}
                 failModal={loginFailed}/>
             </GradientScreen>
+            </>
     );
 }
 

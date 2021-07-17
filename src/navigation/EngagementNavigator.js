@@ -8,6 +8,7 @@ import NewEngagementList from "../screens/NewEngagementList";
 import MemberEngagementDetailScreen from "../screens/MemberEngagementDetailScreen";
 import EditEngagementScreen from "../screens/EditEngagementScreen";
 import NavigHeaderButton from "../components/NavigHeaderButton";
+import EngagementVotantScreen from "../screens/EngagementVotantScreen";
 
 const EngageNavig = createStackNavigator()
 
@@ -17,9 +18,10 @@ function EngagementNavigator(props) {
             headerStyle: {backgroundColor: defaultStyles.colors.rougeBordeau},
             headerTintColor: defaultStyles.colors.white
         })}>
-            <EngageNavig.Screen name='EtatEngagement' component={EtatEngagementScreen} options={{
-                title: 'Etat des engagements'
-            }}/>
+            <EngageNavig.Screen name='EtatEngagement' component={EtatEngagementScreen} options={() => ({
+                title: 'Etat des engagements',
+                headerLeft: () => null
+            })}/>
             <EngageNavig.Screen name='NewEngagementScreen' component={NewEngagementScreen} options={{
                 title: 'Nouvel engagement'
             }}/>
@@ -39,6 +41,10 @@ function EngagementNavigator(props) {
 
             <EngageNavig.Screen name='EditEngagementScreen' component={EditEngagementScreen} options={({route}) => ({
                 title: 'Edition engagement',
+            })}/>
+
+            <EngageNavig.Screen name='Votants' component={EngagementVotantScreen} options={({route}) => ({
+                title: 'Ils ont dejà voté',
             })}/>
         </EngageNavig.Navigator>
     );

@@ -9,14 +9,14 @@ import routes from "../navigation/routes";
 
 
 const validInfo = Yup.object().shape({
-    nom: Yup.string().label("Le nom doit être de type chaine de caractère"),
-    prenom: Yup.string().label("Le prenom doit être de type chaine de caractère"),
-    username: Yup.string().label("Le username doit être de type chaine de caractère"),
-    email: Yup.string().email("email invalide"),
-    phone: Yup.string().label("Le numero de telephone doit être de type chaine de caractère"),
-    profession: Yup.string().label("La prefession doit être de type chaine de caractère"),
-    emploi: Yup.string().label("L'emploi doit être de type chaine de caractère"),
-    adresse: Yup.string().label("L'adresse doit être de type chaine de caractère")
+    nom: Yup.string().label("Le nom doit être de type chaine de caractère").nullable(),
+    prenom: Yup.string().label("Le prenom doit être de type chaine de caractère").nullable(),
+    username: Yup.string().label("Le username doit être de type chaine de caractère").nullable(),
+    email: Yup.string().email("email invalide").required("l'adresse email est requis"),
+    phone: Yup.string().label("Vous devez choisir un numero de telephone").length(10, "Le numero de telephone doit etre de 10 chiffres"),
+    profession: Yup.string().label("La prefession doit être de type chaine de caractère").nullable(),
+    emploi: Yup.string().label("L'emploi doit être de type chaine de caractère").nullable(),
+    adresse: Yup.string().label("Vous devez donner une adresse").min(2, "Votre lieu de residence doit etre de 2 caratères minimum").required("L'adresse est requise")
 })
 function EditUserCompteScreen({navigation}) {
     const dispatch = useDispatch()

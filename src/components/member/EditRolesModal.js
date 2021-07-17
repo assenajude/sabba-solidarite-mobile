@@ -7,6 +7,7 @@ import AppButton from "../AppButton";
 import defaultStyles from '../../utilities/styles'
 import {useDispatch, useStore} from "react-redux";
 import {getMemberRolesEdited} from "../../store/slices/associationSlice";
+import FormItemPicker from "../form/FormItemPicker";
 
 
 
@@ -19,6 +20,7 @@ function EditRolesModal({editRoles, dismissModal, member}) {
     const store = useStore()
 
     const handleEditRoles = async (role) => {
+        console.log(role.roles);
         const data = {
             memberId: member.id,
             roles: [role.roles]
@@ -50,10 +52,11 @@ function EditRolesModal({editRoles, dismissModal, member}) {
                 <AppForm
                     validationSchema={validRoles}
                     initialValues={{
-                        roles: ''
+                        roles: 'moderator'
                     }}
                     onSubmit={handleEditRoles} >
-                    <AppFormField name='roles' placeholder='roles'/>
+                    <FormItemPicker label='Roles' name='roles' data={['moderator', 'admin']}/>
+                    {/*<AppFormField name='roles' placeholder='roles'/>*/}
                     <FormSubmitButton title='Editer'/>
                 </AppForm>
             </View>

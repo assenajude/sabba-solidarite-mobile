@@ -17,7 +17,7 @@ function ValidationTransacDetailScreen({route, navigation}) {
     const {getReseau} = useTransaction()
     const {isAdmin} = useAuth()
     const {formatFonds, formatDate} = useManageAssociation()
-    const [selectedReseau, setSelectedReseau] = useState(getReseau(selectedTransaction.reseau))
+    const [selectedReseau, setSelectedReseau] = useState(getReseau(selectedTransaction?.reseau))
 
     useFocusEffect(
         useCallback(() => {
@@ -35,7 +35,9 @@ function ValidationTransacDetailScreen({route, navigation}) {
 
     return (
         <>
-        <ScrollView>
+        <ScrollView contentContainerStyle={{
+            paddingBottom: 40
+        }}>
             <AppHeaderGradient/>
             <ReseauBackImageAndLabel reseauName={selectedReseau.name} reseauImage={selectedReseau.image}/>
             <View style={styles.numberContainer}>

@@ -13,35 +13,22 @@ import EngagementItem from "../components/engagement/EngagementItem";
 import useEngagement from "../hooks/useEngagement";
 import {
     getEngagementDetail,
-    getPayingTranche,
     showEngagementTranches
 } from "../store/slices/engagementSlice";
 import useAuth from "../hooks/useAuth";
 import AppHeaderGradient from "../components/AppHeaderGradient";
 import {Picker} from "@react-native-picker/picker";
-import TrancheRightActions from "../components/tranche/TrancheRightActions";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function EtatEngagementScreen({navigation}) {
     const dispatch = useDispatch()
-    const {getMemberUserCompte, dataSorter, getConnectedMember} = useAuth()
+    const {getMemberUserCompte} = useAuth()
     const {formatFonds, associationValidMembers} = useManageAssociation()
-    const {getMemberEngagementInfos, handlePayTranche, getValidEngagementList} = useEngagement()
+    const {getMemberEngagementInfos, getValidEngagementList} = useEngagement()
 
     const isLoading = useSelector(state => state.entities.engagement.loading)
-
-    const engagements = useSelector(state => {
-        const list = state.entities.engagement.list
-        let validList = list.filter(item => {
-            if(item.accord === true && item.statut === 'paying' || item.statut === 'ended')return true
-        })
-        const sortedList = dataSorter(validList)
-        return sortedList
-    })
-    const allTranches = useSelector(state => state.entities.engagement.tranches)
     const [mainData, setMainData] = useState(getValidEngagementList())
     const [pickerValue, setPickerValue] = useState('all')
-    const [editTrancheMontant, setEditTrancheMontant] = useState('')
 
     const handleEngagementDetails = async (item) => {
         await dispatch(getEngagementDetail(item))
@@ -95,17 +82,6 @@ function EtatEngagementScreen({navigation}) {
                          return <EngagementItem
                              getMembersDatails={() => navigation.navigate('Members',{screen: 'MemberDetails', params: getMemberUserCompte(item.Creator)})}
                              getMoreDetails={() => navigation.navigate('MemberEngagementDetail', item)}
-                             renderRightActions={(tranche) =>
-                                 getConnectedMember()?.id === item.creatorId?<TrancheRightActions
-                                 ended={tranche.montant===tranche.solde}
-                                 isPaying={tranche.paying}
-                                 payingTranche={() => {dispatch(getPayingTranche(tranche))}}
-                             />:null
-                             }
-                             editTrancheMontant={editTrancheMontant}
-                             onChangeTrancheMontant={val => setEditTrancheMontant(val)}
-                             handlePayTranche={(tranche) =>handlePayTranche(tranche.id, item.id, editTrancheMontant)}
-                             tranches={allTranches.filter(tranche => tranche.engagementId === item.id)}
                              showTranches={item.showTranches}
                              getTranchesShown={() => {
                                  dispatch(showEngagementTranches(item))

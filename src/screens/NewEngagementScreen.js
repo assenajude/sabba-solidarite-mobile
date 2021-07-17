@@ -9,6 +9,7 @@ import AppTimePicker from "../components/AppTimePicker";
 import FormItemPicker from "../components/form/FormItemPicker";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import useAuth from "../hooks/useAuth";
+import useManageAssociation from "../hooks/useManageAssociation";
 
 const validEngagement = Yup.object().shape({
     libelle: Yup.string(),
@@ -21,15 +22,18 @@ function NewEngagementScreen({navigation, route}) {
     const dispatch = useDispatch()
     const store = useStore()
     const {getConnectedMember} = useAuth()
+    const {memberQuotite} = useManageAssociation()
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const isLoading = useSelector(state => state.entities.engagement.loading)
-    const [editing, setEditing] = useState(selectedEngagement?selectedEngagement.editing : false)
 
 
     const handleAddEngagement = async (engagement, {resetForm}) => {
          const montant = Number(engagement.montant)
-                const dateEcheance = engagement.echeance.getTime()
-                const data = {
+        if(montant > memberQuotite()) {
+            return alert("Le montant de votre engagement ne doit pas depassé votre quotité.")
+        }
+        const dateEcheance = engagement.echeance.getTime()
+        const data = {
                     id: selectedEngagement?selectedEngagement.id : null,
                     libelle: engagement.libelle,
                     typeEngagement: engagement.typeEngagement,

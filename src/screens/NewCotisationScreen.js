@@ -75,7 +75,7 @@ function NewCotisationScreen({route, navigation}) {
         <ScrollView contentContainerStyle={{paddingVertical: 20, paddingHorizontal: 20}}>
             <AppForm initialValues={{
                 typeCotisation: selectedCotisation?selectedCotisation.typeCotisation : 'mensuel',
-                montant: selectedCotisation?String(selectedCotisation.montant) : '',
+                montant: selectedCotisation?String(selectedCotisation.montant) : String(selectedAssociation.cotisationMensuelle),
                 motif: selectedCotisation?selectedCotisation.motif : initMotif,
                 dateDebut: selectedCotisation?new Date(selectedCotisation.dateDebut) : new Date(),
                 dateFin: selectedCotisation?new Date(selectedCotisation.dateFin) : new Date()

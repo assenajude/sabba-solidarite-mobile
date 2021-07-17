@@ -12,7 +12,8 @@ const authSlice = createSlice({
         allUsers: [],
         token: null,
         randomCode: null,
-        changeCredentialMessage: null
+        changeCredentialMessage: null,
+        welcomeImageReady: false
     },
     reducers: {
         authRequested: (state, action) => {
@@ -75,13 +76,16 @@ const authSlice = createSlice({
             if(selectedUser.id === state.user.id && selectedUser.avatarLoading !== state.user.avatarLoading) {
                 state.user = selectedUser
             }
+        },
+        welcomeImageIsReady: state => {
+            state.welcomeImageReady = true
         }
 
     }
 
 })
 
-const {authRequested, authRequestFailed, authRequestSuccess,
+const {authRequested, authRequestFailed, authRequestSuccess,welcomeImageIsReady,
      logout, userUpdated, allUserReceived, credentialsReset, avatarLoaded} = authSlice.actions
 export default authSlice.reducer
 
@@ -198,4 +202,8 @@ export const getLogout = () => dispatch => {
 
 export const connectedUserAvatarLoaded = (user) => dispatch => {
     dispatch(avatarLoaded(user))
+}
+
+export const getWelcomeImageState = () => dispatch => {
+    dispatch(welcomeImageIsReady())
 }

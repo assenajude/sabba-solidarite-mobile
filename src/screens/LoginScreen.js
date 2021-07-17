@@ -73,6 +73,7 @@ function LoginScreen({navigation, route}) {
     }
 
     return (
+        <>
         <GradientScreen>
             <AppActivityIndicator visible={isLoading || assoLoading || transacLoading}/>
             <View style={styles.logoInfoContainer}>
@@ -139,8 +140,9 @@ function LoginScreen({navigation, route}) {
                 >Contactez nous.</AppText>
             </View>
         </ScrollView>
-            <LoginFailedModal failModal={loginFailed} dismissModal={() => setLoginFailed(false)}/>
+                <LoginFailedModal failModal={loginFailed} dismissModal={() => setLoginFailed(false)}/>
         </GradientScreen>
+            </>
     );
 }
 

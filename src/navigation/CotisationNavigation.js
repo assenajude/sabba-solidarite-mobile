@@ -18,9 +18,10 @@ function CotisationNavigation(props) {
             headerTintColor: defaultStyles.colors.white
         })}>
             <CotisationNavig.Screen name='EtatCotisationScreen' component={EtatCotisationScreen}
-                                    options={{
-                                        title: 'Etat des cotisations'
-                                    }}/>
+                                    options={() => ({
+                                        title: 'Etat des cotisations',
+                                        headerLeft: () => null
+                                    })}/>
             <CotisationNavig.Screen name='NewCotisationScreen' component={NewCotisationScreen}
                                     options={{
                                         title: 'Nouvelle cotisation'

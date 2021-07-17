@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View,StyleSheet} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../AppText";
@@ -8,31 +8,91 @@ import defaultStyles from '../../utilities/styles'
 import VoteItem from "../vote/VoteItem";
 import AppSimpleLabelWithValue from "../AppSimpleLabelWithValue";
 import TrancheItem from "../tranche/trancheItem";
-import {getPayingTranche} from "../../store/slices/engagementSlice";
-import {useDispatch} from "react-redux";
+import {
+    getPayingTranche,
+    voteEngagement
+} from "../../store/slices/engagementSlice";
+import {useDispatch, useSelector} from "react-redux";
 import * as Progress from "react-native-progress";
 import AppIconButton from "../AppIconButton";
 import useAuth from "../../hooks/useAuth";
 import routes from "../../navigation/routes";
 import {useNavigation} from '@react-navigation/native'
 import useEngagement from "../../hooks/useEngagement";
+import {getSelectedAssociation} from "../../store/slices/associationSlice";
+import {getConnectedMemberUser} from "../../store/slices/memberSlice";
+import {getUserData} from "../../store/slices/authSlice";
+import TrancheRightActions from "../tranche/TrancheRightActions";
 
 
-function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,engagement,tranches,renderRightActions,isEditable=false,
-                            onWaiting, engagementDetails, handleVoteUp, handleVoteDown, showAvatar=true,getMoreDetails,
-                            allVoted, downVotes, upVotes, isVoting, validationDate, showTranches, getTranchesShown,
-                            handlePayTranche, onChangeTrancheMontant, editTrancheMontant, editEngagement, deletePending}) {
+function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,engagement,isEditable=false,
+                            onWaiting, engagementDetails,showAvatar=true,getMoreDetails,
+                            isVoting, validationDate, showTranches, getTranchesShown,
+                            editEngagement, deletePending}) {
     const navigation = useNavigation()
-
     const dispatch = useDispatch()
-    const {formatFonds, formatDate} = useManageAssociation()
-    const {deleteEngagement} = useEngagement()
-    const {isAdmin, isModerator} = useAuth()
+    const {votorsNumber, formatFonds, formatDate} = useManageAssociation()
+    const {isAdmin, isModerator,getMemberUserCompte, getConnectedMember:connectedMember} = useAuth()
     const isAuthorized = isModerator() || isAdmin()
+    const {deleteEngagement, getEngagementVotesdData, handlePayTranche, getEngagementVotans} = useEngagement()
+
+    const tranches = useSelector(state => {
+        const list = state.entities.engagement.tranches
+        const selectedTranches = list.filter(item => item.engagementId === engagement.id)
+        return selectedTranches
+    })
+    const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
+
+
+    const [upVotes, setUpVotes] = useState(getEngagementVotesdData(engagement).upVotes)
+    const [downVotes, setDownVotes] = useState(getEngagementVotesdData(engagement).downVotes)
+    const [tranchePayMontant, setTranchePayMontant] = useState('')
+    const [allVoted, setAllVoted] = useState(upVotes+downVotes)
 
     const handleDeleteEngagement = async (engage) => {
         await deleteEngagement(engage)
     }
+
+
+
+    const voteUp = (item) => {
+        const data = {
+            id: item.id,
+            typeVote: 'up',
+            votorId: connectedMember().id,
+            associationId: currentAssociation.id
+        }
+        dispatch(voteEngagement(data))
+        if(allVoted === votorsNumber() && getEngagementVotesdData(engagement).upVotes > getEngagementVotesdData(engagement).downVotes) {
+            dispatch(getSelectedAssociation({associationId: currentAssociation.id}))
+            dispatch(getConnectedMemberUser({associationId: currentAssociation.id}))
+            dispatch(getUserData({userId: getMemberUserCompte().id}))
+        }
+
+
+    }
+
+    const voteDown = (item) => {
+        const data = {
+            id: item.id,
+            typeVote: 'down',
+            votorId: connectedMember().id,
+            associationId: currentAssociation.id
+        }
+        dispatch(voteEngagement(data))
+    }
+
+    const handleGetVotants = () => {
+        const params = {engagement:engagement, votants:getEngagementVotans(engagement.id)}
+        navigation.navigate('Engagements',{screen:routes.VOTANT,params:params})
+    }
+
+    useEffect(() => {
+        setUpVotes(getEngagementVotesdData(engagement).upVotes)
+        setDownVotes(getEngagementVotesdData(engagement).downVotes)
+        setAllVoted(upVotes+downVotes)
+
+    }, [getEngagementVotesdData(engagement).upVotes, getEngagementVotesdData(engagement).downVotes])
 
     return (
         <View>
@@ -52,17 +112,25 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                 <View style={styles.montant}>
                     <AppText style={{fontSize: 15, fontWeight: 'bold'}}>{formatFonds(engagement.montant)}</AppText>
                 </View>
+
                 <View style={{marginVertical: 10 }}>
                     <AppText onPress={getMoreDetails} style={{color: defaultStyles.colors.bleuFbi}}> + Details</AppText>
                 </View>
                 {engagementDetails && <View>
                     <AppSimpleLabelWithValue label='Montant demandée' labelValue={formatFonds(engagement.montant)}/>
                     <AppSimpleLabelWithValue label='Montant Interet' labelValue={formatFonds(engagement.interetMontant)}/>
-                    <AppSimpleLabelWithValue label='Total à rembourser' labelValue={formatFonds(engagement.montant+engagement.interetMontant)}/>
+                    <AppSimpleLabelWithValue label='Montant Penalité' labelValue={formatFonds(engagement.penalityMontant)}/>
+                    <AppSimpleLabelWithValue label='Total à rembourser' labelValue={formatFonds(engagement.montant+engagement.interetMontant+engagement.penalityMontant)}/>
                     <AppSimpleLabelWithValue label='Date demande' labelValue={formatDate(engagement.createdAt)}/>
                     {validationDate && <AppSimpleLabelWithValue label='Date Validation' labelValue={formatDate(validationDate)}/>}
                     <AppSimpleLabelWithValue label='Date écheance' labelValue={formatDate(engagement.echeance)}/>
-
+                    {!isVoting && <View style={{
+                        marginVertical: 10,
+                        marginBottom: 20
+                    }}>
+                        <AppText onPress={handleGetVotants}
+                                 style={{color: defaultStyles.colors.bleuFbi}}>Voir les votants</AppText>
+                    </View>}
                     <View>
                         <View style={styles.trancheIcon}>
                             <AppIconButton iconSize={24}
@@ -78,10 +146,16 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                         }}>
                             {tranches.map((item,index)=>
                                 <TrancheItem
-                                    handlePayTranche={() => handlePayTranche(item)}
-                                    renderRightActions={() => renderRightActions(item)}
-                                    trancheEditMontant={editTrancheMontant}
-                                    onChangeTrancheMontant={onChangeTrancheMontant}
+                                    handlePayTranche={() =>handlePayTranche(item.id, engagement.id, tranchePayMontant)}
+                                    renderRightActions={() =>
+                                        connectedMember().id === engagement.creatorId?<TrancheRightActions
+                                            ended={item.montant===item.solde}
+                                            isPaying={item.paying}
+                                            payingTranche={() => {dispatch(getPayingTranche(item))}}
+                                        />:null
+                                    }
+                                    trancheEditMontant={tranchePayMontant}
+                                    onChangeTrancheMontant={val => setTranchePayMontant(val)}
                                     payingTranche={item.paying}
                                     payTranche={() => {
                                         dispatch(getPayingTranche(item))
@@ -128,11 +202,12 @@ function EngagementItem({getEngagementDetails,getMembersDatails,selectedMember,e
                 </View>
             </View>
             {isVoting && <VoteItem
+                getEngagementVotants={handleGetVotants}
                 downVotes={downVotes}
                 upVotes={upVotes}
-                allVoted={allVoted}
-                handleVoteDown={handleVoteDown}
-                handleVoteUp={handleVoteUp}
+                allVoted={getEngagementVotesdData(engagement).upVotes+getEngagementVotesdData(engagement).downVotes}
+                handleVoteUp={() => voteUp(engagement)}
+                handleVoteDown={() => voteDown(engagement)}
             />}
             {onWaiting && <View style={styles.rejected}>
             </View>}

@@ -9,9 +9,7 @@ function AppLabelWithValue({label, value, showLimit=true}) {
             <View style={styles.detailContainer}>
                 <AppText style={{fontWeight: 'bold'}}>{label}</AppText>
             </View>
-            <View style={{
-                alignItems: 'center'
-            }}>
+            <View style={styles.valueStyle}>
                 <AppText>{value}</AppText>
             </View>
             {showLimit && <ListItemSeparator/>}
@@ -26,6 +24,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 10
     },
+    valueStyle: {
+        alignItems: 'center'
+    }
 })
 
 export default AppLabelWithValue;

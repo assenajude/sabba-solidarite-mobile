@@ -6,10 +6,9 @@ function GradientScreen({children}) {
         <LinearGradient
             start={[0,1]}
             end={[1,0]}
-            colors={['#efd807','#ffedff','#ffe3ff','#860432']}
-            style={{
+            colors={['#efd807','#ffedff','#ffe3ff','#860432']} style={{
                 flex: 1
-            }}>
+        }}>
             {children}
         </LinearGradient>
     );

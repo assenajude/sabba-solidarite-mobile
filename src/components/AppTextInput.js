@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     inputStyle: {
         width: '90%',
         paddingHorizontal: 10,
-        height: 35
+        height: 50
     }
 })
 

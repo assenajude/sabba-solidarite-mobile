@@ -36,7 +36,7 @@ function HelpScreen() {
                             <MaterialCommunityIcons name="facebook" size={40} color={defaulStyles.colors.bleuFbi} />
                             <MaterialCommunityIcons name="facebook-messenger" size={40} color={defaulStyles.colors.bleuFbi} />
                         </View>
-                        <AppText style={{fontWeight: 'bold', fontSize: 18}}>sabba.com</AppText>
+                        <AppText style={{fontWeight: 'bold', fontSize: 18}}>sabbat.com</AppText>
                     </View>
 
                     <View style={styles.mailAdresse}>
@@ -45,8 +45,8 @@ function HelpScreen() {
                             alignItems: 'center',
                             justifyContent: 'space-between'
                         }}>
-                            <MaterialCommunityIcons name="email" size={40} color="black" />
-                            <AppText style={{fontSize: 18, fontWeight: 'bold'}}>sabbatech@gmail.com</AppText>
+                            <MaterialCommunityIcons name="email" size={40} color={defaulStyles.colors.dark} />
+                            <AppText style={{fontSize: 18, fontWeight: 'bold'}}>sabbattech@gmail.com</AppText>
                         </View>
                     </View>
                 </View>

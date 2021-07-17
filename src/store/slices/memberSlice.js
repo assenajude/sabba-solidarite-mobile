@@ -42,10 +42,10 @@ const memberSlice = createSlice({
             const updatedIndex = state.list.findIndex(item => item.id === action.payload.id)
             let selected = state.list[updatedIndex]
             let updated = action.payload
-            if(selected.avatar !== action.payload.avatar){
+            if(selected.member.avatar !== action.payload.member.avatar){
                 updated.avatarLoading = true
             }
-            if(selected.backImage !== updated.backImage) {
+            if(selected.member.backImage !== updated.member.backImage) {
                 updated.backImageLoading = true
             }
             state.list[updatedIndex] = updated

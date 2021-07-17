@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "153219879188",
+    "project_id": "pc-api-8501945421244204338-759",
+    "storage_bucket": "pc-api-8501945421244204338-759.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153219879188:android:75cc41f99c34fcb15c7201",
+        "android_client_info": {
+          "package_name": "com.sabbat.solidarite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "153219879188-r66so921immvtngkhib81qu7ee7da78c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2GActfSrOLSL3yuI-_j5focB2VcmaXao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "153219879188-r66so921immvtngkhib81qu7ee7da78c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

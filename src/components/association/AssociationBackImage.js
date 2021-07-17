@@ -3,7 +3,6 @@ import {View, Image, StyleSheet, TouchableWithoutFeedback, Alert} from "react-na
 import LottieView from "lottie-react-native";
 import AppImagePicker from "../AppImagePicker";
 import AppText from "../AppText";
-import AppButton from "../AppButton";
 import useUploadImage from "../../hooks/useUploadImage";
 import AppUploadModal from "../AppUploadModal";
 import useAuth from "../../hooks/useAuth";
@@ -11,9 +10,8 @@ import {useDispatch} from "react-redux";
 import {getSelectedAssociation, mainAssociationImageLoaded} from "../../store/slices/associationSlice";
 import {associationImageLoaded, getConnectedUserAssociations} from "../../store/slices/memberSlice";
 import colors from "../../utilities/colors";
-import AppImageValidator from "../AppImageValidator";
 
-function AssociationBackImage({association, cameraContainer,uploadResult, cameraStyle, imageLoading}) {
+function AssociationBackImage({association, cameraContainer,uploadResult, cameraStyle}) {
     const dispatch = useDispatch()
     const {isModerator, isAdmin} = useAuth()
     const {dataTransformer, directUpload} = useUploadImage()
@@ -23,6 +21,7 @@ function AssociationBackImage({association, cameraContainer,uploadResult, camera
     const [imageData, setImageData] = useState([])
     const [onEdit, setOnEdit] = useState(false)
     const [selectingImage, setSelectingImage] = useState(false)
+    const [imageLoading, setImageLoading] = useState(false)
 
     const isImage = imageUrl !== null && imageUrl !== ''
     const isAuthorized = isAdmin() || isModerator()
@@ -59,17 +58,21 @@ function AssociationBackImage({association, cameraContainer,uploadResult, camera
     }
 
     const editImage = () => {
-        Alert.alert("Alert", "voulez-vous supprimer l'image?", [{
-            text: 'supprimer', onPress: () => {setImageUrl(association.avatar)}
-        }, {
-            text: 'retour', onPress: () => {return;}
-        }])
+        if(isAuthorized) {
+            Alert.alert("Alert", "voulez-vous supprimer l'image?", [{
+                text: 'supprimer', onPress: () => {setImageUrl(association.avatar)}
+            }, {
+                text: 'retour', onPress: () => {return;}
+            }])
+        }
+
     }
 
 
 
     useEffect(() => {
         setImageUrl(association.avatar)
+        setImageLoading(association.imageLoading)
     }, [association, association.imageLoading])
 
     return (
@@ -77,12 +80,7 @@ function AssociationBackImage({association, cameraContainer,uploadResult, camera
             <TouchableWithoutFeedback onPress={editImage}>
                 <View>
                     <Image
-                    onLoadEnd={() => {
-                        if(association.imageLoading) {
-                            dispatch(associationImageLoaded(association))
-                            dispatch(mainAssociationImageLoaded(association))
-                        }
-                        }}
+                    onLoadEnd={() => setImageLoading(false)}
                     style={styles.image} source={isImage?{uri: imageUrl}:require('../../../assets/solidariteImg.jpg')}/>
                     {imageLoading && <View style={styles.loading}>
                         <LottieView

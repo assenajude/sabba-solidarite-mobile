@@ -12,7 +12,7 @@ import useCotisation from "../hooks/useCotisation";
 import useEngagement from "../hooks/useEngagement";
 import BackgroundWithAvatar from "../components/member/BackgroundWithAvatar";
 import useAuth from "../hooks/useAuth";
-import {useDispatch,useStore} from "react-redux";
+import {useDispatch, useSelector, useStore} from "react-redux";
 import {
     cancelChangingImage,
     changeMemberImage,
@@ -29,13 +29,14 @@ function MemberCompteScreen({navigation}) {
     const {isModerator, getConnectedMember,isAdmin, getMemberUserCompte} = useAuth()
     const {getMemberCotisations} = useCotisation()
     const {getMemberEngagementInfos} = useEngagement()
-    const {formatFonds, formatDate, leaveAssociation} = useManageAssociation()
+    const {formatFonds, formatDate, leaveAssociation, memberQuotite} = useManageAssociation()
 
     let currentMember = getMemberUserCompte()
+    const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
 
     const [progress, setProgress] = useState(0)
     const [uploadModal, setUploadModal] = useState(false)
-    let [connectedMember, setConnectedMember] = useState(currentMember)
+    let [connectedMember, setConnectedMember] = useState({})
     const [editingAvatar, setEditingAvatar] = useState(false)
     const [avatarImage, setAvatarImage] = useState(null)
     const [backImage, setBackImage] = useState(null)
@@ -45,7 +46,7 @@ function MemberCompteScreen({navigation}) {
     const [selectingModal, setSelectingModal] = useState(false)
     const [selectingBackModal, setSelectingBackModal] = useState(false)
 
-    const [backImageLoading, setBackImageLoading] = useState(currentMember.backImageLoading)
+    const [backImageLoading, setBackImageLoading] = useState(true)
 
     const isAuthorized = isAdmin() || isModerator()
 
@@ -113,9 +114,26 @@ function MemberCompteScreen({navigation}) {
     }
 
 
+
     useEffect(() => {
+        if(getConnectedMember()) {
             setConnectedMember(currentMember)
-    }, [currentMember, getMemberUserCompte().avatarLoading, getMemberUserCompte().backImageLoading])
+        }
+    }, [currentMember, getMemberUserCompte()?.avatarLoading, getMemberUserCompte()?.backImageLoading])
+
+    if(!getConnectedMember() && Object.keys(connectedMember).length === 0) {
+        return (
+            <View style={{
+                flex:1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginHorizontal: 20
+            }}>
+                <AppText>Vous n'êtes pas connecté entant que membre de cette association.</AppText>
+            </View>
+        )
+    }
+
     return (
         <>
             <ScrollView contentContainerStyle={{paddingBottom: 20}}>
@@ -150,6 +168,7 @@ function MemberCompteScreen({navigation}) {
                 </View>
                 <View style={{marginTop: 30}}>
                     <AppLabelWithValue label='Fonds' value={formatFonds(getConnectedMember().fonds)}/>
+                    <AppLabelWithValue label='Ma quotité' value={formatFonds(memberQuotite())}/>
                     <AppLabelWithValue label="Date d'adhesion" value={formatDate(getConnectedMember().adhesionDate)}/>
                 </View>
                 <View style={{
@@ -175,12 +194,12 @@ function MemberCompteScreen({navigation}) {
                                     totalAmount={getMemberEngagementInfos(getConnectedMember()).engagementAmount}/>
                 </View>
             </ScrollView>
-            {isAuthorized && <View style={styles.edit}>
-                <AppAddNewButton name='account-edit'
+             <View style={styles.edit}>
+                 {isAuthorized && <AppAddNewButton name='account-edit'
                                  onPress={() => navigation.navigate('Members',{
                                      screen : routes.EDIT_MEMBER,
                                      params: getMemberUserCompte()
-                                 })}/>
+                                 })}/>}
                 <AppAddNewButton
                     buttonContainerStyle={{
                         backgroundColor: defaultStyles.colors.rougeBordeau,
@@ -188,7 +207,7 @@ function MemberCompteScreen({navigation}) {
                     }}
                     name='account-minus'
                     onPress={() => leaveAssociation(getMemberUserCompte())}/>
-            </View>}
+            </View>
 
           <AppUploadModal
               closeModal={() => setUploadModal(false)}
@@ -220,7 +239,7 @@ const styles = StyleSheet.create({
     edit: {
       position: 'absolute',
         right: 5,
-        bottom: 5,
+        bottom: -5,
         alignItems: 'center'
     },
     fontImage: {

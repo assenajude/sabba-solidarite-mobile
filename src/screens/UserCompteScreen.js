@@ -3,7 +3,7 @@ import {View, ScrollView, StyleSheet,BackHandler, TouchableOpacity, TouchableWit
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../components/AppText";
 import AppAvatar from "../components/AppAvatar";
-import {useDispatch, useStore} from "react-redux";
+import {useDispatch, useSelector, useStore} from "react-redux";
 import defaultStyles from '../utilities/styles'
 import LottieView from "lottie-react-native";
 import useManageAssociation from "../hooks/useManageAssociation";
@@ -15,11 +15,12 @@ import EditFundModal from "../components/user/EditFundModal";
 import ListItemSeparator from "../components/ListItemSeparator";
 import {LinearGradient} from "expo-linear-gradient";
 import useUploadImage from "../hooks/useUploadImage";
-import {getUserImagesEdit} from "../store/slices/authSlice";
+import {getUserData, getUserImagesEdit} from "../store/slices/authSlice";
 import AppUploadModal from "../components/AppUploadModal";
 import AppShowImage from "../components/AppShowImage";
 import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
 import AppImageValidator from "../components/AppImageValidator";
+import AppActivityIndicator from "../components/AppActivityIndicator";
 
 
 function UserCompteScreen({navigation, route}) {
@@ -29,6 +30,7 @@ function UserCompteScreen({navigation, route}) {
     const {isAdmin} = useAuth()
     const {formatFonds} = useManageAssociation()
     const {directUpload, dataTransformer} = useUploadImage()
+    const authLoding = useSelector(state => state.auth.loading)
     const initRecto = {imageData: null, url:selectedUser.piece? selectedUser.piece[0]:null}
     const initVerso = {imageData: null, url:selectedUser.piece? selectedUser.piece[1]:null}
 
@@ -53,7 +55,6 @@ function UserCompteScreen({navigation, route}) {
     const [editingVerso, setEditingVerso] = useState(false)
     const [changingVerso, setChangingVerso] = useState(false)
 
-
     const onChangeAvatar = (image) => {
         setChangingAvatar(false)
         setAvatarImage(image)
@@ -74,14 +75,13 @@ function UserCompteScreen({navigation, route}) {
     }
 
     const deleteAvatarImage = () => {
-        if(Object.keys(avatarImage).length === 0 || avatarImage.avatar === null) {
+        if(avatarImage.url ===  null) {
             return;
         }
         Alert.alert("Alert", "Que voulez-vous faire de l'image?", [{text: 'supprimer', onPress: () => {
-            return setAvatarImage(selectedUser)
+            return setAvatarImage({imageData: null, url: selectedUser.url})
             }}, {text: 'afficher', onPress: () => {
-                const url = avatarImage.avatar?avatarImage.avatar : avatarImage.url
-                setImageUrl(url)
+                setImageUrl(avatarImage.url)
                 setImageModal(true)
             }}])
     }
@@ -175,17 +175,28 @@ function UserCompteScreen({navigation, route}) {
         navigation.navigate(routes.STARTER)
     }
 
+    const getConnectedUserData = async (user) => {
+        await dispatch(getUserData({userId: user.id}))
+        const justConnected = store.getState().auth.user
+        setCurrentUser(justConnected)
+    }
+
     useEffect(() => {
+        if(!isAdmin() && selectedUser) {
+         getConnectedUserData(selectedUser)
+        }else {
+            setCurrentUser(selectedUser)
+        }
         if(editingRecto && editingVerso) {
             setEditingPiece(true)
         }
-        setCurrentUser(selectedUser)
         const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
         return () => backHandler.remove();
     }, [editingRecto, editingVerso, selectedUser])
 
     return (
         <>
+            <AppActivityIndicator visible={authLoding}/>
         <ScrollView>
             <LinearGradient
                 colors={['#860432', 'transparent']}
@@ -349,6 +360,12 @@ function UserCompteScreen({navigation, route}) {
 
         </ScrollView>
             <EditFundModal
+                fundResult={(result) => {
+                    if(result) {
+                        const newUser = store.getState().auth.user
+                        selectedUser = newUser
+                    }
+                }}
                 editVisible={editFund}
                 closeFundModal={() => setEditFund(false)}/>
             <AppUploadModal progress={progress} uploadModalVisible={uploadModal}/>

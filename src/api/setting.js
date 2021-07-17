@@ -2,13 +2,13 @@ import Constants from 'expo-constants'
 
 const settings = {
     dev: {
-        baseURL: "http://192.168.1.178:5000/api"
+        baseURL: "http://192.168.8.103:5000/api"
     },
     staging: {
-        baseURL: "https://sabba-solidarite.herokuapp.com/api"
+        baseURL: "https://sabbat-solidarite.herokuapp.com/api"
     },
     prod: {
-        baseURL: "https://sabba-solidarite.herokuapp.com/api"
+        baseURL: "https://sabbat-solidarite.herokuapp.com/api"
     }
 }
 

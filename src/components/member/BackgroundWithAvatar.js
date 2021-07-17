@@ -16,14 +16,14 @@ function BackgroundWithAvatar({getCompteDetails,allowCamera=false, fondStyle,can
         <View>
             {!selectedMember.backImage && <LinearGradient
                 colors={['#860432', 'transparent']}
-                style={[styles.background, {height: selectedMember.member.backImage?20:100}]}
+                style={[styles.background, {height: selectedMember?.member?.backImage?0:100}]}
             />}
 
-            {selectedMember.member.backImage && <View>
+            {selectedMember?.member?.backImage && <View>
             <Image
                 onLoadEnd={onBackImageLoadEnd}
                 style={[styles.fontImage, fondStyle]}
-                source={{uri: selectedMember.member.backImage}}/>
+                source={{uri: selectedMember?.member?.backImage}}/>
 
                 {onBackImageLoading && <View style={styles.backLoadingStyle}>
                     <LottieView style={{
@@ -37,7 +37,7 @@ function BackgroundWithAvatar({getCompteDetails,allowCamera=false, fondStyle,can
 
             </View>
             }
-            {allowCamera && <View style={[styles.backImagePicker, {top:selectedMember.member.backImage?0:-10}]}>
+            {allowCamera && <View style={[styles.backImagePicker, {top:selectedMember?.member?.backImage?0:-10}]}>
                 <AppImagePicker
                     cameraStyle={styles.backCameraStyle}
                     iconSize={15}

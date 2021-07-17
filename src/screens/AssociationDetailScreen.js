@@ -5,7 +5,6 @@ import AssociationBackImage from "../components/association/AssociationBackImage
 import {useDispatch, useSelector, useStore} from "react-redux";
 
 import {getAvatarUpdate} from "../store/slices/associationSlice";
-import AppLabelWithValue from "../components/AppLabelWithValue";
 import AppSimpleLabelWithValue from "../components/AppSimpleLabelWithValue";
 import useManageAssociation from "../hooks/useManageAssociation";
 import AppAddNewButton from "../components/AppAddNewButton";
@@ -13,6 +12,8 @@ import routes from "../navigation/routes";
 import useAuth from "../hooks/useAuth";
 import AppReglement from "../components/AppReglement";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import AppText from "../components/AppText";
+import {getSelectedAssociationMembers} from "../store/slices/memberSlice";
 
 function AssociationDetailScreen({route, navigation}) {
     const selectedAssociation = route.params
@@ -22,6 +23,8 @@ function AssociationDetailScreen({route, navigation}) {
     const {isAdmin}= useAuth()
 
     const [associationState, setAssociationState] = useState(selectedAssociation)
+    const [respoInfo, setRespoInfo] = useState(null)
+    const [modInfo, setModInfo] = useState(null)
 
     const isLoading = useSelector(state => state.entities.association.loading)
     const currentAssociation = useSelector(state => {
@@ -29,6 +32,15 @@ function AssociationDetailScreen({route, navigation}) {
         const selected = allAssociation.find(item => item.id === selectedAssociation.id)
         return selected
     })
+
+    const getInfos = useCallback(async () => {
+        await dispatch(getSelectedAssociationMembers({associationId: selectedAssociation?.associationState?.id}))
+        const memberList = store.getState().entities.member.list
+        const respo = memberList.find(item => item.member.statut.toLowerCase() === 'responsable' || item.member.statut.toLowerCase() === 'president' || item.member.statut.toLowerCase() === 'président')
+        const admin = memberList.find(item => item.member.statut.toLowerCase() === 'moderateur' || item.member.statut.toLowerCase() === 'administrateur')
+        if(respo) setRespoInfo(respo.phone?respo.phone: respo.email)
+        if(admin) setModInfo(admin.phone?admin.phone : admin.email)
+    }, [])
 
    const handleSaveChanged = async (uploadResult) => {
         if(uploadResult) {
@@ -60,6 +72,7 @@ function AssociationDetailScreen({route, navigation}) {
    )
 
     useEffect(() => {
+        getInfos()
         setAssociationState(currentAssociation)
     }, [currentAssociation.imageLoading])
 
@@ -73,8 +86,15 @@ function AssociationDetailScreen({route, navigation}) {
               <View style={styles.info}>
                 <AppSimpleLabelWithValue label='Cotisation' labelValue={formatFonds(associationState.cotisationMensuelle)}/>
                 <AppSimpleLabelWithValue label='Frequence' labelValue={associationState.frequenceCotisation}/>
-                  <AppReglement association={associationState}/>
-                <AppLabelWithValue showLimit={false} label='Description' value={associationState.description}/>
+                <AppSimpleLabelWithValue label='Contact Responsable' labelValue={respoInfo !== null?respoInfo : 'pas de contact'}/>
+                <AppSimpleLabelWithValue label='Contact Administrateur' labelValue={modInfo !== null?modInfo : 'pas de contact'}/>
+                <View style={{
+                    marginVertical: 10
+                }}>
+                    <AppText style={{fontWeight: 'bold'}}>Description</AppText>
+                    <AppText>{associationState.description}</AppText>
+                </View>
+                  <AppReglement  association={associationState}/>
               </View>
               </ScrollView>
                 {isAdmin() && <View style={{
@@ -84,7 +104,7 @@ function AssociationDetailScreen({route, navigation}) {
                 }}>
                     <AppAddNewButton
                         name='file-document-edit'
-                        onPress={() => navigation.navigate(routes.NEW_ASSOCIATION, {associationState, edit: true})}/>
+                        onPress={() => navigation.navigate(routes.NEW_ASSOCIATION, {selectedAssociation:associationState, edit: true})}/>
                 </View>}
         </>
     );

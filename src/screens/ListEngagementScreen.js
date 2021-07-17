@@ -6,27 +6,23 @@ import BackgroundWithAvatar from "../components/member/BackgroundWithAvatar";
 import EngagementItem from "../components/engagement/EngagementItem";
 import {
     getEngagementDetail,
-    getPayingTranche,
     showEngagementTranches
 } from "../store/slices/engagementSlice";
 import ListItemSeparator from "../components/ListItemSeparator";
 import useAuth from "../hooks/useAuth";
 import AppAddNewButton from "../components/AppAddNewButton";
 import routes from "../navigation/routes";
-import TrancheRightActions from "../components/tranche/TrancheRightActions";
-import useEngagement from "../hooks/useEngagement";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function ListEngagementScreen({route, navigation}) {
     const selectedMember = route.params
-    const {handlePayTranche} = useEngagement()
     const dispatch = useDispatch()
-    const { getMemberUserCompte, getConnectedMember} = useAuth()
+    const { getMemberUserCompte} = useAuth()
 
     const currentUser = useSelector(state => state.auth.user)
     const isLoading = useSelector(state => state.entities.engagement.loading)
+    const [backImageLoading, setBackImageLoading] = useState(true)
 
-    const allTranches = useSelector(state => state.entities.engagement.tranches)
     const memberEngagements = useSelector(state => {
         const list = state.entities.engagement.list
         const memberList = list.filter(engagement => engagement.creatorId === selectedMember.member.id)
@@ -39,13 +35,13 @@ function ListEngagementScreen({route, navigation}) {
         return validList
     })
 
-    const [tranchePayMontant, setTranchePayMontant] = useState('')
-
-
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
-            <BackgroundWithAvatar selectedMember={selectedMember}/>
+            <BackgroundWithAvatar
+                onBackImageLoadEnd={() => setBackImageLoading(false)}
+                onBackImageLoading={backImageLoading}
+                selectedMember={selectedMember}/>
              <View style={{marginVertical: 20}}>
                  <ListItemSeparator/>
              </View>
@@ -57,21 +53,10 @@ function ListEngagementScreen({route, navigation}) {
                 renderItem={({item}) =>
                           <EngagementItem
                               getMoreDetails={() => navigation.navigate('MemberEngagementDetail', item)}
-                              tranches={allTranches.filter(tranche => tranche.engagementId === item.id)}
                               showTranches={item.showTranches}
                               getTranchesShown={() => {
                                   dispatch(showEngagementTranches(item))
                               }}
-                              handlePayTranche={(tranche) =>handlePayTranche(tranche.id, item.id, tranchePayMontant)}
-                              editTrancheMontant={tranchePayMontant}
-                              onChangeTrancheMontant={val => setTranchePayMontant(val)}
-                              renderRightActions={(tranche) =>
-                                  getConnectedMember().id === item.creatorId?<TrancheRightActions
-                                      ended={tranche.montant===tranche.solde}
-                                      isPaying={tranche.paying}
-                                      payingTranche={() => {dispatch(getPayingTranche(tranche))}}
-                                  />:null
-                              }
                               engagement={item} 
                               validationDate={item.updatedAt}
                               showAvatar={false}

@@ -11,7 +11,7 @@ import {saveEditFund} from "../../store/slices/authSlice";
 const validFund = Yup.object().shape({
     fonds: Yup.number()
 })
-function EditFundModal({editVisible, closeFundModal}) {
+function EditFundModal({editVisible, closeFundModal, fundResult}) {
     const store = useStore()
     const dispatch = useDispatch()
     const currentUser = useSelector(state => state.auth.user)
@@ -29,6 +29,7 @@ function EditFundModal({editVisible, closeFundModal}) {
                 )
             return;
         }
+        fundResult({success: true})
         ToastAndroid.showWithGravityAndOffset("Succès: Le fonds a été ajouté",
             ToastAndroid.LONG,
             ToastAndroid.TOP,

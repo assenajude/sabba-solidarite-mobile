@@ -17,22 +17,20 @@ import {getPopulateReseauList, getUserTransactions} from "../store/slices/transa
 import {reseauData} from "../utilities/reseau.data";
 import useNotification from "../hooks/useNotification";
 import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
-import {associationImageLoaded} from "../store/slices/memberSlice";
 
 function StarterScreen({navigation}) {
     const dispatch = useDispatch()
     const {registerForPushNotificationsAsync} = useNotification()
     const {isAdmin, getInitAssociation} = useAuth()
-    const {getMemberRelationType, deleteAssociation} = useManageAssociation()
+    const {getMemberRelationType, deleteAssociation, sendAdhesionMessageToAssociation} = useManageAssociation()
 
     const currentUser = useSelector(state => state.auth.user)
     const assoLoading = useSelector(state => state.entities.association.loading)
+    const allAssociations = useSelector(state => state.entities.association.list)
     const memberLoading = useSelector(state => state.entities.member.loading)
     const memberAssociations = useSelector(state => state.entities.member.userAssociations)
+    const updated = useSelector(state => state.entities.association.updated)
 
-    const [image1Loading, setImage1Loading] = useState(false)
-    const [image2Loading, setImage2Loading] = useState(false)
-    const [image3Loading, setImage3Loading] = useState(false)
 
     const loading = assoLoading || memberLoading
 
@@ -56,7 +54,11 @@ function StarterScreen({navigation}) {
             await getInitAssociation(association)
             navigation.navigate('BottomTab')
         } else
-            alert("Vous n'êtes pas encore membre de cette association")
+            Alert.alert("Info","Vous n'êtes pas encore membre de cette association. Si vous avez déjà envoyé la demande, vous pouvez contacter l'administrateur de cette association pour qu'il vous accepte.", [{
+                text: 'Contacter', onPress: () => navigation.navigate(routes.ASSOCIATION_DETAILS, association)
+            }, {
+                text: 'Retour', onPress: () => null
+            }])
     }
 
     const getNotifToken = async () => {
@@ -86,19 +88,19 @@ function StarterScreen({navigation}) {
                 'Alert!',
                 'Etes-vous sûr de vous deconnecter?',
                 [
-                    { text: "Non", style: 'cancel', onPress: () => {} },
+                    { text: "Non", style: 'cancel', onPress: () => {return;}},
                     {
                         text: 'Me deconnecter',
                         style: 'destructive',
                         onPress: () => {
-                            dispatch(getLogout())
                             navigation.dispatch(e.data.action)
+                            dispatch(getLogout())
                         },
                     },
                 ]
             );
         })
-    }, [navigation])
+    }, [navigation, updated])
 
 
     return (
@@ -138,7 +140,7 @@ function StarterScreen({navigation}) {
                             onPress={() => navigation.navigate(routes.ASSOCIATION_LIST)}/>
 
                         <AppIconWithLabelButton
-                            label='Nous contacter'
+                            label="Besoin d'aide"
                             onPress={() => navigation.navigate(routes.HELP)}
                             iconName='help-circle'/>
                     </View>
@@ -159,17 +161,12 @@ function StarterScreen({navigation}) {
 
             {!loading && memberAssociations.length > 0 &&
                 <FlatList
-                    data={memberAssociations}
+                    data={isAdmin()?allAssociations : memberAssociations}
                     keyExtractor={item => item.id.toString()}
                     numColumns={2}
                     renderItem={({item}) =>
                         <AssociationItem
-                            imageLoading={item.imageLoading}
-                            onImageLoadEnd={() => {
-                                if(item.imageLoading) {
-                                    dispatch(associationImageLoaded(item))
-                                }
-                            }}
+                            sendAdhesionMessage={() => sendAdhesionMessageToAssociation(item)}
                             deleteSelected={() => deleteAssociation(item)}
                             association={item}
                             relationType={getMemberRelationType(item)}

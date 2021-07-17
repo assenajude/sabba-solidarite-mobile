@@ -4,7 +4,7 @@ import MainNavigator from "./src/navigation/MainNavigator";
 import {NavigationContainer} from "@react-navigation/native";
 import useNotification from "./src/hooks/useNotification";
 import * as Notifications from "expo-notifications";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {getAllAssociation} from "./src/store/slices/associationSlice";
 import {getUserTransactions} from "./src/store/slices/transactionSlice";
 
@@ -15,9 +15,12 @@ Notifications.setNotificationHandler({
         shouldSetBadge: true,
     }),
 });
-function AppWrapper(props) {
+function AppWrapper({getImageState}) {
     const dispatch = useDispatch()
     const {handleNotificationTaped} = useNotification()
+
+    const imageState = useSelector(state => state.auth.welcomeImageReady)
+
 
     const [notification, setNotification] = useState({})
     const notificationListener = useRef();
@@ -38,6 +41,9 @@ function AppWrapper(props) {
         handleNotificationTaped(response.notification.request.content)
     }
 
+    const setImageState = () => {
+        getImageState(imageState)
+    }
     useEffect(() => {
         notificationListener.current = Notifications.addNotificationReceivedListener(handleReceivedListener);
         responseListener.current = Notifications.addNotificationResponseReceivedListener(handleNotificationResponse);
@@ -46,8 +52,8 @@ function AppWrapper(props) {
             Notifications.removeNotificationSubscription(notificationListener.current);
             Notifications.removeNotificationSubscription(responseListener.current);
         };
-
-    }, [])
+        setImageState()
+    }, [imageState])
 
     return (
         <NavigationContainer ref={navigationRef}>

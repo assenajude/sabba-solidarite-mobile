@@ -125,6 +125,20 @@ export default useEngagement = () => {
         }
     }
 
+    const getEngagementVotans = (engagementId) => {
+        const votants = votingData[engagementId]
+        const allVotans = []
+        if(votants.length>0) {
+            for (let member of votants) {
+                const currentUserMember = associationValidMembers().users.find(item => item.id === member.userId)
+                const typeVote = member.vote.typeVote
+                const votor = {...currentUserMember, typeVote}
+                allVotans.push(votor)
+            }
+        }
+        return allVotans
+    }
+
     return {getMemberEngagementInfos, getAssociationEngagementTotal,deleteEngagement,
-        getEngagementVotesdData, handlePayTranche, getEngagementTranches, getValidEngagementList}
+        getEngagementVotesdData, handlePayTranche, getEngagementTranches, getValidEngagementList, getEngagementVotans}
 }

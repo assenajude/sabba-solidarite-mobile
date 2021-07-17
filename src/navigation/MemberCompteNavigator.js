@@ -18,7 +18,9 @@ function MemberCompteNavigator(props) {
                 onPress={() => navigation.navigate('Starter', {screen: 'StarterScreen'})}/>
 
         })}>
-            <MemberCompteNavig.Screen name='Compte' component={MemberCompteScreen}/>
+            <MemberCompteNavig.Screen name='Compte' component={MemberCompteScreen} options={() => ({
+                headerLeft: () => null
+            })}/>
         </MemberCompteNavig.Navigator>
     );
 }

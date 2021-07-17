@@ -25,5 +25,7 @@ export default Object.freeze({
     PAYEMENT_COTISATION: 'PayementCotisation',
     CODE_LOGIN: 'CodeLogin',
     CODE_REGISTER: 'CodeRegister',
-    PARAMS: 'ParamScreen'
+    PARAMS: 'ParamScreen',
+    CGU: 'CguScreen',
+    VOTANT:'Votants'
 })

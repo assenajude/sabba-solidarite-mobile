@@ -12,7 +12,6 @@ import AppLinkButton from "../components/AppLinkButton";
 import useCotisation from "../hooks/useCotisation";
 import useEngagement from "../hooks/useEngagement";
 import routes from "../navigation/routes";
-import AppHeaderGradient from "../components/AppHeaderGradient";
 import AssociationBackImage from "../components/association/AssociationBackImage";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import {getAvatarUpdate} from "../store/slices/associationSlice";
@@ -52,7 +51,6 @@ function DashboardScreen({navigation}) {
 
     useEffect(() => {
         navigation.addListener('beforeRemove', (e) => {
-            // Prevent default behavior of leaving the screen
             e.preventDefault();
             Alert.alert(
                 'Alert!',
@@ -74,8 +72,9 @@ function DashboardScreen({navigation}) {
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
-            <ScrollView>
-            <AppHeaderGradient/>
+            <ScrollView contentContainerStyle={{
+                paddingBottom: 50
+            }}>
             <AssociationBackImage
                 imageLoading={currentAssociation.imageLoading}
                 association={currentAssociation}
@@ -107,10 +106,10 @@ function DashboardScreen({navigation}) {
                 </View>
                 <View style={{
                     flexDirection: 'row',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
                     marginVertical: 10,
-                    marginHorizontal: 10
+                    marginHorizontal: 10,
+                    justifyContent: 'space-around'
                 }}>
                     <View style={{alignItems: 'center'}}>
                         <AppText>CM</AppText>
@@ -124,6 +123,15 @@ function DashboardScreen({navigation}) {
                         <AppText>TI</AppText>
                     <View style={styles.cotisation}>
                         <AppText style={{fontWeight: 'bold'}}>{currentAssociation.interetCredit}%</AppText>
+                    </View>
+                    </View>
+
+                    <View style={{
+                        alignItems: 'center'
+                    }}>
+                        <AppText>PE</AppText>
+                    <View style={styles.cotisation}>
+                        <AppText style={{fontWeight: 'bold'}}>{currentAssociation.penality}%</AppText>
                     </View>
                     </View>
 
@@ -158,6 +166,10 @@ function DashboardScreen({navigation}) {
                             <FondsLabel label='Depenses' labelStyle={{color: defaultStyles.colors.rougeBordeau}}
                                         value={getManagedAssociationFund().depenseAmount} valueStyle={{color: defaultStyles.colors.rougeBordeau}}
                                         icon='credit-card-minus' iconColor={defaultStyles.colors.rougeBordeau}/>
+
+                            <FondsLabel label='Quotité' labelStyle={{color: defaultStyles.colors.dark}}
+                                        value={getManagedAssociationFund().quotite} valueStyle={{color: defaultStyles.colors.dark}}
+                                        icon='credit-card' iconColor={defaultStyles.colors.dark}/>
 
                     </View>
 
@@ -210,7 +222,7 @@ function DashboardScreen({navigation}) {
                         </View>}
                     </View>
                 </View>
-                <AppReglement association={currentAssociation}/>
+                <AppReglement containerStyle={{marginHorizontal: 20}} association={currentAssociation}/>
             </ScrollView>
         </>
     );

@@ -1,5 +1,5 @@
-import React, {useRef} from 'react';
-import {View, KeyboardAvoidingView, Platform} from "react-native";
+import React, {useEffect, useRef, useState} from 'react';
+import {View, KeyboardAvoidingView, Platform, ScrollView} from "react-native";
 import * as Yup from 'yup'
 import AppLogoInfo from "../components/AppLogoInfo";
 import {AppForm, AppFormField, FormSubmitButton} from "../components/form";
@@ -30,6 +30,8 @@ function CodeRegisterScreen({navigation}) {
     const pinRef = useRef()
     const confirmRef = useRef()
     const phoneRef = useRef()
+    const [pinLength, setPinLength] = useState(0)
+    const [confirmLength, setConfirmLength] = useState(0)
 
     const handleCodeRegister = async (data) => {
         const registerData = {
@@ -44,14 +46,30 @@ function CodeRegisterScreen({navigation}) {
         navigation.navigate(routes.CODE_LOGIN)
     }
 
+    const handlePinChange = (event) => {
+        const {text} = event.nativeEvent;
+        setPinLength(text.length)
+    }
+
+    const handleConfirmChange = (event) => {
+        const {text} = event.nativeEvent;
+        setConfirmLength(text.length)
+    }
+
+    useEffect(() => {
+        if(pinLength === 4) {
+            confirmRef.current.focus()
+        }
+        if(confirmLength === 4) {
+            phoneRef.current.focus()
+        }
+
+    }, [pinLength, confirmLength])
     return (
-        <GradientScreen>
+        <>
             <AppActivityIndicator visible={isLoading}/>
-       <KeyboardAvoidingView
-           style={{
-               marginVertical: 40
-           }}
-           behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <GradientScreen>
+            <ScrollView>
            <View style={{
                marginVertical: 30
            }}>
@@ -70,6 +88,7 @@ function CodeRegisterScreen({navigation}) {
                    validationSchema={validRegister}
                    onSubmit={handleCodeRegister}>
                    <AppFormField
+                       onChange={handlePinChange}
                        textAlign='center'
                        placeholder='code pin'
                        width={200}
@@ -80,6 +99,7 @@ function CodeRegisterScreen({navigation}) {
                        name='pin'
                        formFielRef={pinRef}/>
                    <AppFormField
+                       onChange={handleConfirmChange}
                        textAlign='center'
                        placeholder='confirm code pin'
                        width={200}
@@ -107,8 +127,9 @@ function CodeRegisterScreen({navigation}) {
                    onPress={() => navigation.navigate(routes.CODE_LOGIN)}
                    style={{color: colors.bleuFbi}}>Connectez-vous.</AppText>
            </View>
-       </KeyboardAvoidingView>
+            </ScrollView>
             </GradientScreen>
+            </>
     );
 }
 

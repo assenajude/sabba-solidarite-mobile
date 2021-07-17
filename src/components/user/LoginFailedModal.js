@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
       backgroundColor: defaultStyles.colors.dark
     },
     contentModal: {
-        alignItems: 'flex-start',
+        alignSelf: "center",
         width: '100%',
         height: 200,
         marginVertical: 20,

@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
         borderColor: defaultStyles.colors.leger,
         borderWidth: 0.5,
         height: 1,
+        marginVertical: 10
     }
 })
 export default ListItemSeparator;

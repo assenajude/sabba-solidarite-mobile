@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Image,  TouchableWithoutFeedback,} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 
@@ -8,14 +8,19 @@ import defaultStyles from '../../utilities/styles'
 import AppIconButton from "../AppIconButton";
 import useAuth from "../../hooks/useAuth";
 import LottieView from 'lottie-react-native'
-import {associationImageLoaded} from "../../store/slices/memberSlice";
-import {useDispatch} from "react-redux";
 
 
 function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, isMember,
-                             relationType,onImageLoadEnd,imageLoading,
-                             showState=true, deleteSelected}) {
+                             relationType, showState=true, deleteSelected}) {
     const {isAdmin} = useAuth()
+    const [imageLoading, setImageLoading] = useState(true)
+    const [currentAssociation, setCurrentAssociation] = useState(association)
+
+    useEffect(() => {
+        setCurrentAssociation(association)
+    }, [association])
+
+
     return (
         <View style={[{width: '50%', marginVertical: 10}, borderStyle]}>
         <View style={styles.container}>
@@ -25,10 +30,10 @@ function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, i
                 borderWidth: imageLoading?0.5:0
             }}>
                 <Image
-                    onLoadEnd={onImageLoadEnd}
+                    onLoadEnd={() => setImageLoading(false)}
                     loadingIndicatorSource={require('../../../assets/solidariteImg.jpg')}
                     style={styles.associationAvatar}
-                    source={association.avatar.length>0?{uri: association.avatar} : require('../../../assets/solidariteImg.jpg')}/>
+                    source={currentAssociation.avatar.length>0?{uri: currentAssociation.avatar} : require('../../../assets/solidariteImg.jpg')}/>
                 {imageLoading && <View style={{
                     position: 'absolute',
                     width: '100%',
@@ -45,14 +50,15 @@ function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, i
                     loop={true}
                     autoPlay={true}/>
                 </View>}
-                <AppText style={[styles.nom, {marginTop: imageLoading?30:0, marginVertical: imageLoading?0:10}]}>{association.nom}</AppText>
+                <AppText style={[styles.nom, {marginTop: imageLoading?30:0, marginVertical: imageLoading?0:10}]}>{currentAssociation.nom}</AppText>
             </View>
         </TouchableWithoutFeedback>
         </View>
             {showState && <View style={{
                 position: 'absolute',
                 top:0,
-                right:10
+                right:10,
+                borderRadius: 10,
             }}>
                 {!isMember && <AppButton otherButtonStyle={styles.buttonStyle} title='adherer' onPress={sendAdhesionMessage}/>}
                 {isMember && relationType.toLowerCase() === 'ondemand' && <AppText style={{color: defaultStyles.colors.bleuFbi}}>envoyé</AppText> }
@@ -110,6 +116,7 @@ const styles = StyleSheet.create({
         height: 30,
         justifyContent: 'center',
         width: 30,
+        backgroundColor: defaultStyles.colors.white
     },
     nom: {
         textAlign: 'center',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Image, StyleSheet, View, TouchableOpacity, Alert} from "react-native";
 import AppImagePicker from "../AppImagePicker";
 import {useFormikContext} from "formik";
@@ -14,6 +14,8 @@ function FormImagePicker({name, label}) {
                 setFieldValue(name, {})
                 }}, {text: 'non', onPress: () => {return;}}])
     }
+
+    const [selectingImage, setSelectingImage] = useState(false)
 
     return (
         <View style={styles.container}>
@@ -32,9 +34,16 @@ function FormImagePicker({name, label}) {
              </TouchableOpacity>
              }
             </View>
-            <AppImagePicker cameraContainer={{
+            <AppImagePicker
+                onPressCloseButton={() => setSelectingImage(false)}
+                onPressCamera={() => setSelectingImage(true)}
+                selectingImage={selectingImage}
+                cameraContainer={{
                 marginHorizontal: 10
-            }} onSelectImage={image => setFieldValue(name, image)}/>
+            }} onSelectImage={image => {
+                setFieldValue(name, image)
+                setSelectingImage(false)
+            }}/>
         </View>
     );
 }

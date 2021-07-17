@@ -5,7 +5,7 @@ import AppAddNewButton from "../components/AppAddNewButton";
 import routes from "../navigation/routes";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import AppText from "../components/AppText";
-import {getAllAssociation, mainAssociationImageLoaded} from "../store/slices/associationSlice";
+import {getAllAssociation} from "../store/slices/associationSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AssociationItem from "../components/association/AssociationItem";
 import useManageAssociation from "../hooks/useManageAssociation";
@@ -16,14 +16,14 @@ function ListAssociationScreen({navigation, route}) {
     const shouldUpdate = route.params?.updated
     const store = useStore()
     const {isAdmin} = useAuth()
-    const {getMemberRelationType, deleteAssociation} = useManageAssociation()
+    const {getMemberRelationType, deleteAssociation, sendAdhesionMessageToAssociation} = useManageAssociation()
     const dispatch = useDispatch()
 
-    const connectedMember = useSelector(state => state.auth.user)
     const isLoadding = useSelector(state=> state.entities.association.loading)
     const isMemberLoading = useSelector(state => state.entities.member.loading)
     const userAssociations = useSelector(state => state.entities.member.userAssociations)
     const deletedSuccess = useSelector(state => state.entities.association.deleteSuccess)
+    const updated = useSelector(state => state.entities.association.updated)
 
     const [selectedList, setSelectedList] = useState([])
     const [searchLabel, setSearchLabel] = useState('')
@@ -33,19 +33,6 @@ function ListAssociationScreen({navigation, route}) {
 
     const handleDeleteOne = (ass) => {
         deleteAssociation(ass)
-    }
-
-    const handleSendAdhesionMessage = async(item) => {
-        const data = {
-            associationId: item.id,
-            userId: connectedMember.id,
-            relation: 'onDemand'
-        }
-        await dispatch(sendAdhesionMessage(data))
-        const error = store.getState().entities.member.error
-        if(error !== null) {
-           return  alert("Votre message n'a pas été envoyé, veuillez reessayer plutard.")
-        }
     }
 
     const getAssociationList = useCallback(async () => {
@@ -70,17 +57,6 @@ function ListAssociationScreen({navigation, route}) {
     }, [searchLabel, updateList, navigation, deleted, deletedSuccess])
 
 
-    const handleImageLoaded = async (asso) => {
-        if(asso.imageLoading) {
-            await dispatch(mainAssociationImageLoaded(asso))
-            const newAssoState = store.getState().entities.association.list
-            const selected = newAssoState.find(association => association.id == asso.id)
-            const oldArray = selectedList.filter(item => item.id !== asso.id)
-            const newArray = [...oldArray, selected]
-            setSelectedList(newArray)
-        }
-    }
-
 
     useEffect(() => {
         getAssociationList()
@@ -88,7 +64,7 @@ function ListAssociationScreen({navigation, route}) {
             if(shouldUpdate) setUpdateList(true)
         })
         return () => unsubscribe
-    }, [searchLabel, shouldUpdate, navigation, deleted, deletedSuccess])
+    }, [searchLabel, shouldUpdate, navigation, deleted, deletedSuccess, updated])
 
     return (
         <>
@@ -119,12 +95,10 @@ function ListAssociationScreen({navigation, route}) {
                 numColumns={2}
                 renderItem={({item}) =>
                     <AssociationItem
-                        onImageLoadEnd={() => handleImageLoaded(item)}
-                        imageLoading={item.imageLoading}
                         deleteSelected={() => handleDeleteOne(item)}
                         association={item}
                         onPress={() => navigation.navigate(routes.ASSOCIATION_DETAILS,item)}
-                        sendAdhesionMessage={() => handleSendAdhesionMessage(item)}
+                        sendAdhesionMessage={() => sendAdhesionMessageToAssociation(item)}
                         isMember={userAssociations.some(ass => ass.id === item.id)}
                         relationType={getMemberRelationType(item)}
                     />}

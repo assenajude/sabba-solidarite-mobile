@@ -1,11 +1,15 @@
 import React from 'react';
-import {FlatList, TouchableOpacity, View} from "react-native";
+import {FlatList, TouchableOpacity, View, Alert} from "react-native";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import MemberListItem from "../components/member/MemberListItem";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import defaultStyles from '../utilities/styles'
 import AppSwiper from "../components/AppSwiper";
-import {getSelectedAssociationMembers, respondToAdhesionMessage} from "../store/slices/memberSlice";
+import {
+    getConnectedUserAssociations,
+    getSelectedAssociationMembers,
+    respondToAdhesionMessage
+} from "../store/slices/memberSlice";
 import AppText from "../components/AppText";
 import useManageAssociation from "../hooks/useManageAssociation";
 import ListItemSeparator from "../components/ListItemSeparator";
@@ -27,23 +31,31 @@ function NouvelleAdhesionScreen({navigation}) {
     const memberLoading = useSelector(state => state.entities.member.loading)
 
 
-    const handleRespondToDemand = async (member, response) => {
-        await dispatch(respondToAdhesionMessage({
-            userId: member.id,
-            associationId:  selectedAssociation.id,
-            adminResponse: response,
-            info: member.member.statut.toLowerCase() === 'new'?"new":'old'
-        }))
-        const error = store.getState().entities.member.error
-        if(error !== null) {
-            return alert("Erreur: Nous avons rencontré une erreur, veuillez reessayer plutard.")
-        }
-        dispatch(getSelectedAssociationMembers({associationId: selectedAssociation.id}))
-        if(response === 'rejected') {
-            dispatch(getAssociationCotisations({associationId: selectedAssociation.id}))
-            dispatch(getEngagementsByAssociation({associationId: selectedAssociation.id}))
-        }
-        return alert(response === 'member'?"Membre ajouté avec succès." : "La reponse de reject a été envoyée au demandeur.")
+    const handleRespondToDemand = (member, response) => {
+        Alert.alert("Alert","Voulez-vous repondre à cette invitation?", [{
+            text: "oui", onPress: async() => {
+                await dispatch(respondToAdhesionMessage({
+                    userId: member.id,
+                    associationId:  selectedAssociation.id,
+                    adminResponse: response,
+                    info: member.member.statut.toLowerCase() === 'new'?"new":'old'
+                }))
+                const error = store.getState().entities.member.error
+                if(error !== null) {
+                    return alert("Erreur: Nous avons rencontré une erreur, veuillez reessayer plutard.")
+                }
+                dispatch(getSelectedAssociationMembers({associationId: selectedAssociation.id}))
+                dispatch(getConnectedUserAssociations())
+                if(response === 'rejected') {
+                    dispatch(getAssociationCotisations({associationId: selectedAssociation.id}))
+                    dispatch(getEngagementsByAssociation({associationId: selectedAssociation.id}))
+                }
+                return alert(response === 'member'?"Membre ajouté avec succès." : "La reponse de reject a été envoyée au demandeur.")
+            }
+        }, {
+            text: "non", onPress: () => {return;}
+        }])
+
     }
 
 

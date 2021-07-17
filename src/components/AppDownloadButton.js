@@ -5,7 +5,7 @@ import * as FileSystem from "expo-file-system";
 import AppUploadModal from "./AppUploadModal";
 import * as MediaLibrary from "expo-media-library";
 
-function AppDownloadButton({association}) {
+function AppDownloadButton({label, url}) {
 
 
     const [progress, setProgress] = useState(0)
@@ -13,8 +13,9 @@ function AppDownloadButton({association}) {
 
     let fileTypeArray
     let fileType
-    if(association.reglementInterieur && association.reglementInterieur !== null) {
-     fileTypeArray = association.reglementInterieur.split('.')
+    const isValidUrl = url !== "" && url !== undefined && url !== null
+    if(isValidUrl) {
+     fileTypeArray = url.split('.')
       fileType = fileTypeArray.pop()
 
     }
@@ -25,14 +26,14 @@ function AppDownloadButton({association}) {
                 const asset = await MediaLibrary.createAssetAsync(file_uri);
                 const album = await MediaLibrary.getAlbumAsync('Download');
                 if (album === null || Object.keys(album).length === 0) {
-                    const result = await MediaLibrary.createAlbumAsync('Download', asset, false);
+                    await MediaLibrary.createAlbumAsync('Download', asset, false);
                 } else {
                     await MediaLibrary.addAssetsToAlbumAsync([asset], album.id, false);
                 }
             } else {
                 return alert("Vous devez accepter toutes les permissions.")
             }
-            alert(`Le fichier a été téléchargé et enregistré sur votre appareil. son nom est: ${association.nom}Reglement.${fileType}`)
+            alert(`Le fichier a été téléchargé et enregistré sur votre appareil. son nom est: _${label}`)
         } catch (error) {
             alert("Une erreur est survenue lors de l'enregistrement du fichier sur votre appareil. Veuillez reessayer plutard.");
             throw new Error(error);
@@ -40,8 +41,8 @@ function AppDownloadButton({association}) {
     }
 
     const downloadFile = async () => {
-        if(!association.reglementInterieur || association.reglementInterieur === '') {
-            return alert("Aucun texte de reglementation pour cette association.")
+        if(!isValidUrl) {
+            return alert("Aucun document telechargeable trouvé.")
         }
 
         setProgress(0)
@@ -53,8 +54,8 @@ function AppDownloadButton({association}) {
         };
 
         const downloadResumable = FileSystem.createDownloadResumable(
-            association.reglementInterieur,
-            FileSystem.documentDirectory + `${association.nom}Reglement.${fileType}`,
+            url,
+            FileSystem.documentDirectory + `${label}_.${fileType}`,
             {},
             callback
         );
