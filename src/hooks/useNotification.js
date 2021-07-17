@@ -5,11 +5,12 @@ import navigation from '../navigation/routeNavigation'
 import {useDispatch, useStore} from "react-redux";
 import {setSelectedAssociation} from "../store/slices/associationSlice";
 import useAuth from "./useAuth";
+import {getUserTransactions} from "../store/slices/transactionSlice";
 let useNotification;
 export default useNotification = () => {
     const store = useStore()
     const dispatch = useDispatch()
-    const {getInitAssociation} = useAuth()
+    const {getInitAssociation, isAdmin} = useAuth()
 
     const registerForPushNotificationsAsync = async () => {
         let token = ''
@@ -29,14 +30,6 @@ export default useNotification = () => {
             alert('Must use physical device for Push Notifications');
         }
 
-       /* if (Platform.OS === 'android') {
-            Notifications.setNotificationChannelAsync('default', {
-                name: 'default',
-                importance: Notifications.AndroidImportance.MAX,
-                vibrationPattern: [0, 250, 250, 250],
-                lightColor: '#FF231F7C',
-            });
-        }*/
         return token
     };
 
@@ -58,8 +51,12 @@ export default useNotification = () => {
             }
             }
         if(notifType === 'transaction') {
+            if(!isAdmin()) {
+                return;
+            }
             if (isUserConnected) {
-            const transactionList = store.getState().entities.transaction.list
+                await dispatch(getUserTransactions({userId: currentUser.id}))
+                const transactionList = store.getState().entities.transaction.list
             const selectedTransaction = transactionList.find(transac => transac.id === data.transactionId)
                 navigation.navigate("Starter",{
                     screen: "ValidationTransacDetail",

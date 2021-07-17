@@ -53,7 +53,7 @@ function NewAssociationScreen({navigation, route}) {
         let imageUploaded = false
         let isTheSameImage = false
         if(isImage) {
-            if(oldAssociation.avatar === avatarArray[0].url) {
+            if(oldAssociation && oldAssociation.avatar === avatarArray[0].url) {
                 isTheSameImage = true
             } else {
                 const transmedArray = await dataTransformer(avatarArray)
