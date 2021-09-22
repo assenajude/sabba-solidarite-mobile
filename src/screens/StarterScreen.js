@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, StyleSheet, FlatList, TouchableOpacity, Alert} from "react-native";
-import {MaterialCommunityIcons} from '@expo/vector-icons'
+import {View, StyleSheet,Alert,ScrollView} from "react-native";
 import AppText from "../components/AppText";
 import {useDispatch, useSelector} from "react-redux";
 import routes from "../navigation/routes";
@@ -9,14 +8,13 @@ import {setSelectedAssociation} from "../store/slices/associationSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import defaultStyles from '../utilities/styles'
 import useAuth from "../hooks/useAuth";
-import ListItemSeparator from "../components/ListItemSeparator";
 import useManageAssociation from "../hooks/useManageAssociation";
 import AppButton from "../components/AppButton";
 import {getLogout, getNotificationTokenUpdate, getUserAllUsers} from "../store/slices/authSlice";
 import {getPopulateReseauList, getUserTransactions} from "../store/slices/transactionSlice";
 import {reseauData} from "../utilities/reseau.data";
 import useNotification from "../hooks/useNotification";
-import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
+import HomeHeader from "../components/HomeHeader";
 
 function StarterScreen({navigation}) {
     const dispatch = useDispatch()
@@ -30,11 +28,29 @@ function StarterScreen({navigation}) {
     const memberLoading = useSelector(state => state.entities.member.loading)
     const memberAssociations = useSelector(state => state.entities.member.userAssociations)
     const updated = useSelector(state => state.entities.association.updated)
+    const [dataTabOne, setDataTabOne] = useState([])
+    const [dataTabTwo, setDataTabTwo] = useState([])
+    const data = isAdmin()?allAssociations : memberAssociations
 
+    const getStartedData = () => {
+        const tab1 = []
+        const tab2 = []
+        for(let i = 0; i<data.length; i++) {
+            const item = data[i];
+            if(i===0) {
+                tab1.push(item)
+            }else if(i===1) {
+                tab2.push(item)
+            }else {
+                if(i % 2 === 0) {
+                    tab1.push(item)
+                }else tab2.push(item)
+            }
+        }
+        setDataTabOne(tab1)
+        setDataTabTwo(tab2)
+    }
 
-    const loading = assoLoading || memberLoading
-
-    const [showLinks, setShowLinks] = useState(true)
 
 
     const getInit = useCallback(() => {
@@ -42,7 +58,7 @@ function StarterScreen({navigation}) {
             dispatch(getUserAllUsers())
         }
         dispatch(getPopulateReseauList(reseauData))
-        dispatch(getUserTransactions({userId: currentUser.id}))
+        dispatch(getUserTransactions({creatorId: currentUser.id}))
     }, [])
 
     const handleGoToDashboard = async (association) => {
@@ -71,18 +87,14 @@ function StarterScreen({navigation}) {
             dispatch(getNotificationTokenUpdate({userId: currentUser.id, notificationToken: notifToken}))
         }
         }
+
     }
-
-
-
 
     useEffect(() => {
         getNotifToken()
         getInit()
-        setTimeout(() => {
-            setShowLinks(false)
-        }, 2000)
-        navigation.addListener('beforeRemove', (e) => {
+        getStartedData()
+        const unsubscribe = navigation.addListener('beforeRemove', (e) => {
             e.preventDefault();
             Alert.alert(
                 'Alert!',
@@ -100,83 +112,104 @@ function StarterScreen({navigation}) {
                 ]
             );
         })
-    }, [navigation, updated])
+        return unsubscribe
+    }, [navigation, updated, data])
 
 
     return (
         <>
             <AppActivityIndicator visible={assoLoading || memberLoading}/>
-            <View>
-                <View style={{
-                    alignItems: 'center',
-                    marginBottom:showLinks?0:20
-                }}>
-                    <TouchableOpacity onPress={() => setShowLinks(!showLinks)}  style={{backgroundColor: defaultStyles.colors.grey, paddingHorizontal: 10}}>
-                       {!showLinks && <MaterialCommunityIcons name="chevron-down" size={30} color="black" />}
-                       {showLinks && <MaterialCommunityIcons name="chevron-up" size={30} color="black" />}
-                    </TouchableOpacity>
-                </View>
-                {showLinks &&  <View>
-                 <View style={{
-                    flexDirection:'row',
-                    justifyContent: 'space-between',
-                    marginVertical:20,
-                     marginHorizontal: 10
-                }}>
-                    <AppIconWithLabelButton
-                        onPress={() => navigation.navigate(routes.USER_COMPTE, currentUser)}
-                        label='Mon compte'/>
+            <HomeHeader/>
+            <ScrollView style={{
+                paddingBottom: 50
+            }}>
+            <View style={styles.links}>
 
-                    <AppIconWithLabelButton
-                        iconName='credit-card-multiple'
-                        onPress={() => navigation.navigate(routes.TRANSACTION)}
-                        label='Transactions'/>
+                    <View style={styles.firstLink}>
+                        <AppButton
+                            onPress={() => navigation.navigate(routes.TRANSACTION)}
+                            mode="text"
+                            labelStyle={{color: defaultStyles.colors.white}}
+                            iconName='credit-card-multiple'
+                            title='Transactions'
+                        />
+                        <AppButton
+                            mode='text'
+                            labelStyle={{
+                                color: defaultStyles.colors.white
+                            }}
+                            title="Besoin d'aide"
+                            onPress={() => navigation.navigate(routes.HELP)}
+                            iconName='help-circle'
+                        />
 
-                </View>
-                    <View style={{alignItems: 'center',flexDirection: 'row',justifyContent: 'space-between',marginHorizontal:10,marginBottom: 20}}>
-                        <AppIconWithLabelButton
+                    </View>
+                        <AppButton
+                            mode='text'
+                            labelStyle={{
+                                color: defaultStyles.colors.white
+                            }}
+                            style={{
+                                alignSelf: 'center',
+                                marginVertical: 10,
+                            }}
                             iconName='account-group'
-                            label='Associations'
+                            title='Associations'
                             onPress={() => navigation.navigate(routes.ASSOCIATION_LIST)}/>
 
-                        <AppIconWithLabelButton
-                            label="Besoin d'aide"
-                            onPress={() => navigation.navigate(routes.HELP)}
-                            iconName='help-circle'/>
-                    </View>
-                </View>}
             </View>
-                <ListItemSeparator/>
-            {!assoLoading && !memberLoading && memberAssociations.length === 0 && <View style={styles.emptyStyle}>
-                <AppText style={{marginBottom: 10}}>Vous n'êtes pas encore membre d'associations.</AppText>
+            {data.length === 0 &&
+            <View style={styles.emptyStyle}>
+                <View style={{
+                    marginHorizontal: 40
+                }}>
+                    <AppText style={{marginBottom: 10}}>Vous n'êtes pas encore membre d'associations.</AppText>
+                </View>
                 <AppButton
-                    otherButtonStyle={{
-                        width: 'auto',
-                        height: 30,
-                        padding: 5
+                    style={{
+                        width: 300,
+                        marginTop: 50
                     }}
+                    iconName="account-group"
                     title='Adherer maintenant'
                     onPress={() =>navigation.navigate(routes.ASSOCIATION_LIST)}/>
             </View>}
 
-            {!loading && memberAssociations.length > 0 &&
-                <FlatList
-                    data={isAdmin()?allAssociations : memberAssociations}
-                    keyExtractor={item => item.id.toString()}
-                    numColumns={2}
-                    renderItem={({item}) =>
-                        <AssociationItem
-                            sendAdhesionMessage={() => sendAdhesionMessageToAssociation(item)}
-                            deleteSelected={() => deleteAssociation(item)}
-                            association={item}
-                            relationType={getMemberRelationType(item)}
-                            isMember={memberAssociations.some(association => association.id === item.id)}
-                            onPress={() => handleGoToDashboard(item)}
-                            nameStyle={{color: defaultStyles.colors.bleuFbi}}
-                        />}
-                />
+            {data.length > 0 &&
+            <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignSelf: 'center'
+            }}>
+                <View>
+                {dataTabOne.map((item, index) =>
+                    <AssociationItem
+                        key={index.toString()}
+                    sendAdhesionMessage={() => sendAdhesionMessageToAssociation(item)}
+                    deleteSelected={() => deleteAssociation(item)}
+                    association={item}
+                    relationType={getMemberRelationType(item)}
+                    isMember={memberAssociations.some(association => association.id === item.id)}
+                    onPress={() => handleGoToDashboard(item)}
+                    nameStyle={{color: defaultStyles.colors.bleuFbi}}
+                />)}
+                </View>
+                <View>
+                {dataTabTwo.map((item, index) =>
+                    <AssociationItem
+                        key={index.toString()}
+                    sendAdhesionMessage={() => sendAdhesionMessageToAssociation(item)}
+                    deleteSelected={() => deleteAssociation(item)}
+                    association={item}
+                    relationType={getMemberRelationType(item)}
+                    isMember={memberAssociations.some(association => association.id === item.id)}
+                    onPress={() => handleGoToDashboard(item)}
+                    nameStyle={{color: defaultStyles.colors.bleuFbi}}
+                />)}
+                </View>
+            </View>
             }
-
+            </ScrollView>
             </>
     );
 }
@@ -185,7 +218,41 @@ const styles = StyleSheet.create({
     emptyStyle: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        alignSelf: 'center'
+    },
+
+    headerShower:{
+        position: 'absolute',
+        bottom: -20,
+        alignSelf: 'center',
+        backgroundColor: defaultStyles.colors.rougeBordeau,
+        paddingHorizontal: 0,
+        justifyContent: 'flex-end',
+        borderWidth: 1,
+        borderColor: defaultStyles.colors.white
+    },
+    firstLink:{
+        flexDirection:'row',
+        justifyContent: 'space-between',
+        marginVertical:20,
+        marginHorizontal: 10
+    },
+    showMore: {
+        width: 80,
+        height: 40,
+        borderWidth: 1,
+        backgroundColor: defaultStyles.colors.rougeBordeau,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderColor: defaultStyles.colors.white,
+        alignSelf: 'center'
+    },
+    links: {
+        height: 'auto',
+        paddingVertical: 20,
+        backgroundColor: defaultStyles.colors.rougeBordeau,
+        marginBottom: 20
     }
 })
 

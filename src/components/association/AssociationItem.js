@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, Image,  TouchableWithoutFeedback,} from "react-native";
+import {View, StyleSheet, Image,  TouchableWithoutFeedback,TouchableOpacity} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
+import {useNavigation} from '@react-navigation/native'
 
 import AppText from "../AppText";
 import AppButton from "../AppButton";
@@ -8,10 +9,13 @@ import defaultStyles from '../../utilities/styles'
 import AppIconButton from "../AppIconButton";
 import useAuth from "../../hooks/useAuth";
 import LottieView from 'lottie-react-native'
+import colors from "../../utilities/colors";
+import routes from "../../navigation/routes";
 
 
 function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, isMember,
                              relationType, showState=true, deleteSelected}) {
+    const navigation = useNavigation()
     const {isAdmin} = useAuth()
     const [imageLoading, setImageLoading] = useState(true)
     const [currentAssociation, setCurrentAssociation] = useState(association)
@@ -22,7 +26,7 @@ function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, i
 
 
     return (
-        <View style={[{width: '50%', marginVertical: 10}, borderStyle]}>
+        <View style={[{width: 'auto', marginVertical: 10, marginHorizontal: 10}, borderStyle]}>
         <View style={styles.container}>
         <TouchableWithoutFeedback onPress={onPress}>
             <View style={{
@@ -60,7 +64,11 @@ function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, i
                 right:10,
                 borderRadius: 10,
             }}>
-                {!isMember && <AppButton otherButtonStyle={styles.buttonStyle} title='adherer' onPress={sendAdhesionMessage}/>}
+                {!isMember &&
+                <AppButton
+                    height={30}
+                    title='adherer'
+                    onPress={sendAdhesionMessage}/>}
                 {isMember && relationType.toLowerCase() === 'ondemand' && <AppText style={{color: defaultStyles.colors.bleuFbi}}>envoyé</AppText> }
                 {isMember && relationType.toLowerCase() === 'rejected' && <AppText style={{color: defaultStyles.colors.rouge}}>refusé</AppText> }
                 {isMember && relationType.toLowerCase() === 'member' && <View style={styles.iconContainer}>
@@ -85,6 +93,19 @@ function AssociationItem({association,borderStyle,sendAdhesionMessage,onPress, i
                    }}
                    iconName='delete'/>
             </View>}
+            {!association.isValid &&
+            <TouchableOpacity
+                onPress={() => alert('cette association est en cours de validation.')}
+                style={styles.validation}>
+                <AppText style={{fontSize: 15}}>validation encours...</AppText>
+            </TouchableOpacity>}
+            {isAdmin() && <AppButton
+                height={30}
+                onPress={() => navigation.navigate(routes.NEW_ASSOCIATION, {selectedAssociation: association})}
+                title='editer'
+                iconName='circle-edit-outline'
+                style={styles.edit}
+            />}
             </View>
     );
 }
@@ -98,11 +119,6 @@ const styles = StyleSheet.create({
     container: {
         marginVertical: 20,
         marginHorizontal:10,
-    },
-    buttonStyle: {
-        width: 'auto',
-        height: 20,
-        padding: 5
     },
     deleteButton: {
       position: 'absolute',
@@ -121,6 +137,21 @@ const styles = StyleSheet.create({
     nom: {
         textAlign: 'center',
         fontWeight: 'bold'
+    },
+    validation: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: colors.white,
+        opacity: 0.8,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    edit: {
+        position: 'absolute',
+        alignSelf: 'center',
+        backgroundColor: colors.bleuFbi,
+        bottom: 0
     }
 })
 export default AssociationItem;

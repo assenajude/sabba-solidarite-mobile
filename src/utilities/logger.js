@@ -4,7 +4,7 @@ import * as Sentry from 'sentry-expo'
 
 const start = () => {
     Sentry.init({
-        dsn: "https://b47616e1c7ed43d482ad72435fd9ed78@o834784.ingest.sentry.io/5813079",
+        dsn: "https://5f7b4a619f274176b0fd96c42366d515@o541240.ingest.sentry.io/5805068",
         enableInExpoDevelopment: true,
         debug: true,
     });

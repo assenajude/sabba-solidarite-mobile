@@ -5,13 +5,11 @@ import colors from "../utilities/colors";
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 
 import defaulStyles from '../utilities/styles'
-import AppHeaderGradient from "../components/AppHeaderGradient";
 
 
 function HelpScreen() {
     return (
         <ScrollView>
-            <AppHeaderGradient/>
             <Image source={require('../../assets/help.jpg')} style={{
                 width: '100%',
                 height: 300

@@ -9,13 +9,12 @@ import {getAllAssociation} from "../store/slices/associationSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import AssociationItem from "../components/association/AssociationItem";
 import useManageAssociation from "../hooks/useManageAssociation";
-import {sendAdhesionMessage, getConnectedUserAssociations} from "../store/slices/memberSlice";
-import AppTextInput from "../components/AppTextInput";
+import {getConnectedUserAssociations} from "../store/slices/memberSlice";
+import AppSearchBar from "../components/AppSearchBar";
 
 function ListAssociationScreen({navigation, route}) {
     const shouldUpdate = route.params?.updated
     const store = useStore()
-    const {isAdmin} = useAuth()
     const {getMemberRelationType, deleteAssociation, sendAdhesionMessageToAssociation} = useManageAssociation()
     const dispatch = useDispatch()
 
@@ -69,27 +68,23 @@ function ListAssociationScreen({navigation, route}) {
     return (
         <>
             <AppActivityIndicator visible={isLoadding || isMemberLoading}/>
-            <View style={{
-                alignItems: 'center',
-            }}>
-                <AppTextInput
-                    placeholder='nom ou description'
-                    onChangeText={val => {
-                        setSearching(true)
-                        setSearchLabel(val)
-                    }}
-                    value={searchLabel}
-                    style={{
-                        height: 20
-                    }}
-                    width={200}
-                    icon='book-search-outline'/>
-            </View>
+            <AppSearchBar
+                placeholder='Chercher une association'
+                onChangeText={val =>{
+                    setSearching(true)
+                    setSearchLabel(val)
+                }}
+                value={searchLabel}
+            />
             {selectedList.length === 0 && !isLoadding && <View style={styles.emptyStyle}>
                 <AppText>Aucune association trouvée</AppText>
             </View>}
             {selectedList.length > 0 &&
             <FlatList
+                contentContainerStyle={{
+                    alignItems: 'center',
+                    paddingBottom: 50
+                }}
                 data={selectedList}
                 keyExtractor={item => item.id.toString()}
                 numColumns={2}
@@ -103,9 +98,9 @@ function ListAssociationScreen({navigation, route}) {
                         relationType={getMemberRelationType(item)}
                     />}
             />}
-            {isAdmin() && <View style={styles.addNew}>
+            <View style={styles.addNew}>
                 <AppAddNewButton onPress={() => navigation.navigate(routes.NEW_ASSOCIATION)}/>
-            </View>}
+            </View>
         </>
     );
 }

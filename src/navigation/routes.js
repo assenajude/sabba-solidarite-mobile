@@ -5,6 +5,7 @@ export default Object.freeze({
     ASSOCIATION_LIST: 'ListAssociationScreen',
     NEW_ASSOCIATION: 'NewAssociationScreen',
     EDIT_MEMBER: 'EditMemberScreen',
+    MEMBER_DETAILS:'MemberDetails',
     NEW_COTISATION: 'NewCotisationScreen',
     LIST_ENGAGEMENT: 'ListEngagementScreen',
     NEW_ENGAGEMENT: 'NewEngagementScreen',
@@ -27,5 +28,8 @@ export default Object.freeze({
     CODE_REGISTER: 'CodeRegister',
     PARAMS: 'ParamScreen',
     CGU: 'CguScreen',
-    VOTANT:'Votants'
+    VOTANT:'Votants',
+    TRANCHE: 'TrancheScreen',
+    MEMBER_RETRAIT: 'MemberRetrait',
+    SELECTED_RESEAU:'SelectedReseau'
 })

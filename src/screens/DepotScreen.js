@@ -12,7 +12,8 @@ import AppAddNewButton from "../components/AppAddNewButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import {reseauData} from "../utilities/reseau.data";
 
-function DepotScreen({navigation}) {
+function DepotScreen({navigation, route}) {
+    const currentParams = route.params
     const dispatch = useDispatch()
     const {getReseau} = useTransaction()
     const {dataSorter}  = useAuth()
@@ -29,7 +30,7 @@ function DepotScreen({navigation}) {
 
     const getInitTransaction = useCallback(async () => {
         await dispatch(getPopulateReseauList(reseauData))
-        await dispatch(getUserTransactions({userId: currentUser.id}))
+        await dispatch(getUserTransactions({creatorId: currentParams?.creatorId?currentParams.creatorId : currentUser.id}))
     }, [])
 
 

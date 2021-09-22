@@ -6,11 +6,19 @@ import RetraitScreen from "../screens/RetraitScreen";
 const TransactionNavig = createMaterialTopTabNavigator();
 
 
-function TransactionNavigator(props) {
+function TransactionNavigator({route}) {
+    const params = route.params
     return (
         <TransactionNavig.Navigator >
-            <TransactionNavig.Screen name='Depot' component={DepotScreen}/>
-            <TransactionNavig.Screen name='Retrait' component={RetraitScreen}/>
+            <TransactionNavig.Screen
+                initialParams={params}
+                name='Depot'
+                component={DepotScreen}
+            />
+            <TransactionNavig.Screen
+                initialParams={params}
+                name='Retrait'
+                component={RetraitScreen}/>
         </TransactionNavig.Navigator>
     );
 }

@@ -19,7 +19,6 @@ function NewEngagementList({navigation}) {
     const dispatch = useDispatch()
     const  {dataSorter} = useAuth()
     const store = useStore()
-    const {getMemberUserCompte} = useAuth()
     const {associationValidMembers} = useManageAssociation()
 
     const isLoading = useSelector(state => state.entities.engagement.loading)

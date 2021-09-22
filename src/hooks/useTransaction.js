@@ -1,9 +1,10 @@
-import {useSelector} from "react-redux";
+import {useSelector, useStore} from "react-redux";
 import useAuth from "./useAuth";
 
 let useTransaction;
 export default useTransaction = () => {
-    const {dataSorter} = useAuth()
+    const {dataSorter, isAdmin} = useAuth()
+    const store = useStore()
 
     const listReseau = useSelector(state => state.entities.transaction.reseauList)
     const retraitTransactions = useSelector(state => {
@@ -26,5 +27,16 @@ export default useTransaction = () => {
         return finalResult
     }
 
-    return {getReseau, getRetraitRecentNumber}
+    const getCreatorUser = (transaction) => {
+        let creator
+        const allUsers = store.getState().auth.allUsers
+        if(transaction.creatorType === 'member') {
+            creator = allUsers.find(item => item.id === transaction.member.userId)
+        }else{
+            creator = allUsers.find(item => item.id === transaction.user.id)
+        }
+        return creator
+    }
+
+    return {getReseau, getRetraitRecentNumber, getCreatorUser}
 }

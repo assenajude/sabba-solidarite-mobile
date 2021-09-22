@@ -3,7 +3,12 @@ import {getAssociationCotisations} from "../store/slices/cotisationSlice";
 import {getMemberInfos, getMembersCotisations, getSelectedAssociationMembers} from "../store/slices/memberSlice";
 import {getAllVotes, getEngagementsByAssociation} from "../store/slices/engagementSlice";
 import {getAssociationInfos} from "../store/slices/informationSlice";
-import {getAllAssociation, getMemberRoles, setSelectedAssociation} from "../store/slices/associationSlice";
+import {
+    getAllAssociation,
+    getMemberRoles,
+    getStateUpdate,
+    setSelectedAssociation
+} from "../store/slices/associationSlice";
 import {useCallback} from "react";
 import {getPopulateReseauList, getUserTransactions} from "../store/slices/transactionSlice";
 import {reseauData} from "../utilities/reseau.data";
@@ -60,6 +65,7 @@ export default useAuth = () => {
                     dispatch(getMemberRoles({memberId: currentMember.member.id}))
                 }
             }
+            dispatch(getStateUpdate({updating: false}))
         }, [])
 
 
@@ -115,5 +121,15 @@ export default useAuth = () => {
         }
         return sorTable
     }
-    return {isAdmin,getMemberUserCompte, isModerator,getConnectedMember, dataSorter, getInitAssociation, isValidEmail, notifNavig}
+
+    const getMemberStatut = (statut) => {
+        let memberStatut = 'ORDINAIRE'
+        if(statut) {
+        if(statut.toLowerCase() === 'moderator') memberStatut = 'MODERATEUR'
+        if(statut.toLowerCase() === 'admin') memberStatut = 'ADMINISTRATEUR'
+        }
+        return memberStatut
+    }
+
+    return {getMemberStatut,isAdmin,getMemberUserCompte, isModerator,getConnectedMember, dataSorter, getInitAssociation, isValidEmail, notifNavig}
 }

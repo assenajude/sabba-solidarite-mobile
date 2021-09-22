@@ -2,13 +2,12 @@
   "expo": {
     "name": "sabbat-solidarite",
     "slug": "sabbat-solidarite",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "resizeMode": "contain"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -26,24 +25,18 @@
       }
     },
     "androidStatusBar": {
-      "barStyle": "light-content",
-      "backgroundColor": "#860432"
+      "barStyle": "dark-content",
+      "backgroundColor": "#ffffff",
+      "translucent": false
     },
     "android": {
       "package": "com.sabbat.solidarite",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 6 ,
+      "versionCode":11,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      },
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.INTERNET"
-      ]
+      }
     },
     "plugins": [
       "sentry-expo",
@@ -58,9 +51,9 @@
         {
           "file": "sentry-expo/upload-sourcemaps",
           "config": {
-            "organization": "sabba",
-            "project": "sabba",
-            "authToken": "b4f0a5d05f354b469095931f2127942c71c4ca98267e44838ea1a5277da4801c"
+            "organization": "sabbat",
+            "project": "sabbat-solidarite",
+            "authToken": "f1f529f4997b4ad6a094a8be05c8023080d7d9cf490048c6b8026fcf441c69f3"
           }
         }
       ]

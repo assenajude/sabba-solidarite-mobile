@@ -1,31 +1,22 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, ScrollView, TouchableWithoutFeedback} from "react-native";
+import {View, StyleSheet, ScrollView} from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Progress from 'react-native-progress'
 
 import AppText from "../components/AppText";
-import {useDispatch, useSelector, useStore} from "react-redux";
+import { useSelector, useStore} from "react-redux";
 import BackgroundWithAvatar from "../components/member/BackgroundWithAvatar";
 import defaultStyles from "../utilities/styles";
 import useManageAssociation from "../hooks/useManageAssociation";
 import AppLabelWithValue from "../components/AppLabelWithValue";
-import TrancheItem from "../components/tranche/trancheItem";
-import ListItemSeparator from "../components/ListItemSeparator";
-import useEngagement from "../hooks/useEngagement";
-import TrancheRightActions from "../components/tranche/TrancheRightActions";
-import {getPayingTranche} from "../store/slices/engagementSlice";
-import useAuth from "../hooks/useAuth";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import {ProgressBar} from "react-native-paper";
+import AppButton from "../components/AppButton";
+import routes from "../navigation/routes";
 
-function MemberEngagementDetailScreen({route}) {
+function MemberEngagementDetailScreen({route, navigation}) {
     let selectedEngagement = route.params
-    const dispatch = useDispatch()
-    const store = useStore()
-    const {getConnectedMember} = useAuth()
     const {formatDate, formatFonds} = useManageAssociation()
-    const {handlePayTranche} = useEngagement()
 
-    const isLoading = useSelector(state => state.entities.engagement.loading)
     const creatorMember = useSelector(state => {
         const membersList = state.entities.member.list
         const selected = membersList.find(member => member.id === selectedEngagement.Creator.userId)
@@ -37,23 +28,8 @@ function MemberEngagementDetailScreen({route}) {
         return selectedTranches
     })
 
-    const [showTranches, setShowTranches] = useState(false)
-    const [montantToPay, setMontantToPay] = useState('')
-
-    const handleTranchePayed = async (tranche) => {
-        await handlePayTranche(tranche.id, selectedEngagement.id, montantToPay)
-        const error = store.getState().entities.engagement.error
-        if(error === null) {
-            const list = store.getState().entities.engagement.list
-            const newEngagement = list.find(engage => engage.id === selectedEngagement.id)
-            if(newEngagement) selectedEngagement = newEngagement
-        }
-    }
-
-
     return (
         <>
-            <AppActivityIndicator visible={isLoading}/>
         <ScrollView contentContainerStyle={{
             paddingBottom: 20
         }}>
@@ -62,13 +38,14 @@ function MemberEngagementDetailScreen({route}) {
                 alignItems: 'center',
                 marginVertical: 40
             }}>
-                {selectedEngagement.progression>0 && selectedEngagement.progression<1 && <Progress.Bar progress={selectedEngagement.progression} width={200}/>}
+                {selectedEngagement.progression>0 && selectedEngagement.progression<1 &&
+                <ProgressBar progress={selectedEngagement.progression} style={{width: 200, height: 5}}/>}
                 {selectedEngagement.progression === 1 && <MaterialCommunityIcons name="credit-card-check" size={40} color={defaultStyles.colors.vert}/>}
             </View>}
             <View style={styles.montantContainer}>
             <View style={styles.numberContainer}>
                 <View elevation={5} style={styles.number}>
-                    <AppText style={{fontWeight: 'bold'}}>{formatFonds(selectedEngagement.montant + selectedEngagement.interetMontant)}</AppText>
+                    <AppText style={{fontWeight: 'bold'}}>{formatFonds(selectedEngagement.montant+selectedEngagement.interetMontant+selectedEngagement.penalityMontant)}</AppText>
                 </View>
                 <View style={styles.label}>
                     <AppText style={{color: defaultStyles.colors.white}}>Net à payer</AppText>
@@ -84,50 +61,17 @@ function MemberEngagementDetailScreen({route}) {
                     </View>
             </View>
             </View>
-
-            <View>
-                <TouchableWithoutFeedback onPress={() => setShowTranches(!showTranches)}>
-                    <View style={styles.trancheLabelContainer}>
-                        {!showTranches && <MaterialCommunityIcons name="plus" size={24} color="black" />}
-                        {showTranches && <MaterialCommunityIcons name="minus" size={24} color="black" />}
-                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>Tranches({engagementTranches.length})</AppText>
-                    </View>
-                </TouchableWithoutFeedback>
-                {showTranches && <View style={styles.trancheContainer}>
-                    {engagementTranches.length === 0 && <AppText>Aucune tranche trouvés</AppText>}
-                    {engagementTranches.length>0 && <View style={{
-                        marginHorizontal: 10
-                    }}>
-                        {engagementTranches.map((tranche, index) =>
-                            <TrancheItem
-                                key={tranche.id.toString()}
-                                numero={index+1}
-                                toPay={tranche.montant}
-                                payed={tranche.solde}
-                                payingTranche={tranche.paying}
-                                datePayement={tranche.solde === tranche.montant?tranche.updatedAt : tranche.echeance}
-                                handlePayTranche={() => handleTranchePayed(tranche)}
-                                onChangeTrancheMontant={val => setMontantToPay(val)}
-                                trancheEditMontant={montantToPay}
-                                payTranche={() => {
-                                    dispatch(getPayingTranche(tranche))
-                                }}
-                                renderRightActions={() =>
-                                    getConnectedMember().id === selectedEngagement.creatorId?<TrancheRightActions
-                                        ended={tranche.montant===tranche.solde}
-                                        isPaying={tranche.paying}
-                                        payingTranche={() => dispatch(getPayingTranche(tranche))}
-                                    />:null}
-                            />)}
-                    </View>
-                    }
-                </View>}
-                <ListItemSeparator/>
-            </View>
+            <AppButton
+               style={{alignSelf: 'flex-start'}}
+                onPress={() => navigation.navigate(routes.TRANCHE, {...selectedEngagement, tranches : engagementTranches})}
+                mode='text'
+                title={`Tranches payement (${engagementTranches.length})`}
+            />
             <AppLabelWithValue label='Libellé' value={selectedEngagement.libelle}/>
             <AppLabelWithValue label='Montant' value={formatFonds(selectedEngagement.montant)}/>
             <AppLabelWithValue label='Interet' value={formatFonds(selectedEngagement.interetMontant)}/>
-            <AppLabelWithValue label='Total à payer' value={formatFonds(selectedEngagement.interetMontant + selectedEngagement.montant)}/>
+            <AppLabelWithValue label='Montant Penalité' value={formatFonds(selectedEngagement.penalityMontant)}/>
+            <AppLabelWithValue label='Total à rembourser' value={formatFonds(selectedEngagement.montant+selectedEngagement.interetMontant+selectedEngagement.penalityMontant)}/>
             <AppLabelWithValue label='Echeance' value={formatDate(selectedEngagement.echeance)}/>
             <AppLabelWithValue label='Type' value={selectedEngagement.typeEngagement}/>
         </ScrollView>

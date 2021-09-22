@@ -9,10 +9,13 @@ import MemberEngagementDetailScreen from "../screens/MemberEngagementDetailScree
 import EditEngagementScreen from "../screens/EditEngagementScreen";
 import NavigHeaderButton from "../components/NavigHeaderButton";
 import EngagementVotantScreen from "../screens/EngagementVotantScreen";
+import useInfo from "../hooks/useInfo";
+import TrancheScreen from "../screens/TrancheScreen";
 
 const EngageNavig = createStackNavigator()
 
 function EngagementNavigator(props) {
+    const {getMemberInfoPerso} = useInfo()
     return (
         <EngageNavig.Navigator screenOptions={() =>({
             headerStyle: {backgroundColor: defaultStyles.colors.rougeBordeau},
@@ -26,7 +29,7 @@ function EngagementNavigator(props) {
                 title: 'Nouvel engagement'
             }}/>
             <EngageNavig.Screen name='ListEngagementScreen' component={ListEngagementScreen} options={({route}) => ({
-                title: 'Engagements de '+route.params?.username,
+                title: 'Engagements '+getMemberInfoPerso(route.params),
             })}/>
             <EngageNavig.Screen name='NewEngagementList' component={NewEngagementList} options={({route,navigation}) => ({
                 title: 'Engagements en validation',
@@ -45,6 +48,13 @@ function EngagementNavigator(props) {
 
             <EngageNavig.Screen name='Votants' component={EngagementVotantScreen} options={({route}) => ({
                 title: 'Ils ont dejà voté',
+            })}/>
+
+            <EngageNavig.Screen
+                name='TrancheScreen'
+                component={TrancheScreen}
+                options={({route}) => ({
+                title: 'Tranches Payement',
             })}/>
         </EngageNavig.Navigator>
     );

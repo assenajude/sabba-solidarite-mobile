@@ -53,12 +53,21 @@ const transactionSlice = createSlice({
             selectedTransac.showMore = !selectedTransac.showMore
             const othersTransac = state.list.filter(transac => transac.id !== selectedTransac.id)
             othersTransac.forEach(item => item.showMore = false)
+        },
+        transactionDeleted: (state, action) => {
+           state.loading = false
+            state.error = null
+            const deletedIndex = state.list.findIndex(item =>item.id === action.payload.transactionId)
+            if(deletedIndex !== -1) {
+                delete state.list[deletedIndex]
+            }
         }
     }
 })
 
 export default transactionSlice.reducer
 const {transactionAdded, transactionReceived,
+    transactionDeleted,
     reseauListPopulated, transactionRequested,
     transactionRequestFailed, reseauSelected,
     transactionShownMore, transactionUpdated} = transactionSlice.actions
@@ -89,6 +98,24 @@ export const getUserTransactions = (data) => apiRequested({
     method: 'post',
     onStart: transactionRequested.type,
     onSuccess: transactionReceived.type,
+    onError: transactionRequestFailed.type
+})
+
+export const getTransactionDelete = (data) => apiRequested({
+    url: url+'/deleteOne',
+    data,
+    method: 'delete',
+    onStart: transactionRequested.type,
+    onSuccess: transactionDeleted.type,
+    onError: transactionRequestFailed.type
+})
+
+export const getTransactionCancel = (data) => apiRequested({
+    url: url+'/cancelOne',
+    data,
+    method: 'patch',
+    onStart: transactionRequested.type,
+    onSuccess: transactionUpdated.type,
     onError: transactionRequestFailed.type
 })
 

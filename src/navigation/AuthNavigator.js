@@ -21,11 +21,13 @@ function AuthNavigator(props) {
                 headerTintColor: defaultStyles.colors.white,
             })}>
             <AuthNavig.Screen name='Welcome' component={WelcomeScreen} options={{headerTitle:'Bienvenue', headerTitleAlign: 'center'}}/>
-            <AuthNavig.Screen name='CguScreen' component={CguScreen}
-                                 options={({route, navigation}) =>({
-                                     title: "Contitions Générales d'Utilisation",
-                                     headerTitleAlign: 'center'
-                                 })}/>
+            <AuthNavig.Screen
+                name='CguScreen'
+                component={CguScreen}
+                options={({route, navigation}) =>({
+                    title: "Terms & Conditions",
+                    headerTitleAlign: 'center'
+                })}/>
             <AuthNavig.Screen name='LoginScreen' component={LoginScreen} options={{title:'Connectez-vous'}}/>
             <AuthNavig.Screen name='RegisterScreen' component={RegisterScreen} options={{title:'Créer votre compte'}}/>
             <AuthNavig.Screen  name='CodeLogin' component={CodeLoginScreen} options={{

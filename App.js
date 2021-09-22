@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import configureStore from "./src/store/configureStore";
 import {Provider} from "react-redux";
+import {Provider as PaperProvider} from 'react-native-paper'
 import logger from "./src/utilities/logger";
 import OfflineNotice from "./src/components/OfflineNotice";
 import AppWrapper from "./AppWrapper";
-import {SafeAreaProvider} from 'react-native-safe-area-context'
 import {BackHandler, Alert} from "react-native";
 import AppLoading from 'expo-app-loading'
 
@@ -34,9 +34,7 @@ export default function App() {
         return () => backHandler.remove();
     }, []);
 
-  const handleGetImage = (value) => {
-      console.log('image state in appp image',value);
-  }
+
   if(!isReady) {
       return <AppLoading
           startAsync={() => null}
@@ -44,12 +42,12 @@ export default function App() {
           onError={(error) => console.log(error)}/>
     }
   return (
-      <SafeAreaProvider>
         <Provider store={store}>
+            <PaperProvider>
             <AppWrapper/>
             <OfflineNotice/>
+            </PaperProvider>
         </Provider>
-      </SafeAreaProvider>
   );
 }
 

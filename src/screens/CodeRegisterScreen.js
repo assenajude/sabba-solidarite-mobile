@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {View, KeyboardAvoidingView, Platform, ScrollView} from "react-native";
+import {View, ScrollView} from "react-native";
 import * as Yup from 'yup'
 import AppLogoInfo from "../components/AppLogoInfo";
 import {AppForm, AppFormField, FormSubmitButton} from "../components/form";
@@ -9,7 +9,6 @@ import AppActivityIndicator from "../components/AppActivityIndicator";
 import routes from "../navigation/routes";
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
-import GradientScreen from "../components/GradientScreen";
 
 const validRegister = Yup.object().shape({
     pin: Yup.string().length(4, 'Le code pin doit être de 4 chiffre'),
@@ -68,17 +67,14 @@ function CodeRegisterScreen({navigation}) {
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
-        <GradientScreen>
-            <ScrollView>
+            <ScrollView contentContainerStyle={{
+                marginHorizontal: 20
+            }}>
            <View style={{
                marginVertical: 30
            }}>
                <AppLogoInfo/>
            </View>
-           <View style={{
-               marginHorizontal: 20,
-               alignItems: 'center'
-           }}>
                <AppForm
                    initialValues={{
                        pin: '',
@@ -88,10 +84,9 @@ function CodeRegisterScreen({navigation}) {
                    validationSchema={validRegister}
                    onSubmit={handleCodeRegister}>
                    <AppFormField
+                       style={{width: 200}}
                        onChange={handlePinChange}
-                       textAlign='center'
-                       placeholder='code pin'
-                       width={200}
+                       label='code pin'
                        secureTextEntry
                        onSubmitEditing={() => confirmRef.current.focus()}
                        returnKeyType='next'
@@ -100,9 +95,8 @@ function CodeRegisterScreen({navigation}) {
                        formFielRef={pinRef}/>
                    <AppFormField
                        onChange={handleConfirmChange}
-                       textAlign='center'
-                       placeholder='confirm code pin'
-                       width={200}
+                       label='confirm code pin'
+                       style={{width: 200, marginTop: 20, marginBottom: 10}}
                        secureTextEntry
                        onSubmitEditing={() => phoneRef.current.focus()}
                        returnKeyType='next'
@@ -114,12 +108,11 @@ function CodeRegisterScreen({navigation}) {
                        width={300}
                        keyboardType='numeric'
                        name='phone' formFielRef={phoneRef}/>
-                   <FormSubmitButton title='Valider'/>
+                   <FormSubmitButton
+                       title='Valider'/>
                </AppForm>
-           </View>
 
            <View style={{
-               marginVertical: 20,
                marginHorizontal: 20
            }}>
                <AppText>Vous avez un compte PIN?</AppText>
@@ -128,7 +121,6 @@ function CodeRegisterScreen({navigation}) {
                    style={{color: colors.bleuFbi}}>Connectez-vous.</AppText>
            </View>
             </ScrollView>
-            </GradientScreen>
             </>
     );
 }

@@ -1,71 +1,83 @@
-import React from 'react';
-import {View, StyleSheet, TouchableWithoutFeedback, TextInput} from "react-native";
-import {Swipeable} from "react-native-gesture-handler";
+import React, {useState} from 'react';
+import {View, StyleSheet, TouchableOpacity} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../AppText";
 import useManageAssociation from "../../hooks/useManageAssociation";
 import defaultStyles from '../../utilities/styles'
 import AppButton from "../AppButton";
-import ListItemSeparator from "../ListItemSeparator";
+import AppTextInput from "../AppTextInput";
+import AppSimpleLabelWithValue from "../AppSimpleLabelWithValue";
+import useEngagement from "../../hooks/useEngagement";
+import AppActivityIndicator from "../AppActivityIndicator";
+import {getStateUpdate} from "../../store/slices/associationSlice";
+import {useDispatch} from "react-redux";
 
 
-function TrancheItem({numero, payed,payingTranche,renderRightActions,
-                         toPay, datePayement, payTranche,handlePayTranche,
-                         trancheEditMontant, onChangeTrancheMontant}) {
+function TrancheItem({tranche={},engagementPaying,
+                         payingTranche, isAuthorized}) {
+
+    const dispatch = useDispatch()
+    const {handlePayTranche} = useEngagement()
     const {formatDate, formatFonds} = useManageAssociation()
 
+    const [montant, setMontant] = useState(String(tranche.montant))
+    const [loading, setLoading] = useState(false)
+
+    const handleTranchePayed = async () => {
+        setLoading(true)
+        await handlePayTranche(tranche.id, tranche.engagementId, Number(montant))
+        dispatch(getStateUpdate({updating: true}))
+        setLoading(false)
+    }
 
     return (
         <>
-        <Swipeable
-            renderRightActions={renderRightActions}>
+            <AppActivityIndicator visible={loading}/>
         <View style={styles.container}>
-            <View style={[styles.numero, {fontWeight: 'bold'}]}>
-                <AppText style={styles.itemText}>{numero}</AppText>
-            </View>
-            <View style={styles.montant}>
-                <AppText style={styles.itemText}>{payed}</AppText>
-                <AppText style={{fontWeight: 'bold'}}> / </AppText>
-                <AppText style={styles.itemText}>{formatFonds(toPay)}</AppText>
-            </View>
-            <View>
-                <AppText style={styles.itemText}>{formatDate(datePayement)}</AppText>
-            </View>
-            {payed === toPay && <View style={{
-                marginLeft: 10
+            <TouchableOpacity
+                onPress={payingTranche}
+                style={styles.trancheItem}>
+               {engagementPaying &&  <MaterialCommunityIcons size={30}
+                    name={tranche.paying?'chevron-down' : 'chevron-right'}/>}
+                <AppText>{formatFonds(tranche.montant)}</AppText>
+                <AppText> {tranche.solde === tranche.montant?'payé le' : 'au'} </AppText>
+                <AppText>{formatDate(tranche.solde === tranche.montant?tranche.updatedAt : tranche.echeance)}</AppText>
+            </TouchableOpacity>
+            {tranche.solde>0 && <View style={{
+                position: 'absolute',
+                top: 0,
+                right: 0
             }}>
-                <MaterialCommunityIcons name="credit-card-check" size={24} color={defaultStyles.colors.vert} />
+                <MaterialCommunityIcons
+                    name="credit-card-check"
+                    size={24}
+                    color={tranche.solde === tranche.montant?defaultStyles.colors.vert : defaultStyles.colors.orange} />
             </View>}
         </View>
-        </Swipeable>
-            {payingTranche &&<View style={{
-                alignItems: 'center'
+            {engagementPaying && tranche.paying &&
+            <View style={{
+                backgroundColor: defaultStyles.colors.white
             }}>
-             <View elevation={10} style={{
-                flexDirection: 'row',
-                alignItems: 'center'
-            }}>
-                <TextInput textAlign='center'
-                    keyboardType='numeric' style={{
-                    borderWidth: 1,
-                    width: 100,
-                    marginVertical: 10,
-                    paddingHorizontal:5,
-                    borderRadius: 10
-                }}
-                    value={trancheEditMontant}
-                    onChangeText={onChangeTrancheMontant}
-                />
-                <AppButton iconName='check' title='Payer' otherButtonStyle={{
-                    height: 30,
-                    width: 100,
-                    marginLeft: 10
-                }} textStyle={{fontSize: 15}} iconSize={20} onPress={handlePayTranche}/>
-                <TouchableWithoutFeedback onPress={payTranche}>
-                    <MaterialCommunityIcons style={{marginLeft: 20}} name="close-circle" size={24} color={defaultStyles.colors.rougeBordeau} />
-                </TouchableWithoutFeedback>
-            </View>
-                <ListItemSeparator width={300}/>
+                <View style={{
+                    marginHorizontal: 20
+                }}>
+                <AppSimpleLabelWithValue label='Total à payer' labelValue={formatFonds(tranche.montant)}/>
+                <AppSimpleLabelWithValue label='Déjà payé' labelValue={formatFonds(tranche.solde)}/>
+                <AppSimpleLabelWithValue label='Reste à payer' labelValue={formatFonds(tranche.montant - tranche.solde)}/>
+                </View>
+             {isAuthorized && <View>
+                 <AppTextInput
+                     style={{marginVertical: 10,width: 200, alignSelf: 'center'}}
+                     label='montant à payer'
+                     onChangeText={val => setMontant(val)}
+                     value={tranche.solde === tranche.montant?String(0) :montant}
+                 />
+                <AppButton
+                    style={{alignSelf: 'center', marginVertical: 20, width: 200}}
+                    iconName='check'
+                    title='Payer'
+                    onPress={handleTranchePayed}/>
+            </View>}
             </View>}
             </>
     );
@@ -73,10 +85,8 @@ function TrancheItem({numero, payed,payingTranche,renderRightActions,
 
 const styles = StyleSheet.create({
     container: {
-       flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginHorizontal: 40
+        marginHorizontal: 10,
+        alignItems: 'center'
     },
     itemText: {
       fontSize: 15
@@ -93,7 +103,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    swipeable: {
+    trancheItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 10
     }
 })
 export default TrancheItem;

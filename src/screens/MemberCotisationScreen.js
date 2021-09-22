@@ -93,16 +93,18 @@ function MemberCotisationScreen({route, navigation}) {
             </ScrollView>}
             </View>
 
-            <FlatList data={allMonths}
-                      ItemSeparatorComponent={ListItemSeparator}
-                      keyExtractor={item => item.label}
-                      renderItem={({item}) =>
-                          <MonthItem month={item.label}
-                                     getCotisationDetails={handleCotisationDetails}
-                                     monthTotal={getMonthTotal(item)}
-                                     showMonthDetail={item.showDetail}
-                                     showMonthItemDetail={() => handleMonthDetail(item)}
-                                     monthCotisations={selectedMonthCotisations}/>}
+            <FlatList
+                data={allMonths}
+                ItemSeparatorComponent={ListItemSeparator}
+                keyExtractor={item => item.label}
+                renderItem={({item}) =>
+                          <MonthItem
+                              month={item.label}
+                              getCotisationDetails={handleCotisationDetails}
+                              monthTotal={getMonthTotal(item)}
+                              showMonthDetail={item.showDetail}
+                              showMonthItemDetail={() => handleMonthDetail(item)}
+                              monthCotisations={selectedMonthCotisations}/>}
             />
 
         </>

@@ -36,6 +36,7 @@ function StarterNavigator() {
             <StarterNavig.Screen name='StarterScreen' component={StarterScreen} options={({navigation}) => ({
                 title: 'Accueil',
                 headerLeft: () =>null,
+                headerShown: false,
                 headerRight: () =>
                     <TouchableOpacity onPress={() => navigation.navigate('Auth', {screen: 'Welcome'})
                     }>

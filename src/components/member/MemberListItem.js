@@ -1,6 +1,5 @@
 import React from 'react';
 import {View,StyleSheet, TouchableOpacity} from "react-native";
-import * as Progress from "react-native-progress";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import defaultStyles from '../../utilities/styles'
 import {MaterialCommunityIcons} from '@expo/vector-icons'
@@ -8,6 +7,8 @@ import {MaterialCommunityIcons} from '@expo/vector-icons'
 import MemberItem from "./MemberItem";
 import AppText from "../AppText";
 import AppIconButton from "../AppIconButton";
+import {ProgressBar} from "react-native-paper";
+import useAuth from "../../hooks/useAuth";
 
 function MemberListItem({selectedMember,getMemberDetails,progress=0.4,showProgress=false,showMemberState=false,
                             childrenStyle, renderRightActions,deleteAvatar,avatarStyle, notMember, label, deleteMember, children}) {
@@ -26,7 +27,7 @@ function MemberListItem({selectedMember,getMemberDetails,progress=0.4,showProgre
         <TouchableOpacity onPress={getMemberDetails}>
         <View>
             {showProgress && <View style={styles.progress}>
-                <Progress.Bar progress={progress} width={200} />
+                <ProgressBar progress={progress} style={{width:200, height: 5}} />
             </View>}
         <View style={styles.mainContent}>
            <MemberItem selectedMember={selectedMember} deleteAvatar={deleteAvatar}

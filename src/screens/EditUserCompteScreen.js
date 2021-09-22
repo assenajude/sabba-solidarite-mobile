@@ -9,20 +9,21 @@ import routes from "../navigation/routes";
 
 
 const validInfo = Yup.object().shape({
-    nom: Yup.string().label("Le nom doit être de type chaine de caractère").nullable(),
-    prenom: Yup.string().label("Le prenom doit être de type chaine de caractère").nullable(),
-    username: Yup.string().label("Le username doit être de type chaine de caractère").nullable(),
-    email: Yup.string().email("email invalide").required("l'adresse email est requis"),
-    phone: Yup.string().label("Vous devez choisir un numero de telephone").length(10, "Le numero de telephone doit etre de 10 chiffres"),
-    profession: Yup.string().label("La prefession doit être de type chaine de caractère").nullable(),
+    nom: Yup.string().required("Le nom est requis."),
+    prenom: Yup.string().required("Le prenom est requis"),
+    username: Yup.string().nullable(),
+    email: Yup.string().email("email invalide"),
+    phone: Yup.string().label("Vous devez choisir un numero de telephone").length(10, "Le numero de telephone doit etre de 10 chiffres").required("Le numero de telephone est requis"),
+    profession: Yup.string().nullable(),
     emploi: Yup.string().label("L'emploi doit être de type chaine de caractère").nullable(),
-    adresse: Yup.string().label("Vous devez donner une adresse").min(2, "Votre lieu de residence doit etre de 2 caratères minimum").required("L'adresse est requise")
+    adresse: Yup.string().required("L'adresse est requise")
 })
-function EditUserCompteScreen({navigation}) {
+function EditUserCompteScreen({navigation, route}) {
     const dispatch = useDispatch()
     const store = useStore()
 
-    const currentUser = useSelector(state => state.auth.user)
+    // const currentUser = useSelector(state => state.auth.user)
+    const currentUser = route.params
     const isLoading = useSelector(state => state.auth.loading)
     const nameRef = useRef()
     const userNameRef = useRef()
@@ -57,14 +58,14 @@ function EditUserCompteScreen({navigation}) {
            <AppForm
                validationSchema={validInfo}
                initialValues={{
-                   nom: currentUser.nom,
-                   prenom: currentUser.prenom,
+                   nom: currentUser.nom?currentUser.nom: '',
+                   prenom: currentUser.prenom?currentUser.prenom : '',
                    username: currentUser.username,
                    email: currentUser.email,
-                   phone: currentUser.phone,
+                   phone: currentUser.phone?currentUser.phone : '',
                    profession: currentUser.profession,
                    emploi: currentUser.emploi,
-                   adresse: currentUser.adresse
+                   adresse: currentUser.adresse?currentUser.adresse : ''
                }} onSubmit={saveUserEdit}>
                <AppFormField
                    onSubmitEditing={() => nameRef.current.focus()}

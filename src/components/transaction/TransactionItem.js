@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, Image, TouchableOpacity} from "react-native";
+import {View, StyleSheet, Image, TouchableOpacity, TouchableWithoutFeedback} from "react-native";
 import AppText from "../AppText";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 
@@ -16,7 +16,9 @@ function TransactionItem({isSelected,onSelectReseau, item}) {
                 <AppText style={styles.label}>{item.name}</AppText>
             </View>
             </TouchableOpacity>
-            <Image resizeMode='stretch' source={item.image} style={styles.image}/>
+            <TouchableWithoutFeedback onPress={onSelectReseau}>
+                <Image resizeMode='stretch' source={item.image} style={styles.image}/>
+            </TouchableWithoutFeedback>
         </View>
     );
 }

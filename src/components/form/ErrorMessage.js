@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet} from "react-native"
 import AppText from "../AppText";
+import colors from "../../utilities/colors";
 
 
 function ErrorMessage({visible, error}) {
@@ -12,7 +13,9 @@ function ErrorMessage({visible, error}) {
 
 const styles = StyleSheet.create({
     error: {
-        color: 'red'
+        color: 'red',
+        backgroundColor: colors.white,
+        padding: 5
     }
 })
 export default ErrorMessage;

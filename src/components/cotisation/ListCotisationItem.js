@@ -25,7 +25,10 @@ function ListCotisationItem({cotisation,payCotisation, isPayed, showMore,
             alignItems: 'center',
             justifyContent: 'center'
         }}>
-            {!isPayed && <AppButton onPress={payCotisation} otherButtonStyle={{padding: 5, height: 40}} title='Payer'/>}
+            {!isPayed &&
+            <AppButton
+                onPress={payCotisation}
+                title='Payer'/>}
             {isPayed && <AppText style={{color: defaultStyles.colors.bleuFbi}}>payé</AppText>}
         </View>}>
         <View style={styles.container}>
@@ -35,6 +38,7 @@ function ListCotisationItem({cotisation,payCotisation, isPayed, showMore,
                     <AppText style={{
                         fontWeight: isPayed?'normal':'bold'
                     }}>{formatFonds(cotisation.montant)}</AppText>
+                    <MaterialCommunityIcons name={showMore?'chevron-up' : 'chevron-right'} size={30}/>
                 </View>
             </TouchableWithoutFeedback>
             {showMore && <View
@@ -67,12 +71,6 @@ function ListCotisationItem({cotisation,payCotisation, isPayed, showMore,
                             iconName='delete'/>
                     </View>}
             </View>}
-            <View style={styles.showMore}>
-                <TouchableOpacity onPress={showCotisationMore}>
-                {!showMore && <MaterialCommunityIcons name="chevron-down" size={30} color="black" />}
-                {showMore && <MaterialCommunityIcons name="chevron-up" size={30} color="black" />}
-                </TouchableOpacity>
-            </View>
         </View>
         </Swipeable>
     );
@@ -86,7 +84,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginHorizontal: 20
+        marginHorizontal: 10
     },
     iconContainer: {
         paddingHorizontal: 0,
@@ -96,14 +94,10 @@ const styles = StyleSheet.create({
         marginVertical: 10
     },
     showMore: {
-        backgroundColor: defaultStyles.colors.white,
-        right: '30%',
-        bottom: -10,
-        alignItems: 'center',
-        justifyContent: 'center',
         position: 'absolute',
-        height: 20,
-        width: 50
+        alignSelf: 'center',
+        width: 70,
+        height: 40
     }
 })
 export default ListCotisationItem;

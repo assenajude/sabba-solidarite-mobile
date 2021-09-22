@@ -18,7 +18,6 @@ import {getAllAssociation} from "../store/slices/associationSlice";
 import useAuth from "../hooks/useAuth";
 import {getConnectedUserAssociations} from "../store/slices/memberSlice";
 import LoginFailedModal from "../components/user/LoginFailedModal";
-import GradientScreen from "../components/GradientScreen";
 
 const loginValidSchema = Yup.object().shape({
     info: Yup.string().required('Entrez votre adresse mail ou votre nom utilisateur'),
@@ -32,7 +31,6 @@ function LoginScreen({navigation, route}) {
     const {isValidEmail, notifNavig} = useAuth()
     const isLoading = useSelector(state => state.auth.loading)
     const assoLoading = useSelector(state => state.entities.association.loading)
-    const transacLoading = useSelector(state => state.entities.transaction.loading)
 
     const [loginFailed, setLoginFailed] = useState(false)
 
@@ -74,16 +72,16 @@ function LoginScreen({navigation, route}) {
 
     return (
         <>
-        <GradientScreen>
-            <AppActivityIndicator visible={isLoading || assoLoading || transacLoading}/>
-            <View style={styles.logoInfoContainer}>
-                <AppLogoInfo/>
-            </View>
+            <AppActivityIndicator visible={isLoading || assoLoading}/>
         <ScrollView
             contentContainerStyle={{
                 marginVertical: 20,
-                marginHorizontal: 20
+                marginHorizontal: 20,
+                paddingBottom:50
             }}>
+            <View style={styles.logoInfoContainer}>
+                <AppLogoInfo/>
+            </View>
             <AppForm
                 initialValues={{
                     info: '',
@@ -96,7 +94,7 @@ function LoginScreen({navigation, route}) {
                     name='info'
                     icon='account'
                     keyboardType='email-address'
-                    placeholder='email ou username'
+                    label='email ou username'
                     returnKeyType='next'
                     autoCapitalize='none'
                     onSubmitEditing={() => passRef.current.focus()}
@@ -106,14 +104,14 @@ function LoginScreen({navigation, route}) {
                     autoCapitalize='none'
                     name='password'
                     icon='lock'
-                    placeholder='password'
+                    label='password'
                     secureTextEntry
                 />
-                <FormSubmitButton title='Envoyer' iconName='login'/>
+                <FormSubmitButton
+                    title='Envoyer'
+                    iconName='login'/>
             </AppForm>
-            <View style={{
-                marginTop: 20
-            }}>
+            <View>
                 <AppText style={{color: defaultStyles.colors.bleuFbi}} onPress={() => {
                     if(whereToGo) {
                         navigation.navigate(routes.CODE_LOGIN, whereToGo)
@@ -141,7 +139,6 @@ function LoginScreen({navigation, route}) {
             </View>
         </ScrollView>
                 <LoginFailedModal failModal={loginFailed} dismissModal={() => setLoginFailed(false)}/>
-        </GradientScreen>
             </>
     );
 }

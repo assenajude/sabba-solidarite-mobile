@@ -5,11 +5,12 @@ import defaultStyles from "../utilities/styles";
 import MemberDetails from "../screens/MemberDetails";
 import EditMemberScreen from "../screens/EditMemberScreen";
 import NavigHeaderButton from "../components/NavigHeaderButton";
-import routes from "./routes";
+import useInfo from "../hooks/useInfo";
 
 const MemberNavig = createStackNavigator()
 
 function MembersNavigator(props) {
+    const {getMemberInfoPerso} = useInfo()
     return (
         <MemberNavig.Navigator screenOptions={() => ({
             headerStyle: {backgroundColor: defaultStyles.colors.rougeBordeau},
@@ -23,7 +24,7 @@ function MembersNavigator(props) {
                 title: 'Edition membre'
             })}/>
             <MemberNavig.Screen name='MemberDetails' component={MemberDetails} options={({route,navigation}) => ({
-                title: 'Membre '+ route.params.username,
+                title:''+ getMemberInfoPerso(route.params),
                 headerLeft: () => <NavigHeaderButton title='liste' iconName='arrow-left' onPress={() => navigation.navigate('List')}/>
             })}/>
 

@@ -1,16 +1,21 @@
 import React, {useState} from 'react';
-import {ScrollView, View, StyleSheet, TouchableOpacity, TextInput} from "react-native";
+import {ScrollView, View, StyleSheet, TouchableOpacity, Alert, ToastAndroid} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import * as Yup from 'yup'
 import AppText from "../components/AppText";
 import defaultStyles from '../utilities/styles'
 import {AppForm, AppFormField, FormSubmitButton} from "../components/form";
 import {useDispatch, useSelector, useStore} from "react-redux";
-import {changeCredentials, resetCredentials} from "../store/slices/authSlice";
+import {changeCredentials, getUserDelete, resetCredentials} from "../store/slices/authSlice";
 import useAuth from "../hooks/useAuth";
 import AppSimpleLabelWithValue from "../components/AppSimpleLabelWithValue";
 import AppIconButton from "../components/AppIconButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import AppSwiper from "../components/AppSwiper";
+import MemberItem from "../components/member/MemberItem";
+import routes from "../navigation/routes";
+import AppSearchBar from "../components/AppSearchBar";
 
 const validPass = Yup.object().shape({
     oldPass: Yup.string().required("Ancien mot de passe requis."),
@@ -35,7 +40,7 @@ const pinValid = Yup.object().shape({
         )
     }).required("Veuillez confirmer le nouveau code pin.")
 })
-function ParamScreen(props) {
+function ParamScreen({navigation}) {
     const dispatch = useDispatch()
     const store = useStore()
     const {isAdmin, isValidEmail} = useAuth()
@@ -51,6 +56,7 @@ function ParamScreen(props) {
     const [searchResult, setSearchResult] = useState([])
     const [editingSelected, setEditingSelected] = useState(false)
     const [selected, setSelected] = useState({})
+    const [editUsers, setEditUsers] = useState(false)
 
 
     const handleResetParams = async () => {
@@ -104,6 +110,26 @@ function ParamScreen(props) {
         resetForm()
         alert("Vos paramètres ont été mis à jour avec succès.")
     }
+
+    const handleDeleteUser = (user) => {
+        Alert.alert("Attention", "Voulez-vous supprimer definitivement cet utilisateur?", [{
+            text: 'oui', onPress: async () => {
+               await dispatch(getUserDelete({userId: user.id}))
+                const error = store.getState().auth.error
+                if(error !== null) {
+                    ToastAndroid.showWithGravity("Erreur: Impossible de supprimer cet utilisateur",
+                        ToastAndroid.LONG,
+                        ToastAndroid.CENTER)
+                } else{
+                    ToastAndroid.showWithGravity("Utilisateur supprimé avec succès.",
+                        ToastAndroid.LONG,
+                        ToastAndroid.CENTER)
+                }
+            }
+        }, {text: 'non', onPress: () => null}])
+
+    }
+
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
@@ -132,15 +158,18 @@ function ParamScreen(props) {
                         <AppFormField
                             autoCapitalize='none'
                             secureTextEntry
-                            name='oldPass' placeholder='ancien mot de passe'/>
+                            name='oldPass'
+                            label='ancien mot de passe'/>
                         <AppFormField
                             autoCapitalize='none'
                             secureTextEntry
-                            name='newPass' placeholder='nouveau mot de passe'/>
+                            name='newPass'
+                            label='nouveau mot de passe'/>
                         <AppFormField
                             autoCapitalize='none'
                             secureTextEntry
-                            name='confirmNewPass' placeholder='confirm nouveau passe'/>
+                            name='confirmNewPass'
+                            label='confirm nouveau passe'/>
                         <FormSubmitButton title='Valider'/>
                     </AppForm>
                 </View>}
@@ -168,15 +197,18 @@ function ParamScreen(props) {
                         <AppFormField
                             secureTextEntry
                             keyboardType='numeric'
-                            name='oldPin' placeholder='ancien pin'/>
+                            name='oldPin'
+                            label='ancien pin'/>
                         <AppFormField
                             secureTextEntry
                             keyboardType='numeric'
-                            name='newPin' placeholder='nouveau pin'/>
+                            name='newPin'
+                            label='nouveau pin'/>
                         <AppFormField
                             secureTextEntry
                             keyboardType='numeric'
-                            name='confirmNewPin' placeholder='confirmer le nouveau pin'/>
+                            name='confirmNewPin'
+                            label='confirmer le nouveau pin'/>
                         <FormSubmitButton title='Valider'/>
                     </AppForm>
                 </View>}
@@ -194,18 +226,11 @@ function ParamScreen(props) {
                     {resetParams && <MaterialCommunityIcons name='chevron-up' size={30} color={defaultStyles.colors.dark}/>}
                 </TouchableOpacity>
                {resetParams && <View style={styles.editContainer}>
-                   <View style={styles.inputContainer}>
-                       <MaterialCommunityIcons style={{
-                           marginRight: -20
-                       }} name='account-search' size={24}/>
-                       <TextInput
-                           autoCapitalize='none'
-                           keyboardType='email-address'
-                           onSubmitEditing={() => handleSearch(resetData)}
-                           style={styles.inputStyle}
-                           value={resetData}
-                           onChangeText={val => setResetData(val)}/>
-                   </View>
+                   <AppSearchBar
+                       onIconPress={() => handleSearch(resetData)}
+                       onChangeText={val =>setResetData(val)}
+                       value={resetData}
+                   />
                    <View>
                        {searchResult.length > 0 && <View>
                            {searchResult.map(user => <View style={{
@@ -235,6 +260,50 @@ function ParamScreen(props) {
                        {searchResult.length === 0 && <AppText>Aucun utilisateur trouvé.</AppText>}
                    </View>
                 </View>}
+              <TouchableOpacity
+                  onPress={() => {
+                      setEditPin(false)
+                      setEditPassword(false)
+                      setResetParams(false)
+                      setEditUsers(!editUsers)
+                  }}
+                  style={styles.link}>
+                  <AppText>Edit users</AppText>
+                  {!editUsers && <MaterialCommunityIcons name='chevron-right' size={30} color={defaultStyles.colors.dark}/>}
+                  {editUsers && <MaterialCommunityIcons name='chevron-up' size={30} color={defaultStyles.colors.dark}/>}
+              </TouchableOpacity>
+              {editUsers && <View style={styles.editContainer}>
+                  {allUser.length>0 && <View>
+                      {allUser.map((user) => <Swipeable key={user.id.toString()} renderRightActions={() => <AppSwiper
+                          containerStyle={{
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                          }}>
+                          <AppIconButton
+                              onPress={() => navigation.navigate(routes.EDIT_USER_COMPTE, user)}
+                              iconName='account-edit'/>
+                          <AppIconButton
+                              onPress={()=>handleDeleteUser(user)}
+                              iconColor={defaultStyles.colors.rougeBordeau}
+                              iconName='account-remove' containerStyle={{
+                              marginVertical: 15
+                          }}/>
+                      </AppSwiper>}>
+                          <View style={{
+                              marginVertical: 20
+                          }}>
+                              <MemberItem
+                                  getMemberDetails={() => navigation.navigate(routes.USER_COMPTE, user)}
+                                  selectedMember={user} showPhone={true} />
+                          </View>
+
+                      </Swipeable>)}
+                  </View>
+                      }
+                  {allUser.length === 0 && <View>
+                      <AppText>Aucun utilisateur trouvé</AppText>
+                  </View>}
+              </View>}
             </View>}
         </ScrollView>
             </>
@@ -243,7 +312,6 @@ function ParamScreen(props) {
 
 const styles = StyleSheet.create({
     editContainer: {
-     alignItems: 'center',
         marginVertical: 20,
         marginHorizontal: 30
     },

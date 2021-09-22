@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {ScrollView, ToastAndroid} from "react-native";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import * as Yup from 'yup'
@@ -9,11 +9,11 @@ import AppTimePicker from "../components/AppTimePicker";
 import FormItemPicker from "../components/form/FormItemPicker";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import useAuth from "../hooks/useAuth";
-import useManageAssociation from "../hooks/useManageAssociation";
+import useEngagement from "../hooks/useEngagement";
 
 const validEngagement = Yup.object().shape({
-    libelle: Yup.string(),
-    montant: Yup.number().label("Entrez un montant correct svp."),
+    libelle: Yup.string().required('Veuillez ajouter un motif svp.'),
+    montant: Yup.number().label("Entrez un montant correct svp.").required("Entrez un montant svp."),
     echeance: Yup.date(),
     typeEngagement: Yup.string()
 })
@@ -22,16 +22,22 @@ function NewEngagementScreen({navigation, route}) {
     const dispatch = useDispatch()
     const store = useStore()
     const {getConnectedMember} = useAuth()
-    const {memberQuotite} = useManageAssociation()
+    const {isMemberEligible} = useEngagement()
     const currentAssociation = useSelector(state => state.entities.association.selectedAssociation)
     const isLoading = useSelector(state => state.entities.engagement.loading)
+    const memberQuotite = useSelector(state => state.entities.member.memberQuotite)
 
 
     const handleAddEngagement = async (engagement, {resetForm}) => {
          const montant = Number(engagement.montant)
-        if(montant > memberQuotite()) {
-            return alert("Le montant de votre engagement ne doit pas depassé votre quotité.")
+        if(montant > memberQuotite) {
+            return alert("Le montant de votre engagement ne doit pas excédé votre quotité, veuillez contacter votre administrateur.")
         }
+        const isEligible = isMemberEligible(getConnectedMember().id)
+        if(!isEligible) {
+            return alert("Vous avez un engagement encours, vous n'êtes donc pas éligible, veuillez contactez votre administrateur.")
+        }
+
         const dateEcheance = engagement.echeance.getTime()
         const data = {
                     id: selectedEngagement?selectedEngagement.id : null,
@@ -58,9 +64,6 @@ function NewEngagementScreen({navigation, route}) {
          navigation.navigate('NewEngagementList')
     }
 
-    useEffect(() => {
-    }, [])
-
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
@@ -75,8 +78,8 @@ function NewEngagementScreen({navigation, route}) {
                 echeance:selectedEngagement? new Date(selectedEngagement.echeance) : new Date()
             }} validationSchema={validEngagement} onSubmit={handleAddEngagement}>
                 <FormItemPicker label='Type engagement: ' data={['remboursable', 'non remboursable']} name='typeEngagement'/>
-                <AppFormField name='libelle' placeholder='libelle' maxLength={50}/>
-                <AppFormField keyboardType='numeric' name='montant' placeholder='montant'/>
+                <AppFormField name='libelle' label='Motif (ex: Demande crédit)' maxLength={50}/>
+                <AppFormField keyboardType='numeric' name='montant' label='Montant'/>
                 <AppTimePicker label='Echeance' name='echeance'/>
                 <FormSubmitButton title='Ajouter'/>
             </AppForm>

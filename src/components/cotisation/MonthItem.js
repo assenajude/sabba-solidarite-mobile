@@ -15,19 +15,22 @@ function MonthItem({month, showMonthDetail, showMonthItemDetail, monthCotisation
                 <View style={styles.container}>
                     <AppText style={{fontWeight: showMonthDetail? 'bold':'normal'}}>{month}</AppText>
                     <AppText>{formatFonds(monthTotal)}</AppText>
-                    {!showMonthDetail && <MaterialCommunityIcons name="chevron-right" size={24} color="black" />}
-                    {showMonthDetail && <MaterialCommunityIcons name="chevron-down" size={24} color="black" />}
+                   <MaterialCommunityIcons name={showMonthDetail?"chevron-down" : "chevron-right"} size={24} color="black" />
                 </View>
             </TouchableWithoutFeedback>
           {showMonthDetail &&
           <View style={styles.detail}>
-              {monthCotisations && monthCotisations.length>0 && <ScrollView>
+              {monthCotisations && monthCotisations.length>0 &&
+              <View style={{
+                  marginVertical: 10
+              }}>
                   {monthCotisations.map(item =>
-                      <CotisationItem key={item.id.toString()}
-                                      cotisation={item}
-                                      cotisationDetail={item.showDetail}
-                                      getCotisationDetails={() => getCotisationDetails(item)}/>)}
-              </ScrollView>
+                      <CotisationItem
+                          key={item.id.toString()}
+                          cotisation={item}
+                          cotisationDetail={item.showDetail}
+                          getCotisationDetails={() => getCotisationDetails(item)}/>)}
+              </View>
               }
                 {monthCotisations.length === 0 && <AppText>pas de cotisations trouvées</AppText>}
             </View>}

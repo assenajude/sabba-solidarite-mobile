@@ -9,7 +9,6 @@ import defaultStyles from '../utilities/styles'
 import ListItemSeparator from "../components/ListItemSeparator";
 import useCotisation from "../hooks/useCotisation";
 import useManageAssociation from "../hooks/useManageAssociation";
-import AppHeaderGradient from "../components/AppHeaderGradient";
 import AppAddNewButton from "../components/AppAddNewButton";
 import routes from "../navigation/routes";
 import useAuth from "../hooks/useAuth";
@@ -22,7 +21,6 @@ function EtatCotisationScreen({navigation}) {
 
     return (
         <>
-            <AppHeaderGradient/>
             {associationValidMembers().members.length === 0 && error === null && <View style={{
                 flex: 1,
                 justifyContent: "center",

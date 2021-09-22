@@ -79,6 +79,12 @@ const authSlice = createSlice({
         },
         welcomeImageIsReady: state => {
             state.welcomeImageReady = true
+        },
+        userDeleted: (state, action) => {
+            state.loading = false
+            state.error = null
+            const deletedIndex = state.allUsers.findIndex(user => user.id === action.payload.userId)
+            delete state.allUsers[deletedIndex]
         }
 
     }
@@ -86,7 +92,7 @@ const authSlice = createSlice({
 })
 
 const {authRequested, authRequestFailed, authRequestSuccess,welcomeImageIsReady,
-     logout, userUpdated, allUserReceived, credentialsReset, avatarLoaded} = authSlice.actions
+     logout, userUpdated, allUserReceived, credentialsReset, avatarLoaded, userDeleted} = authSlice.actions
 export default authSlice.reducer
 
 const url = '/auth'
@@ -192,6 +198,15 @@ export const changeCredentials = (data) => apiRequested({
     data,
     onStart: authRequested.type,
     onSuccess: credentialsReset.type,
+    onError: authRequestFailed.type
+})
+
+export const getUserDelete = (data) => apiRequested({
+    url:'/user/deleteOne',
+    method: 'delete',
+    data,
+    onStart: authRequested.type,
+    onSuccess: userDeleted.type,
     onError: authRequestFailed.type
 })
 

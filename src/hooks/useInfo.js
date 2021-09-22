@@ -11,5 +11,12 @@ export default useInfo = () => {
         }
         return selected?.member_info.isRead || false
     }
-    return {getMemberInfoState}
+
+    const getMemberInfoPerso = (member) => {
+        let infoPerso = `Info M${member.id}`
+        if(member.username) infoPerso = member.username
+        else if(member.nom) infoPerso = member.nom
+        return infoPerso
+    }
+    return {getMemberInfoState, getMemberInfoPerso}
 }

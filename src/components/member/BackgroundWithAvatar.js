@@ -1,10 +1,10 @@
 import React from 'react';
 import {Image, View, StyleSheet} from "react-native";
 import LottieView from 'lottie-react-native'
-import {LinearGradient} from "expo-linear-gradient";
 import MemberItem from "./MemberItem";
 import AppImagePicker from "../AppImagePicker";
 import colors from "../../utilities/colors";
+import AppText from "../AppText";
 
 function BackgroundWithAvatar({getCompteDetails,allowCamera=false, fondStyle,cancelAvatarChanging, saveAvatar,
                                   selectedMember,onSaveBackImage,onCancelBackImage,onBackImageEditing,onCloseBackModal,
@@ -14,10 +14,10 @@ function BackgroundWithAvatar({getCompteDetails,allowCamera=false, fondStyle,can
 
     return (
         <View>
-            {!selectedMember.backImage && <LinearGradient
-                colors={['#860432', 'transparent']}
-                style={[styles.background, {height: selectedMember?.member?.backImage?0:100}]}
-            />}
+            {!selectedMember.backImage &&
+                <View style={[styles.background, {height: selectedMember?.member?.backImage?0:200}]}>
+                    <AppText>Aucune image d'arrière plan</AppText>
+                </View>}
 
             {selectedMember?.member?.backImage && <View>
             <Image
@@ -84,6 +84,9 @@ const styles = StyleSheet.create({
     background: {
         height: 100,
         width: '100%',
+        backgroundColor: colors.leger,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     backImagePicker: {
       position: 'absolute',

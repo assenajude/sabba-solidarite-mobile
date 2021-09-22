@@ -12,11 +12,9 @@ import routes from "../navigation/routes";
 import {useDispatch, useSelector, useStore} from "react-redux";
 import {register} from "../store/slices/authSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import GradientScreen from "../components/GradientScreen";
 
 
 const registerValidSchema = Yup.object().shape({
-    username: Yup.string(),
     email: Yup.string().email("Email invalide").required("Email requis"),
     password: Yup.string().min(4,"Le mot de passe doit contenir au moins 4 caractères").required('le mot de passe est requis'),
     confirm:Yup.string().when("password", {
@@ -48,8 +46,9 @@ function RegisterScreen({navigation}) {
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
-        <GradientScreen>
-            <ScrollView>
+            <ScrollView contentContainerStyle={{
+                paddingBottom: 50
+            }}>
             <View style={styles.logoInfoContainer}>
                <AppLogoInfo/>
             </View>
@@ -59,7 +58,6 @@ function RegisterScreen({navigation}) {
             }}>
             <AppForm
                 initialValues={{
-                username: '',
                 email: '',
                 password: '',
                 confirm: ''
@@ -69,16 +67,8 @@ function RegisterScreen({navigation}) {
             >
                 <AppFormField
                     autoCapitalize='none'
-                    name='username'
-                    placeholder='pseudo'
-                    icon='account'
-                    returnKeyType='next'
-                    onSubmitEditing={() => emailRef.current.focus()}
-                />
-                <AppFormField
-                    autoCapitalize='none'
                     name='email'
-                    placeholder='email'
+                    label='email'
                     icon='email'
                     keyboardType='email-address'
                     returnKeyType='next'
@@ -88,7 +78,7 @@ function RegisterScreen({navigation}) {
                 <AppFormField
                     autoCapitalize='none'
                     name='password'
-                    placeholder='password'
+                    label='password'
                     icon='lock'
                     secureTextEntry
                     returnKeyType='next'
@@ -98,12 +88,13 @@ function RegisterScreen({navigation}) {
                 <AppFormField
                     autoCapitalize='none'
                     name='confirm'
-                    placeholder='confirm password'
+                    label='confirm password'
                     icon='lock'
                     secureTextEntry
                     formFielRef={confirmRef}
                 />
-                <FormSubmitButton title='Valider'/>
+                <FormSubmitButton
+                    title='Valider'/>
             </AppForm>
             </View>
 
@@ -132,7 +123,6 @@ function RegisterScreen({navigation}) {
             </View>
         </View>
             </ScrollView>
-            </GradientScreen>
             </>
     );
 }

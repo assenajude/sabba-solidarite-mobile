@@ -50,19 +50,19 @@ function AppTimePicker({name, label}) {
             )}
             <View>
                 <View style={styles.dateStyle}>
-                    <AppText>{label}: </AppText>
+                    <AppText style={{fontWeight: 'bold'}}>{label} </AppText>
                     <View style={{
-                        alignItems: 'center'
+                        flexDirection: 'row'
                     }}>
+                    <View>
                         <AppText>{dayjs(values[name]).format('DD/MM/YYYY')}</AppText>
-                        <AppText style={{color: defaultStyles.colors.bleuFbi, marginTop:5}} onPress={showDatePicker}>Changer</AppText>
+                        <AppText style={{color: defaultStyles.colors.bleuFbi, marginTop:5}} onPress={showDatePicker}>Date</AppText>
                     </View>
-                    <AppText>à</AppText>
-                    <View style={{
-                        alignItems: 'center'
-                    }}>
+                    <AppText>   à   </AppText>
+                    <View>
                     <AppText>{dayjs(values[name]).format('HH:mm:ss')}</AppText>
-                    <AppText style={{color: defaultStyles.colors.bleuFbi, marginTop: 5}} onPress={showTimePicker}>Changer</AppText>
+                    <AppText style={{color: defaultStyles.colors.bleuFbi, marginTop: 5}} onPress={showTimePicker}>heure</AppText>
+                    </View>
                     </View>
                 </View>
             </View>
@@ -73,9 +73,6 @@ function AppTimePicker({name, label}) {
 
 const styles = StyleSheet.create({
     dateStyle: {
-    flexDirection: 'row',
-        alignItems: 'center',
-    justifyContent: 'space-between',
     marginVertical: 10,
         marginHorizontal: 20
 

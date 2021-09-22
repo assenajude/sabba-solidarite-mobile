@@ -16,7 +16,6 @@ import {
     showEngagementTranches
 } from "../store/slices/engagementSlice";
 import useAuth from "../hooks/useAuth";
-import AppHeaderGradient from "../components/AppHeaderGradient";
 import {Picker} from "@react-native-picker/picker";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 
@@ -42,9 +41,10 @@ function EtatEngagementScreen({navigation}) {
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
-            <AppHeaderGradient/>
             <View>
-                <Picker itemStyle={{fontWeight: 'bold'}} style={styles.picker} mode='dropdown' selectedValue={pickerValue} onValueChange={val => {
+                <Picker
+                    itemStyle={{fontWeight: 'bold'}} style={styles.picker} mode='dropdown'
+                    selectedValue={pickerValue} onValueChange={val => {
                     setPickerValue(val)
                     handleChangeContent(val)
                 }}>

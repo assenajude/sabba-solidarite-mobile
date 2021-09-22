@@ -10,7 +10,6 @@ import {
 import {getEngagementsByAssociation} from "../store/slices/engagementSlice";
 import {getAssociationCotisations} from "../store/slices/cotisationSlice";
 import {getAllAssociation, getAssociationDelete} from "../store/slices/associationSlice";
-import useAuth from "./useAuth";
 
 let useManageAssociation;
 export default useManageAssociation = () => {
@@ -64,12 +63,14 @@ export default useManageAssociation = () => {
     }
 
     const getManagedAssociationFund = () => {
+        const newAssociation = store.getState().entities.association.selectedAssociation
+
         let investAmount = 0
         let depenseAmount = 0
         let gain = 0
         let quotite = 0
-        const securityFund = currentAssociation.fondInitial * currentAssociation.seuilSecurite / 100
-        quotite = currentAssociation.fondInitial - securityFund
+        const securityFund = newAssociation.fondInitial * newAssociation.seuilSecurite / 100
+        quotite = newAssociation.fondInitial - securityFund
         const validList = engagementsList.filter(engage => engage.accord === true)
         if(validList.length>0) {
         validList.forEach(item => {
@@ -178,8 +179,9 @@ export default useManageAssociation = () => {
 
     const memberQuotite = () => {
         let quotite = 0
-        if(currentAssociation.individualQuotite > 0) {
-            quotite = getManagedAssociationFund().quotite * currentAssociation.individualQuotite / 100
+        const newAssociation = store.getState().entities.association.selectedAssociation
+        if(newAssociation.individualQuotite > 0) {
+            quotite = getManagedAssociationFund().quotite * newAssociation.individualQuotite / 100
         }else{
             quotite = getManagedAssociationFund().quotite
         }

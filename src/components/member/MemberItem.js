@@ -1,33 +1,25 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, TouchableWithoutFeedback} from "react-native";
 import AppText from "../AppText";
 import defaultStyles from '../../utilities/styles'
 import AppAvatar from "../AppAvatar";
-import {selectedMemberAvatarLoaded} from "../../store/slices/memberSlice";
-import {useDispatch} from "react-redux";
 
-function MemberItem({getMemberDetails, avatarStyle, selectedMember,deleteAvatar, showPhone=false}) {
+function MemberItem({getMemberDetails, selectedMember,deleteAvatar, showPhone=false}) {
 
-    const dispatch = useDispatch()
-
-    const handleImageLoadEnd = () => {
-            if(selectedMember.avatarLoading){
-                dispatch(selectedMemberAvatarLoaded(selectedMember))
-            }
-    }
+    const currentUser = selectedMember
 
     return (
         <TouchableWithoutFeedback onPress={getMemberDetails}>
         <View style={styles.container}>
             <AppAvatar
-                avatarLoading={selectedMember.avatarLoading}
-                onAvatarLoadEnd={() => handleImageLoadEnd()}
-                source={{uri: selectedMember.member?selectedMember.member.avatar : selectedMember.avatar}}
-                avatarStyle={avatarStyle} onDelete={deleteAvatar}/>
+                size={50}
+                user={selectedMember.member?selectedMember.member : selectedMember}
+                onPress={deleteAvatar}
+            />
             <View style={styles.addressContainer}>
-                <AppText style={styles.addressText}>{selectedMember.username}</AppText>
-                <AppText style={styles.addressText}>{selectedMember.email?selectedMember.email:selectedMember.phone}</AppText>
-                {showPhone  && <AppText style={styles.addressText}>{selectedMember.phone}</AppText>}
+                <AppText style={styles.addressText}>{currentUser.username || ''}</AppText>
+                <AppText style={styles.addressText}>{currentUser.email?currentUser.email:currentUser.phone}</AppText>
+                {showPhone  && <AppText style={styles.addressText}>{currentUser.phone}</AppText>}
             </View>
         </View>
         </TouchableWithoutFeedback>

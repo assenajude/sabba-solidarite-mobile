@@ -11,7 +11,8 @@ const associationSlice = createSlice({
         memberRoles: [],
         editedRoleMessage: '',
         deleteSuccess: false,
-        updated: false
+        updated: false,
+        updating: false
     },
     reducers: {
         associationRequested: (state) => {
@@ -89,15 +90,17 @@ const associationSlice = createSlice({
                 state.selectedAssociation = selected
             }
             state.updated = true
+        },
+        stateUpdated : (state, action) => {
+           state.updating = action.payload.updating
         }
-
     }
 })
 
 const {associationAdded, associationReceived,
     associationRequested, associationRequestFailed,
     selectedAssociationSet, memberRolesReceived,
-    rolesEdited, associationUpdated, associationDeleted, imageLoaded} = associationSlice.actions
+    rolesEdited, associationUpdated, associationDeleted, imageLoaded, stateUpdated} = associationSlice.actions
 
 export default associationSlice.reducer
 
@@ -183,4 +186,8 @@ export const setSelectedAssociation = (association) => dispatch => {
 
 export const mainAssociationImageLoaded = (association) => dispatch => {
     dispatch(imageLoaded(association))
+}
+
+export const getStateUpdate = (updating) => dispatch => {
+    dispatch(stateUpdated(updating))
 }

@@ -11,7 +11,6 @@ import {signinByPin} from "../store/slices/authSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import * as Linking from "expo-linking";
 import LoginFailedModal from "../components/user/LoginFailedModal";
-import GradientScreen from "../components/GradientScreen";
 import useAuth from "../hooks/useAuth";
 import {getAllAssociation} from "../store/slices/associationSlice";
 import {getConnectedUserAssociations} from "../store/slices/memberSlice";
@@ -60,10 +59,10 @@ function CodeLoginScreen({navigation, route}) {
 
     return (
         <>
-        <GradientScreen>
             <AppActivityIndicator visible={isLoading}/>
-        <ScrollView contentContainerStyle={{
-            paddingBottom: 40
+        <ScrollView
+            contentContainerStyle={{
+            paddingBottom: 50
         }}>
             <View style={{
                 marginVertical: 20
@@ -71,7 +70,6 @@ function CodeLoginScreen({navigation, route}) {
             <AppLogoInfo/>
             </View>
             <View style={{
-                alignItems: 'center',
                 marginHorizontal: 40,
                 marginVertical: 40
             }}>
@@ -85,7 +83,7 @@ function CodeLoginScreen({navigation, route}) {
                     }}
                     maxLength={10}
                     keyboardType='numeric'
-                    placeholder='Entrez votre numero de telephone'
+                    label='Numero de telephone'
                     icon='cellphone'
                     value={phoneNumber}
                     onChangeText={val => setPhoneNumber(val)
@@ -158,7 +156,6 @@ function CodeLoginScreen({navigation, route}) {
             <LoginFailedModal
                 dismissModal={() => setLoginFailed(false)}
                 failModal={loginFailed}/>
-            </GradientScreen>
             </>
     );
 }

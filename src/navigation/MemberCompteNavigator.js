@@ -3,6 +3,7 @@ import {createStackNavigator} from "@react-navigation/stack";
 import MemberCompteScreen from "../screens/MemberCompteScreen";
 import defaultStyles from "../utilities/styles";
 import NavigHeaderButton from "../components/NavigHeaderButton";
+import MemberRetraitScreen from "../screens/MemberRetraitScreen";
 
 const MemberCompteNavig = createStackNavigator()
 
@@ -12,14 +13,18 @@ function MemberCompteNavigator(props) {
         <MemberCompteNavig.Navigator screenOptions={({navigation}) => ({
             headerStyle: {backgroundColor: defaultStyles.colors.rougeBordeau},
             headerTintColor: defaultStyles.colors.white,
-            headerRight: () => <NavigHeaderButton
-                title='Accueil'
-                iconName='home'
-                onPress={() => navigation.navigate('Starter', {screen: 'StarterScreen'})}/>
 
         })}>
-            <MemberCompteNavig.Screen name='Compte' component={MemberCompteScreen} options={() => ({
-                headerLeft: () => null
+            <MemberCompteNavig.Screen name='Compte' component={MemberCompteScreen} options={({navigation}) => ({
+                headerLeft: () => null,
+                headerRight: () => <NavigHeaderButton
+                    title='Accueil'
+                    iconName='home'
+                    onPress={() => navigation.navigate('Starter', {screen: 'StarterScreen'})}/>
+            })}/>
+
+            <MemberCompteNavig.Screen name='MemberRetrait' component={MemberRetraitScreen} options={() => ({
+                title: 'Retrait de fonds'
             })}/>
         </MemberCompteNavig.Navigator>
     );

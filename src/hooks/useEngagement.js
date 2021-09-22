@@ -49,14 +49,14 @@ export default useEngagement = () => {
     const getEngagementVotesdData = (engagement) => {
         let upVotes = 0
         let downVotes = 0
+        let allVotes = 0
         const engagementVotes = votingData[engagement.id]
         if(engagementVotes && engagementVotes.length>0) {
-        engagementVotes.forEach(item => {
-            if(item.vote.typeVote.toLowerCase() === 'up') upVotes +=1
-            else downVotes += 1
-        })
+            allVotes = engagementVotes.length
+            upVotes = engagementVotes.filter(item => item.vote.typeVote.toLowerCase() === 'up').length
+            downVotes = engagementVotes.filter(item => item.vote.typeVote.toLowerCase() === 'down').length
         }
-        return {upVotes, downVotes}
+        return {upVotes, downVotes, allVotes}
     }
 
 
@@ -76,9 +76,6 @@ export default useEngagement = () => {
             return alert("Impossible de procceder au payement, une erreur est apparue. Veuillez reessayer plutard.")
         }
         dispatch(getEngagementById({engagementId: engagementId}))
-        dispatch(getSelectedAssociation({associationId: currentAssociation.id}))
-        dispatch(getConnectedMemberUser({associationId: currentAssociation.id}))
-        dispatch(getUserData({userId: currentUser.id}))
         ToastAndroid.showWithGravity("Le payement a été effectué avec succès",
             ToastAndroid.CENTER,
             ToastAndroid.LONG)
@@ -128,7 +125,7 @@ export default useEngagement = () => {
     const getEngagementVotans = (engagementId) => {
         const votants = votingData[engagementId]
         const allVotans = []
-        if(votants.length>0) {
+        if(votants) {
             for (let member of votants) {
                 const currentUserMember = associationValidMembers().users.find(item => item.id === member.userId)
                 const typeVote = member.vote.typeVote
@@ -139,6 +136,18 @@ export default useEngagement = () => {
         return allVotans
     }
 
-    return {getMemberEngagementInfos, getAssociationEngagementTotal,deleteEngagement,
+    const isMemberEligible = (memberId) => {
+        let isEligible = true
+        const memberEngagements = listEngagement.filter(item => item.creatorId === memberId)
+        if(memberEngagements && memberEngagements.length> 0) {
+            const isPaying = memberEngagements.some(engagement => engagement.statut.toLowerCase() === 'paying' || engagement.statut.toLowerCase() === 'voting')
+            if(isPaying) isEligible = false
+        }
+
+        return isEligible
+
+    }
+
+    return {getMemberEngagementInfos, getAssociationEngagementTotal,deleteEngagement,isMemberEligible,
         getEngagementVotesdData, handlePayTranche, getEngagementTranches, getValidEngagementList, getEngagementVotans}
 }

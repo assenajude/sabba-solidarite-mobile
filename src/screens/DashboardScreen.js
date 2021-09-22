@@ -14,8 +14,10 @@ import useEngagement from "../hooks/useEngagement";
 import routes from "../navigation/routes";
 import AssociationBackImage from "../components/association/AssociationBackImage";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import {getAvatarUpdate} from "../store/slices/associationSlice";
+import {getAvatarUpdate, getSelectedAssociation, getStateUpdate} from "../store/slices/associationSlice";
 import AppReglement from "../components/AppReglement";
+import AppButton from "../components/AppButton";
+import SubInfo from "../components/association/SubInfo";
 
 function DashboardScreen({navigation}) {
     const dispatch = useDispatch()
@@ -67,6 +69,14 @@ function DashboardScreen({navigation}) {
                 ]
             );
         })
+        const unsubscribe = navigation.addListener('focus', async () => {
+            const mustUpdate = store.getState().entities.association.updating
+                await dispatch(getSelectedAssociation({associationId: currentAssociation.id}))
+            if(mustUpdate) {
+                dispatch(getStateUpdate({updating: false}))
+            }
+        })
+        return unsubscribe
     }, [])
 
     return (
@@ -81,21 +91,23 @@ function DashboardScreen({navigation}) {
                 uploadResult={handleChangeImage}/>
                 <View style={styles.descriptionContainer}>
                     <View>
+                        <TouchableOpacity onPress={() => setShowDescrip(!showDescrip)}>
                         <View
                             style={{
                                 flexDirection: 'row',
                                 margin: 20
                             }}>
-                            <TouchableOpacity onPress={() => setShowDescrip(!showDescrip)}>
-                                {!showDescrip && <MaterialCommunityIcons name="plus" size={24} color="black" />}
-                                {showDescrip && <MaterialCommunityIcons name="minus" size={24} color="black" />}
-                            </TouchableOpacity>
+
+                                {!showDescrip && <MaterialCommunityIcons name="chevron-right" size={24} color="black" />}
+                                {showDescrip && <MaterialCommunityIcons name="chevron-down" size={24} color="black" />}
+
                             <AppText
                                 style={{
                                     fontWeight: 'bold',
                                     marginLeft: 5,
                                 }}>Description</AppText>
                         </View>
+                        </TouchableOpacity>
                         {showDescrip && <View style={{
                             paddingHorizontal: 20
                         }}>
@@ -104,37 +116,22 @@ function DashboardScreen({navigation}) {
                     </View>
 
                 </View>
-                <View style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginVertical: 10,
-                    marginHorizontal: 10,
-                    justifyContent: 'space-around'
-                }}>
-                    <View style={{alignItems: 'center'}}>
-                        <AppText>CM</AppText>
-                    <View style={styles.cotisation}>
-                        <AppText style={{fontWeight: 'bold'}}>{currentAssociation.cotisationMensuelle}</AppText>
-                    </View>
-                    </View>
-                    <View style={{
-                        alignItems: 'center'
-                    }}>
-                        <AppText>TI</AppText>
-                    <View style={styles.cotisation}>
-                        <AppText style={{fontWeight: 'bold'}}>{currentAssociation.interetCredit}%</AppText>
-                    </View>
-                    </View>
+                <View style={styles.subInfo}>
+                    <SubInfo
+                        label='CM'
+                        value={currentAssociation.cotisationMensuelle}/>
+                    <SubInfo
+                        label='TI'
+                        value={currentAssociation.interetCredit+'%'}/>
+                    <SubInfo
+                        label='PM'
+                        value={currentAssociation.penality+'%'}
+                    />
 
-                    <View style={{
-                        alignItems: 'center'
-                    }}>
-                        <AppText>PE</AppText>
-                    <View style={styles.cotisation}>
-                        <AppText style={{fontWeight: 'bold'}}>{currentAssociation.penality}%</AppText>
-                    </View>
-                    </View>
-
+                    <SubInfo
+                        label='QI'
+                        value={currentAssociation.individualQuotite ===0?100+'%' : currentAssociation.individualQuotite+'%'}
+                    />
                 </View>
                 <View elevation={10} style={styles.fondsContainer}>
                     <View>
@@ -193,30 +190,25 @@ function DashboardScreen({navigation}) {
                     marginHorizontal: 20
                 }}>
                     <View style={{marginVertical: 10}}>
-                    <TouchableOpacity onPress={() => navigation.navigate('NEWS')}>
-                        <View style={{
-                            flexDirection: 'row',
-                            alignItems: 'center'
-                        }}>
-                            <MaterialCommunityIcons name="newspaper-variant-outline" size={24} color="black" />
-                            <AppText style={{color: defaultStyles.colors.bleuFbi, marginLeft: 10}}>News</AppText>
-                        </View>
-                    </TouchableOpacity>
+                        <AppButton
+                            style={{alignSelf: 'flex-start'}}
+                            onPress={() => navigation.navigate('NEWS')}
+                            title='News'
+                            iconName='newspaper-variant-outline'
+                            mode='text'
+                        />
                     {notReadInfo.length>0 && <View style={styles.notReadInfo}>
                         <AppText style={{color: defaultStyles.colors.rougeBordeau}}>{notReadInfo.length}</AppText>
                     </View>}
                     </View>
-                    <View style={{
-                        marginVertical: 10
-                    }}>
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center'
-                    }}>
-                        <MaterialCommunityIcons name="account-multiple-plus" size={24} color="black" />
-                        <AppText style={styles.adhesion}
-                                 onPress={() => navigation.navigate(routes.NEW_ADHESION)}>Nouvelle adhésion</AppText>
-                    </View>
+                    <View>
+                        <AppButton
+                            onPress={() => navigation.navigate(routes.NEW_ADHESION)}
+                            iconName='account-multiple-plus'
+                            style={{alignSelf: 'flex-start'}}
+                            mode='text'
+                            title='Nouvelle adhesion'
+                        />
                         {getNewAdhesion().length>0 && <View style={styles.newAdhesionLenght}>
                             <AppText style={{color: defaultStyles.colors.rougeBordeau}}>{getNewAdhesion().length}</AppText>
                         </View>}
@@ -236,16 +228,6 @@ const styles = StyleSheet.create({
     image: {
         height: 200,
         width: '100%'
-    },
-    cotisation: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: defaultStyles.colors.white,
-      height: 60,
-      width: 60,
-       borderRadius: 30,
-      borderWidth: 1,
-      borderColor: defaultStyles.colors.or
     },
     descriptionContainer:{
         flexDirection: 'row',
@@ -307,6 +289,13 @@ const styles = StyleSheet.create({
     },
     secondFonds: {
         flexDirection: 'row',
+    },
+    subInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 10,
+        marginHorizontal: 10,
+        justifyContent: 'space-around'
     }
 })
 export default DashboardScreen;

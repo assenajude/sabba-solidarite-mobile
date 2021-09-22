@@ -26,6 +26,7 @@ function RetraitScreen({navigation}) {
     })
 
 
+
     return (
         <>
             <AppActivityIndicator visible={isLoading}/>
@@ -44,7 +45,7 @@ function RetraitScreen({navigation}) {
                         getTransactionMore={() => dispatch(showTransactionMore(item))}
                         showMore={item.showMore}
                         reseau={getReseau(item.reseau)}
-                        creatorUser={item.user}
+                        creatorUser={item.creatorType=== 'member'?item.member : item.user}
                         transaction={item}/>}
             />}
             <View style={styles.addNew}>

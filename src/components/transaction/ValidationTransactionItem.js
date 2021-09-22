@@ -1,5 +1,5 @@
 import React from 'react';
-import {View,StyleSheet, TouchableWithoutFeedback, TouchableOpacity, Image} from "react-native";
+import {View,StyleSheet, TouchableWithoutFeedback, Image} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "../AppText";
 import useManageAssociation from "../../hooks/useManageAssociation";
@@ -8,11 +8,16 @@ import defaulStyles from '../../utilities/styles'
 import LottieView from 'lottie-react-native'
 import AppButton from "../AppButton";
 import useAuth from "../../hooks/useAuth";
+import AppIconButton from "../AppIconButton";
+import useTransaction from "../../hooks/useTransaction";
 
 function ValidationTransactionItem({reseau,getEditTransaction, transaction, creatorUser, showMore,
                                        getTransactionMore, getTransactionDetails, getCreatorDetails}) {
     const {formatFonds, formatDate} = useManageAssociation()
     const {isAdmin} = useAuth()
+    const {getCreatorUser} = useTransaction()
+
+
     return (
         <View style={styles.container}>
             <View style={styles.date}>
@@ -29,7 +34,8 @@ function ValidationTransactionItem({reseau,getEditTransaction, transaction, crea
                             position: 'absolute',
                             bottom: -5,
                             left: 5,
-                            color: defaulStyles.colors.grey
+                            color: defaulStyles.colors.grey,
+                            fontSize: 15
                         }}>traitement...</AppText>
                 </View>
                 }
@@ -45,53 +51,56 @@ function ValidationTransactionItem({reseau,getEditTransaction, transaction, crea
                         <AppText style={{width: 150, fontWeight: 'bold'}}>{transaction.libelle}</AppText>
                         <AppText style={{fontWeight: 'bold'}}>{formatFonds(transaction.montant)}</AppText>
                     </View>
-                    {!showMore && <View style={styles.showMoreUp}>
-                        <TouchableOpacity onPress={getTransactionMore}>
-                            <MaterialCommunityIcons
-                                name="chevron-down-box-outline" size={30}
-                                color="black" />
-                        </TouchableOpacity>
-                    </View>}
                 </View>
                 {showMore && <View>
                     <View style={styles.reseauContainer}>
                         <AppText >Reseau</AppText>
                         <View style={styles.reseauDetail}>
-                            <Image resizeMode='contain' style={{height: 30,width: 30}} source={reseau.image}/>
-                            <AppText style={{marginLeft: 5}}>{reseau.name}</AppText>
+                            <Image resizeMode='contain' style={{height: 30,width: 30}} source={reseau && reseau.image?reseau.image : require('./../../../assets/icon.png')}/>
+                            {reseau && <AppText style={{marginLeft: 5}}>{reseau.name}</AppText>}
+                            {!reseau && <AppText style={{marginLeft: 5}}>sabbat wallet</AppText>}
                         </View>
                     </View>
-                    <View style={styles.reseauContainer}>
+                    {reseau && <View style={styles.reseauContainer}>
                         <AppText>N° Transaction</AppText>
                         <View style={styles.reseauDetail}>
                             <MaterialCommunityIcons name="card-account-phone" size={24} color="black" />
                             <AppText style={{marginLeft: 5}}>{transaction.numero}</AppText>
                         </View>
-                    </View>
-                    {isAdmin() && <AppButton
+                    </View>}
+                    {isAdmin() &&
+                    <AppButton
+                        style={{alignSelf: 'flex-end'}}
                         onPress={getEditTransaction}
                         iconName='account-edit'
                         title='editer'
-                        otherButtonStyle={styles.editButton}/>}
+                    />}
                 </View>}
             </View>
-            <View style={styles.creator}>
+            {isAdmin() && creatorUser && <View style={styles.creator}>
                 <AppText style={{marginHorizontal: 5}}>par</AppText>
-                <MemberItem getMemberDetails={getCreatorDetails} showPhone={true} selectedMember={creatorUser}/>
-            </View>
+                <MemberItem
+                    getMemberDetails={getCreatorDetails}
+                    showPhone={true}
+                    selectedMember={getCreatorUser(transaction)}/>
+            </View>}
             <View style={{marginTop: 20}}>
             <TouchableWithoutFeedback onPress={getTransactionDetails}>
                 <AppText style={{color: defaulStyles.colors.bleuFbi}}> + détails</AppText>
             </TouchableWithoutFeedback>
             </View>
-
-            {showMore && <View style={styles.showMoreDown}>
-                <TouchableOpacity onPress={getTransactionMore}>
-                <MaterialCommunityIcons
-                    name="chevron-up-box-outline" size={30}
-                    color="black" />
-                </TouchableOpacity>
-            </View>}
+            <View style={styles.showMoreDown}>
+                <AppIconButton
+                    onPress={getTransactionMore}
+                    containerStyle={{
+                        width: 60,
+                        backgroundColor: defaulStyles.colors.leger
+                    }}
+                    iconColor={defaulStyles.colors.black}
+                    iconSize={30}
+                    iconName={showMore?'chevron-up' : 'chevron-down'}
+                />
+            </View>
         </View>
     );
 }
@@ -109,11 +118,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
         justifyContent: 'space-between',
     },
-    editButton: {height: 25,
-        width: 100,
-        padding: 5,
-        alignSelf: 'flex-end'
-    },
+
     image :{
         height: 200,
         width: '100%'

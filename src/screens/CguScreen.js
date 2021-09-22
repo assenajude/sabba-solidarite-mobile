@@ -11,7 +11,9 @@ function CguScreen(props) {
 
     return (
         <>
-       <PDFReader source={{uri: url}}/>
+       <PDFReader
+           withPinchZoom={true}
+           source={{uri: url}}/>
        <View style={{
            position: 'absolute',
            top: 0,

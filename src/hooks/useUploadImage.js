@@ -62,11 +62,11 @@ export default useUploadImage = () => {
                     if(result.ok) uploadSuccess = true
                 }
             }
-            if(uploadSuccess) {
+            /*if(uploadSuccess) {
                 alert('upload success..')
             } else {
                 alert("can't upload now..try later")
-            }
+            }*/
             return uploadSuccess
         } catch (e) {
             throw new Error(`error: ${e.data}`)

@@ -3,7 +3,6 @@ import {View, StyleSheet, ScrollView, Alert} from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AppText from "../components/AppText";
 import defaultStyle from '../utilities/styles'
-import AppHeaderGradient from "../components/AppHeaderGradient";
 import AppLabelWithValue from "../components/AppLabelWithValue";
 import useManageAssociation from "../hooks/useManageAssociation";
 import AppButton from "../components/AppButton";
@@ -32,13 +31,12 @@ function TransactionDetailScreen({route, navigation}) {
 
 
     const handleValidateTransaction = async () => {
-        if(transactionInfos.isRetrait && selectedUser.wallet < (Number(transactionInfos.montant)+200)) {
-            return alert("Vous n'avez pas de fonds suffisant pour retirer ce montant.")
-        }
         const data = {
-            userId: selectedUser.id,
+            creatorId: transactionInfos.reseau.creatorId?transactionInfos.reseau.creatorId : selectedUser.id,
+            mode: 'externe',
+            creatorType: transactionInfos.reseau.creatorType,
             libelle: transactionInfos.isRetrait? 'Retrait de fonds' : 'Rechargement de portefeuille',
-            montant:transactionInfos.isRetrait? Number(transactionInfos.montant)+100: Number(transactionInfos.montant),
+            montant:Number(transactionInfos.montant),
             reseau: transactionInfos.reseau.name,
             type : transactionInfos.isRetrait?'retrait' : 'depot',
             numero: transactionInfos.isRetrait? transactionInfos.retraitNum : transactionInfos.reseau.numero
@@ -56,6 +54,9 @@ function TransactionDetailScreen({route, navigation}) {
     useEffect(() => {
         if(isEnabled){
             scrollRef.current.scrollToEnd()
+            alert("Cher utilisateur vous êtes sur le point de valider une transaction, " +
+                "pour éviter tout désagrement, assurez-vous d'avoir bien vérifié les informations avant de valider." +
+                " Assurez-vous aussi de disposer plus que le montant spécifié pour d'éventuels frais de transaction. Merci")
         }
      }, [isEnabled])
 
@@ -64,34 +65,27 @@ function TransactionDetailScreen({route, navigation}) {
 
     return (
         <>
-            <AppHeaderGradient/>
             <AppActivityIndicator visible={isLoading}/>
         <ScrollView ref={scrollRef}>
             <ReseauBackImageAndLabel
-                reseauImage={transactionInfos.reseau.image}
-                reseauName={transactionInfos.reseau.name}/>
-            <View style={styles.info}>
-                <MaterialCommunityIcons name="alert" size={30} color={defaultStyle.colors.orange} />
-                <AppText style={{margin: 10}}>Cher utilisateur vous êtes sur le point de valider une transaction,
-                    pour éviter tout désagrement, assurez-vous d'avoir bien vérifié les informations avant de valider. Merci</AppText>
-            </View>
-            <AppLabelWithValue label='Type de la transaction' value={transactionInfos.isRetrait?'Retrait de fonds' : 'Rechargement de portefeuille'}/>
-            <AppLabelWithValue label='Numero' value={transactionInfos.isRetrait?transactionInfos.retraitNum: transactionInfos.reseau.numero}/>
-            <AppLabelWithValue label='Montant' value={formatFonds(transactionInfos.montant)}/>
-            <AppLabelWithValue label='Frais transaction' value={transactionInfos.isRetrait?formatFonds(100):formatFonds(0)}/>
-            <AppLabelWithValue label='Total montant' value={transactionInfos.isRetrait?formatFonds(Number(transactionInfos.montant)+100):formatFonds(Number(transactionInfos.montant))}/>
+                reseau={transactionInfos.reseau}
+            />
+                <View style={{marginTop:50}}>
+                    <AppLabelWithValue label='Type de la transaction' value={transactionInfos.isRetrait?'Retrait de fonds' : 'Rechargement de portefeuille'}/>
+                    <AppLabelWithValue label='Numero' value={transactionInfos.isRetrait?transactionInfos.retraitNum: transactionInfos.reseau.numero}/>
+                    <AppLabelWithValue label='Montant' value={formatFonds(transactionInfos.montant)}/>
+                    <AppSwith
+                        label="Je suis d'accord"
+                        isEnabled={isEnabled}
+                        toggleSwitch={toggleSwitch}/>
+                </View>
 
-            <AppSwith
-                label="Je suis d'accord"
-                isEnabled={isEnabled}
-                toggleSwitch={toggleSwitch}/>
-
-            {isEnabled && <AppButton
-                otherButtonStyle={{
-                    marginHorizontal: 20,
-                    width: '80%',
-                    marginVertical: 40,
-                    alignSelf: "center"
+            {isEnabled &&
+            <AppButton
+                style={{
+                    width:300,
+                    alignSelf: 'center',
+                    marginVertical: 50
                 }}
                 title='Valider'
                 onPress={handleValidateTransaction}/>}
@@ -104,13 +98,4 @@ function TransactionDetailScreen({route, navigation}) {
     );
 }
 
-const styles = StyleSheet.create({
-    info: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginVertical: 20,
-        marginHorizontal: 20
-    }
-})
 export default TransactionDetailScreen;

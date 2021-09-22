@@ -4,16 +4,13 @@ import AppButton from "../components/AppButton";
 import routes from "../navigation/routes";
 import AppText from "../components/AppText";
 import colors from "../utilities/colors";
-import {useDispatch} from "react-redux";
-import {getWelcomeImageState} from "../store/slices/authSlice";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 
 function WelcomeScreen({navigation}) {
 
-    const dispatch = useDispatch()
     const [imageLoading, setImageLoading] = useState(true)
     useEffect(() => {
-        navigation.addListener('beforeRemove', (e) => {
+        const unsubscribe = navigation.addListener('beforeRemove', (e) => {
             e.preventDefault();
             Alert.alert(
                 'Alert?',
@@ -28,6 +25,7 @@ function WelcomeScreen({navigation}) {
                 ]
             );
         })
+        return unsubscribe
     }, [navigation])
 
     return (
@@ -37,13 +35,26 @@ function WelcomeScreen({navigation}) {
         <ImageBackground
             onLoadEnd={() => setImageLoading(false)}
             style={styles.container} source={require('../../assets/backImage.png')}>
-
-            <View style={styles.buttonStyle}>
-                <AppButton title='Se connecter' onPress={() => navigation.navigate(routes.LOGIN)}/>
-                <AppButton color1='#FFA500' color2='#ff7f00' color3='#efd807'
-                           title='Créer un compte' onPress={() => navigation.navigate(routes.REGISTER)}/>
-            </View>
         </ImageBackground>
+            <View
+                style={styles.buttons}>
+                <AppButton
+                    style={{backgroundColor: colors.bleuFbi}}
+                    onPress={() => navigation.navigate(routes.LOGIN)}
+                    title='Se connecter'
+                />
+
+                <AppButton
+                    labelStyle={{color: colors.dark}}
+                    onPress={() => navigation.navigate(routes.REGISTER)}
+                    style={{
+                        marginVertical: 10,
+                        marginTop: 20,
+                        backgroundColor: colors.or
+                    }}
+                    title='Creer un compte'
+                />
+            </View>
             <AppText
                 style={{
                     color: colors.bleuFbi,
@@ -62,9 +73,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'flex-end'
     },
-    buttonStyle: {
-        padding: 20,
-        paddingBottom: 5
+    buttons: {
+        position: 'absolute',
+        bottom: 0,
+        alignSelf: 'center',
+        width: '80%',
+        marginHorizontal: 20,
+        marginVertical: 10
     }
 })
 

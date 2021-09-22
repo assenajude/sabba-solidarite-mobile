@@ -7,13 +7,16 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
 import useTransaction from "../hooks/useTransaction";
 import routes from "../navigation/routes";
 import {getReseauSelect} from "../store/slices/transactionSlice";
-import {useDispatch} from "react-redux";
-import AppHeaderGradient from "../components/AppHeaderGradient";
+import {useDispatch, useSelector} from "react-redux";
 import AppIconButton from "../components/AppIconButton";
+import AppTextInput from "../components/AppTextInput";
+import AppButton from "../components/AppButton";
+import FundsInfor from "../components/engagement/FundsInfor";
 
 function SelectedTransactionReseauScreen({route, navigation}) {
     const dispatch = useDispatch()
     const selectedReseau = route.params
+    const connectedUser = useSelector(state => state.auth.user)
 
 
     const {getRetraitRecentNumber} = useTransaction()
@@ -22,12 +25,18 @@ function SelectedTransactionReseauScreen({route, navigation}) {
     const [numRetrait, setNumRetrait] = useState('')
     const [yValue, setYValue] = useState(0)
 
+    const [showRecent, setShowRecent] = useState(false)
+
     const recentScroller = useRef()
 
+    const solde = selectedReseau.isRetrait && selectedReseau.creatorType === 'member'?selectedReseau.fondTotal : connectedUser.wallet
 
     const goNext = () => {
         if(Number(montant)<= 0) {
             return alert("Veuillez saisir un montant superieur à zero.")
+        }
+        if(selectedReseau.isRetrait && Number(montant)>solde) {
+            return alert("Vous ne pouvez pas choisir un montant supérieur à votre solde disponible.")
         }
         const isNumWrong = numRetrait === '' || numRetrait.length<10
         if(selectedReseau.isRetrait && isNumWrong ) {
@@ -45,34 +54,37 @@ function SelectedTransactionReseauScreen({route, navigation}) {
         dispatch(getReseauSelect(selectedReseau))
     }
 
-    const nextScrolling = () => {
-        setYValue(yValue+20)
-        recentScroller.current.scrollTo({x:0,y:yValue})
-    }
 
     useEffect(() => {
         setRecentNumbers(getRetraitRecentNumber(selectedReseau.name))
     }, [])
 
     return (
-        <ScrollView>
-            <AppHeaderGradient/>
+        <ScrollView contentContainerStyle={{
+            paddingBottom: 50
+        }}>
             <ReseauBackImageAndLabel
-                reseauImage={selectedReseau.image}
-                reseauName={selectedReseau.name}/>
+                reseau={selectedReseau}
+            />
             <View style={styles.infoContainer}>
-                {selectedReseau.isRetrait && recentNumbers.length>0 && <View
+                {selectedReseau.isRetrait && recentNumbers.length > 0 &&
+                <TouchableOpacity
+                    onPress={() => setShowRecent(!showRecent)}
+                    style={styles.recent}>
+                    <AppText>Choisir un numero récent</AppText>
+                    <MaterialCommunityIcons name={showRecent?'chevron-down': 'chevron-right'} size={30}/>
+                </TouchableOpacity>
+                }
+                {showRecent && <View
                     style={{
-                    marginBottom: 20,
-                    borderWidth: 0.5
+                        marginBottom: 50,
+                        backgroundColor: defaultStyles.colors.leger
                 }}>
-                    <View>
-                        <AppText style={{fontWeight: 'bold'}}>Numeros recents:</AppText>
-                    </View>
                     <View style={{
                         height: 100
                     }}>
-                        <ScrollView onScroll={event => setYValue(event.nativeEvent.contentOffset.y)}
+                        <ScrollView
+                            onScroll={event => setYValue(event.nativeEvent.contentOffset.y)}
                             ref={recentScroller}
                             contentContainerStyle={{
                             alignItems: 'center',
@@ -110,44 +122,44 @@ function SelectedTransactionReseauScreen({route, navigation}) {
                             iconName='chevron-right' />
                     </View>}
                 </View>}
-                <View>
-                    {!selectedReseau.isRetrait && <View style={styles.numero}>
+                <View style={{
+                    alignItems: 'center'
+                }}>
+                   {selectedReseau.isRetrait &&  <FundsInfor
+                        label='Solde disponible'
+                        fund={solde}
+                    />}
+                    {!selectedReseau.isRetrait &&
+                    <View style={styles.numero}>
                         <AppText>N° dépôt: </AppText>
                         <AppText style={{color: defaultStyles.colors.rougeBordeau, fontWeight: 'bold', marginHorizontal: 20}}>{selectedReseau.numero}</AppText>
                     </View>}
-                    {selectedReseau.isRetrait && <View style={styles.numero}>
-                        <AppText>N° de retrait: </AppText>
-                        <TextInput
-                            textAlign='center'
-                            placeholder='n° retrait'
+                    {selectedReseau.isRetrait &&
+                        <AppTextInput
+                            maxLength={10}
+                            style={{width: 250, alignSelf: 'center'}}
+                            label='Numero de retrait'
                             keyboardType='numeric'
-                            style={styles.montantInput}
                             value={numRetrait}
                             onChangeText={val => setNumRetrait(val)}/>
-                    </View>}
+                            }
                 </View>
-                <View style={styles.montant}>
-                    <AppText>Montant: </AppText>
-                    <TextInput
-                        textAlign='center'
-                        placeholder='montant'
+                    <AppTextInput
+                        label='Montant'
+                        style={{width: 250, marginVertical: 20, alignSelf: 'center'}}
                         keyboardType='numeric'
-                        style={styles.montantInput}
                         value={String(montant)}
                         onChangeText={value => setMontant(value)}/>
-                </View>
-                <TouchableOpacity
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginVertical: 30,
-                        justifyContent: 'flex-end',
-                        marginHorizontal: 20
-                    }}
-                    onPress={goNext}>
-                    <MaterialCommunityIcons name="page-next" size={30} color={defaultStyles.colors.bleuFbi} />
-                    <AppText style={{color: defaultStyles.colors.bleuFbi}}>suivant</AppText>
-                </TouchableOpacity>
+                        <AppButton
+                            onPress={goNext}
+                            style={{
+                                marginTop: 20,
+                                width: 300,
+                                alignSelf: 'center'
+                            }}
+                            iconName='page-next'
+                            title='suivant'
+                        />
             </View>
         </ScrollView>
     );
@@ -163,12 +175,6 @@ const styles = StyleSheet.create({
         marginVertical: 40,
         marginHorizontal: 20
     },
-    montant: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        marginTop: 20,
-    },
     montantInput: {
         width: 120,
         borderWidth: 1,
@@ -178,10 +184,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 2
     },
-    numero: {
+    recent: {
         flexDirection: 'row',
         alignItems: 'center',
-
-    },
+        justifyContent: 'space-between',
+        marginBottom: 40
+    }
 })
 export default SelectedTransactionReseauScreen;

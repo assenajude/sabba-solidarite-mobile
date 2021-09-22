@@ -13,21 +13,17 @@ import useAuth from "../hooks/useAuth";
 import EditRolesModal from "../components/member/EditRolesModal";
 import AppLabelWithValue from "../components/AppLabelWithValue";
 import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
-import {useSelector} from "react-redux";
 import AppAddNewButton from "../components/AppAddNewButton";
+import MemberQuotite from "../components/member/MemberQuotite";
 
 
 function MemberDetails({route, navigation}) {
     const selectedMember = route.params
-    const {isAdmin, isModerator, getMemberUserCompte} = useAuth()
+
+    const {isAdmin, isModerator, getMemberUserCompte, getMemberStatut} = useAuth()
     const {getMemberCotisations} = useCotisation()
     const {getMemberEngagementInfos} = useEngagement()
     const {formatFonds, formatDate, leaveAssociation} = useManageAssociation()
-    const currentMember = useSelector(state => {
-        const list = state.entities.member.list
-        const selected = list.find(item => item.id === selectedMember.id)
-        return selected
-    })
     const [currentMemberState, setCurrentMemberState] = useState(selectedMember)
 
     const [editRoles, setEditRoles] = useState(false)
@@ -36,6 +32,8 @@ function MemberDetails({route, navigation}) {
     const isAuthorized = isAdmin() || isModerator()
     const isTheSameUser = getMemberUserCompte().id === selectedMember.id
     const canQuitMember = isAuthorized || isTheSameUser
+
+
 
     useEffect(() => {
         setCurrentMemberState(selectedMember)
@@ -75,11 +73,11 @@ function MemberDetails({route, navigation}) {
             }
             </View>
             <View style={styles.statut}>
-                <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 20, fontWeight: 'bold'}}>{currentMemberState?.member?.statut}</AppText>
+                <AppText style={{color: defaultStyles.colors.bleuFbi, fontSize: 20, fontWeight: 'bold'}}>{getMemberStatut(currentMemberState.member.statut)}</AppText>
             </View>
             <View style={{marginTop: 30}}>
-
-                <AppLabelWithValue label='Fonds' value={formatFonds(currentMemberState.member.fonds)}/>
+                {canQuitMember && <AppLabelWithValue label='Fonds' value={formatFonds(currentMemberState.member.fonds)}/>}
+                <MemberQuotite/>
                 <AppLabelWithValue label='Nom' value={currentMemberState.nom || "ajoutez votre nom"}/>
                 <AppLabelWithValue label='Prenoms' value={currentMemberState.prenom || "ajoutez votre prenom"}/>
                 <AppLabelWithValue label='Telephone' value={currentMemberState.phone || "ajoutez un numero de telephone"}/>
@@ -99,11 +97,12 @@ function MemberDetails({route, navigation}) {
                         })}>
                     <View style={styles.cotisation}>
                         <AppText style={{color: defaultStyles.colors.bleuFbi}}>Cotisations</AppText>
-                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>({getMemberCotisations(currentMemberState).cotisationLenght})</AppText>
-                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>{formatFonds(getMemberCotisations(currentMemberState).totalCotisation)}</AppText>
+                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>({getMemberCotisations(currentMemberState.member).cotisationLenght})</AppText>
+                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>{formatFonds(getMemberCotisations(currentMemberState.member).totalCotisation)}</AppText>
                         <MaterialCommunityIcons name="clipboard-play-multiple" size={24} color="black" />
                     </View>
                 </TouchableWithoutFeedback>
+
                 <TouchableWithoutFeedback
                     onPress={() => navigation.navigate('Engagements', {
                     screen : routes.LIST_ENGAGEMENT,
@@ -112,8 +111,11 @@ function MemberDetails({route, navigation}) {
                 })}>
                     <View style={styles.cotisation}>
                         <AppText style={{color: defaultStyles.colors.bleuFbi}}>Engagements</AppText>
-                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>({getMemberEngagementInfos(currentMemberState).engagementLength})</AppText>
-                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>{formatFonds(getMemberEngagementInfos(currentMemberState).engagementAmount)}</AppText>
+                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>
+                            ({getMemberEngagementInfos(currentMemberState.member).engagementLength})
+                        </AppText>
+                        <AppText style={{color: defaultStyles.colors.bleuFbi}}>
+                            {formatFonds(getMemberEngagementInfos(currentMemberState.member).engagementAmount)}</AppText>
                         <MaterialCommunityIcons name="clipboard-play-multiple" size={24} color="black" />
                     </View>
                  </TouchableWithoutFeedback>

@@ -23,7 +23,7 @@ function LoginFailedModal({failModal, dismissModal}) {
                     }}
                     onPress={dismissModal}
                     iconColor={defaultStyles.colors.rougeBordeau}
-                    iconName='close'/>
+                    iconName='close' iconSize={24}/>
                     <View style={{
                         flexDirection: 'row'
                     }}>
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     contentModal: {
         alignSelf: "center",
         width: '100%',
-        height: 200,
+        height: 250,
         marginVertical: 20,
         paddingHorizontal: 20,
         backgroundColor: defaultStyles.colors.white

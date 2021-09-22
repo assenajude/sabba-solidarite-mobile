@@ -1,5 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {StatusBar} from 'react-native'
 import {navigationRef} from "./src/navigation/routeNavigation";
+
 import MainNavigator from "./src/navigation/MainNavigator";
 import {NavigationContainer} from "@react-navigation/native";
 import useNotification from "./src/hooks/useNotification";
@@ -56,9 +58,15 @@ function AppWrapper({getImageState}) {
     }, [imageState])
 
     return (
-        <NavigationContainer ref={navigationRef}>
-            <MainNavigator/>
-        </NavigationContainer>
+        <>
+            <StatusBar
+                backgroundColor="#860432"
+                barStyle='light-content'
+                    />
+            <NavigationContainer ref={navigationRef}>
+                <MainNavigator/>
+            </NavigationContainer>
+        </>
     );
 }
 

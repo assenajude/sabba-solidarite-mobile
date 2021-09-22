@@ -1,53 +1,22 @@
 import React from 'react';
-import {TouchableWithoutFeedback,Image, StyleSheet,View} from "react-native";
-import LottieView from "lottie-react-native";
+import {TouchableOpacity} from "react-native";
 import colors from "../utilities/colors";
+import {Avatar} from 'react-native-paper'
 
-function AppAvatar({avatarStyle,source,onDelete, avatarLoading, onAvatarLoadEnd, loadingContainerStyle}) {
-
-    const isImage = Object.keys(source).length>0 && source?.uri !== null && source?.uri !== undefined
-
+function AppAvatar({size=30,user,avatarImage = null, onPress}) {
+    const isUserOk = user && user.avatar
+    const isAvatarImage = avatarImage && avatarImage.url
     return (
-        <TouchableWithoutFeedback onPress={onDelete}>
-            <View style={styles.container}>
-            {!isImage && <Image
-                onLoadEnd={onAvatarLoadEnd}
-                mode='contain' source={require('../../assets/silhouette.png')} style={[styles.avatar, avatarStyle]}/>}
-            {isImage && <Image
-                onLoadEnd={onAvatarLoadEnd}
-                style={[styles.avatar, avatarStyle]} source={source}/>}
-            {avatarLoading && <View style={[styles.avatarLoad, loadingContainerStyle]}>
-                <LottieView
-                    loop={true}
-                    autoPlay={true}
-                    style={styles.loading}
-                    source={require('../../assets/animations/image-loading')}
-                 />
-            </View>}
-            </View>
-        </TouchableWithoutFeedback>
+        <TouchableOpacity onPress={onPress}>
+            <Avatar.Image
+                style={{
+                    backgroundColor: colors.white
+                }}
+                size={size}
+                source={isUserOk?{uri: user.avatar} : isAvatarImage?{uri: avatarImage.url} :  require('../../assets/silhouette.png')}
+            />
+        </TouchableOpacity>
     );
 }
 
-const styles = StyleSheet.create({
-    avatar: {
-        height: 60,
-        width: 60,
-        borderRadius: 30
-    },
-    avatarLoad:{
-        position: 'absolute',
-        width: "100%",
-        height: "100%",
-        backgroundColor: colors.lightGrey
-    },
-    container: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    loading: {
-        minHeight: 50,
-        minWidth: 50
-    }
-})
 export default AppAvatar;

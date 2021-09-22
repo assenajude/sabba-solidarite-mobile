@@ -13,7 +13,6 @@ import AppImagePicker from "../components/AppImagePicker";
 import useAuth from "../hooks/useAuth";
 import EditFundModal from "../components/user/EditFundModal";
 import ListItemSeparator from "../components/ListItemSeparator";
-import {LinearGradient} from "expo-linear-gradient";
 import useUploadImage from "../hooks/useUploadImage";
 import {getUserData, getUserImagesEdit} from "../store/slices/authSlice";
 import AppUploadModal from "../components/AppUploadModal";
@@ -21,6 +20,8 @@ import AppShowImage from "../components/AppShowImage";
 import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
 import AppImageValidator from "../components/AppImageValidator";
 import AppActivityIndicator from "../components/AppActivityIndicator";
+import AppIconButton from "../components/AppIconButton";
+import AppButton from "../components/AppButton";
 
 
 function UserCompteScreen({navigation, route}) {
@@ -43,7 +44,6 @@ function UserCompteScreen({navigation, route}) {
     const [uploadModal, setUploadModal] = useState(false)
     const [imageUrl, setImageUrl] = useState('')
     const [imageModal, setImageModal] = useState(false)
-    const [selectedAvatarLoading, setSelectedAvatarLoading]= useState(selectedUser.avatarLoading)
     const [selectedRectoLoading, setSelectedRectoLoading]= useState(true)
     const [selectedVersoLoading, setSelectedVersoLoading]= useState(true)
     const [editingAvatar, setEditingAvatar] = useState(false)
@@ -54,6 +54,8 @@ function UserCompteScreen({navigation, route}) {
     const [editingRecto, setEditingRecto] = useState(false)
     const [editingVerso, setEditingVerso] = useState(false)
     const [changingVerso, setChangingVerso] = useState(false)
+    const [showInfos, setShowInfos] = useState(false)
+    const [showParams, setShowParams] = useState(false)
 
     const onChangeAvatar = (image) => {
         setChangingAvatar(false)
@@ -62,7 +64,11 @@ function UserCompteScreen({navigation, route}) {
     }
 
     const handleCancelAvatar = () => {
-        setAvatarImage(selectedUser)
+        const newData = {
+            imageData: null,
+            url: selectedUser.avatar?selectedUser.avatar : null
+        }
+        setAvatarImage(newData)
         setEditingAvatar(false)
     }
 
@@ -186,6 +192,7 @@ function UserCompteScreen({navigation, route}) {
          getConnectedUserData(selectedUser)
         }else {
             setCurrentUser(selectedUser)
+            setAvatarImage({imageData: null, url: selectedUser.avatar?selectedUser.avatar:null})
         }
         if(editingRecto && editingVerso) {
             setEditingPiece(true)
@@ -197,45 +204,41 @@ function UserCompteScreen({navigation, route}) {
     return (
         <>
             <AppActivityIndicator visible={authLoding}/>
-        <ScrollView>
-            <LinearGradient
-                colors={['#860432', 'transparent']}
-                style={styles.background}
-            >
-                <View style={[styles.headerContainer, {backgroundColor:selectedAvatarLoading?defaultStyles.colors.lightGrey: defaultStyles.colors.white}]}>
+        <ScrollView contentContainerStyle={{
+            paddingBottom: 50
+        }}>
+                <View style={styles.headerContainer}>
                         <AppAvatar
-                            onAvatarLoadEnd={() => setSelectedAvatarLoading(false)}
-                            avatarLoading={selectedAvatarLoading}
-                            source={{uri: avatarImage.url}} avatarStyle={styles.avatarStyle} user={currentUser} onDelete={deleteAvatarImage}/>
+                            avatarImage={avatarImage}
+                            size={150}
+                            onPress={deleteAvatarImage}/>
+                    <View style={{
+                        position: 'absolute',
+                        bottom: 10,
+                        right:editingAvatar? -10:-20,
+                    }}>
+                        <AppImagePicker
+                            cancelImage={handleCancelAvatar}
+                            saveImage={handleSaveImages}
+                            selectingImage={changingAvatar}
+                            onImageEditing={editingAvatar}
+                            onPressCloseButton={() => setChangingAvatar(false)}
+                            onPressCamera={() => setChangingAvatar(true)}
+                            iconSize={20}
+                            cameraStyle={styles.cameraStyle}
+                            onSelectImage={onChangeAvatar}/>
+                    </View>
                 </View>
-                <View style={{
-                    position: 'absolute',
-                    top: 10,
-                    right:editingAvatar? 10:50
-                }}>
-                    <AppImagePicker
-                        cancelImage={handleCancelAvatar}
-                        saveImage={handleSaveImages}
-                        selectingImage={changingAvatar}
-                        onImageEditing={editingAvatar}
-                        onPressCloseButton={() => setChangingAvatar(false)}
-                        onPressCamera={() => setChangingAvatar(true)}
-                        iconSize={20}
-                        cameraStyle={{height: 40, width: 40}}
-                        onSelectImage={onChangeAvatar}/>
-                </View>
+
                 <View
                     style={{
                         alignSelf:'center',
-                        marginBottom: 30,
-                        marginTop: 10,
-                        marginLeft: 50
+                        marginBottom: 40
                     }}>
-                    <AppText>{currentUser.username}</AppText>
-                    <AppText>{currentUser.email}</AppText>
-                    <AppText>{currentUser.phone}</AppText>
+                    {currentUser.username && <AppText>{currentUser.username}</AppText>}
+                    {currentUser.email && <AppText>{currentUser.email}</AppText>}
+                    {currentUser.phone && <AppText>{currentUser.phone}</AppText>}
                 </View>
-            </LinearGradient>
 
             <View style={styles.walletContent}>
             <View style={styles.wallet}>
@@ -326,38 +329,72 @@ function UserCompteScreen({navigation, route}) {
             <View style={{marginVertical: 10}}>
                 <ListItemSeparator/>
             </View>
-            <View style={{
-                marginHorizontal: 20
-            }}>
-            <AppSimpleLabelWithValue label='Nom' labelValue={currentUser.nom?currentUser.nom:'renseignez votre nom'}/>
-            <AppSimpleLabelWithValue label='Prenom' labelValue={currentUser.prenom?currentUser.prenom:'renseignez votre prenom'}/>
-            <AppSimpleLabelWithValue label='Phone' labelValue={currentUser.phone?currentUser.phone:'renseignez votre phone'}/>
-            <AppSimpleLabelWithValue label='Profession' labelValue={currentUser.profession?currentUser.profession:'renseignez votre profession ou formation'}/>
-            <AppSimpleLabelWithValue label='Emploi' labelValue={currentUser.emploi?currentUser.emploi:'renseignez votre emploi'}/>
-            <AppSimpleLabelWithValue label='Adresse' labelValue={currentUser.adresse?currentUser.adresse:'renseignez votre adresse'}/>
-            </View>
-            <View style={styles.params}>
-                <AppIconWithLabelButton
-                    onPress={() => navigation.navigate('Transaction')}
-                    label='Transactions'
-                    iconName='wallet-outline'/>
-                    <View>
-                        <AppIconWithLabelButton
-                            label='Edit Infos'
-                            onPress={() => navigation.navigate(routes.EDIT_USER_COMPTE)}
-                            iconName='account-edit'/>
-                        <AppIconWithLabelButton
-                            buttonContainerStyle={{
-                                marginVertical: 10,
-                                marginBottom: 10
+            <View style={styles.moreContainer}>
+                <TouchableOpacity onPress={() => setShowInfos(!showInfos)} style={styles.moreContent}>
+                    <AppText>Informations personnelles</AppText>
+                    <AppIconButton
+                        iconColor={defaultStyles.colors.dark}
+                        containerStyle={{
+                            backgroundColor: defaultStyles.colors.lightGrey
+                        }}
+                        onPress={() => setShowInfos(!showInfos)}
+                        iconName={showInfos?'chevron-down':'chevron-right'}/>
+                </TouchableOpacity>
+                {showInfos && <View>
+                    <AppSimpleLabelWithValue label='Nom' labelValue={currentUser.nom?currentUser.nom:'renseignez votre nom'}/>
+                    <AppSimpleLabelWithValue label='Prenom' labelValue={currentUser.prenom?currentUser.prenom:'renseignez votre prenom'}/>
+                    <AppSimpleLabelWithValue label='Phone' labelValue={currentUser.phone?currentUser.phone:'renseignez votre phone'}/>
+                    <AppSimpleLabelWithValue label='Profession' labelValue={currentUser.profession?currentUser.profession:'renseignez votre profession ou formation'}/>
+                    <AppSimpleLabelWithValue label='Emploi' labelValue={currentUser.emploi?currentUser.emploi:'renseignez votre emploi'}/>
+                    <AppSimpleLabelWithValue label='Adresse' labelValue={currentUser.adresse?currentUser.adresse:'renseignez votre adresse'}/>
+                    {/*<AppIconWithLabelButton
+                        buttonContainerStyle={{
+                            marginTop: 10
+                        }}
+                        label='Edit Infos'
+                        onPress={() => navigation.navigate(routes.EDIT_USER_COMPTE, selectedUser)}
+                        iconName='account-edit'/>*/}
+                        <AppButton
+                            mode='text'
+                            style={{
+                                alignSelf: 'flex-start'
                             }}
-                            label='Paramètres'
-                            onPress={() => navigation.navigate(routes.PARAMS)}
-                            iconName='account-settings'/>
-                    </View>
+                            onPress={() => navigation.navigate(routes.EDIT_USER_COMPTE, selectedUser)}
+                            title='Edit infos'
+                            iconName='account-edit'
+                        />
+                </View>}
 
             </View>
-
+            <View style={styles.moreContainer}>
+                <TouchableOpacity onPress={() => setShowParams(!showParams)} style={styles.moreContent}>
+                    <AppText>Gerer les parametres</AppText>
+                    <AppIconButton
+                        iconColor={defaultStyles.colors.dark}
+                        containerStyle={{
+                            backgroundColor: defaultStyles.colors.lightGrey
+                        }}
+                        onPress={() => setShowParams(!showParams)}
+                        iconName={showParams?'chevron-down':'chevron-right'}/>
+                </TouchableOpacity>
+                {showParams && <View style={{
+                    alignItems: 'flex-start',
+                    marginTop: 20
+                }}>
+                    <AppButton
+                        onPress={() => navigation.navigate('Transaction')}
+                        mode='text'
+                        iconName='wallet-outline'
+                        title='Transactions'
+                    />
+                        <AppButton
+                            mode='text'
+                            iconName='account-settings'
+                            onPress={() => navigation.navigate(routes.PARAMS)}
+                            title='Paramètres'
+                        />
+                </View>}
+            </View>
         </ScrollView>
             <EditFundModal
                 fundResult={(result) => {
@@ -379,17 +416,12 @@ function UserCompteScreen({navigation, route}) {
 
 const styles = StyleSheet.create({
     avatarCamera: {
-        height: 50,
-        width: 50,
+        height: 40,
+        width: 40,
         borderRadius: 10,
         marginTop: 20,
         padding: 10,
         backgroundColor: defaultStyles.colors.white
-    },
-    avatarStyle:{
-        height: 200,
-        width: 200,
-        borderRadius: 100,
     },
     background: {
         height: 300,
@@ -432,19 +464,14 @@ const styles = StyleSheet.create({
         top: 40
     },
     headerContainer: {
-        height: 200,
-        width: 200,
+        height: 150,
+        width: 150,
         marginVertical: 10,
         marginHorizontal: 10,
         borderRadius:100,
         alignSelf: 'center',
         alignItems: 'center',
-    },
-    params:{
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        justifyContent: 'space-around',
-        marginVertical: 10
+        backgroundColor: defaultStyles.colors.leger
     },
     pieceLoading: {
       height: 100,
@@ -499,5 +526,14 @@ const styles = StyleSheet.create({
         width: 150,
         backgroundColor: defaultStyles.colors.white
     },
+    moreContainer: {
+        marginVertical: 20,
+        marginHorizontal: 20
+    },
+    moreContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    }
 })
 export default UserCompteScreen;

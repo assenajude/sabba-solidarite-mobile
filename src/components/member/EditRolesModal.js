@@ -2,7 +2,7 @@ import React from 'react';
 import {Modal, StyleSheet, View} from "react-native";
 import * as Yup from 'yup'
 
-import {AppForm, AppFormField, FormSubmitButton} from "../form";
+import {AppForm, FormSubmitButton} from "../form";
 import AppButton from "../AppButton";
 import defaultStyles from '../../utilities/styles'
 import {useDispatch, useStore} from "react-redux";
@@ -20,7 +20,6 @@ function EditRolesModal({editRoles, dismissModal, member}) {
     const store = useStore()
 
     const handleEditRoles = async (role) => {
-        console.log(role.roles);
         const data = {
             memberId: member.id,
             roles: [role.roles]
@@ -42,11 +41,10 @@ function EditRolesModal({editRoles, dismissModal, member}) {
                     margin: 20
                 }}>
                     <AppButton
-                        onPress={dismissModal} title='fermer'
-                        otherButtonStyle={{
-                            height: 20,
-                            backgroundColor: defaultStyles.colors.rougeBordeau
-                        }}/>
+                        style={{backgroundColor: defaultStyles.colors.rougeBordeau}}
+                        onPress={dismissModal}
+                        title='fermer'
+                    />
                 </View>
             <View style={styles.formContainer}>
                 <AppForm
@@ -56,7 +54,6 @@ function EditRolesModal({editRoles, dismissModal, member}) {
                     }}
                     onSubmit={handleEditRoles} >
                     <FormItemPicker label='Roles' name='roles' data={['moderator', 'admin']}/>
-                    {/*<AppFormField name='roles' placeholder='roles'/>*/}
                     <FormSubmitButton title='Editer'/>
                 </AppForm>
             </View>

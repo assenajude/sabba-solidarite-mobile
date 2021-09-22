@@ -3,14 +3,15 @@ import {View, FlatList, StyleSheet} from "react-native";
 import MemberListItem from "../components/member/MemberListItem";
 import AppText from "../components/AppText";
 import ListItemSeparator from "../components/ListItemSeparator";
-import AppHeaderGradient from "../components/AppHeaderGradient";
 import useManageAssociation from "../hooks/useManageAssociation";
+import useAuth from "../hooks/useAuth";
 
 function MembersListScreen({navigation}) {
     const {associationValidMembers} = useManageAssociation()
+    const {getMemberStatut} = useAuth()
+
     return (
         <>
-            <AppHeaderGradient/>
             {associationValidMembers().members.length===0 && <View style={styles.emptyStyle}>
                 <AppText>Aucun membre trouvé</AppText>
             </View>}
@@ -25,7 +26,7 @@ function MembersListScreen({navigation}) {
                               selectedMember={item}
                               childrenStyle={{top: 30}}
                               getMemberDetails={() => navigation.navigate('MemberDetails', item)}>
-                              <AppText>{item.member.statut}</AppText>
+                              <AppText>{getMemberStatut(item.member.statut)}</AppText>
                           </MemberListItem>
                       }
             />}

@@ -15,7 +15,9 @@ const memberSlice = createSlice({
         selectedMonthCotisations: [],
         years: [],
         months: [],
-        userAssociations: []
+        userAssociations: [],
+        memberQuotite: 0,
+        updating: false
     },
     reducers: {
         memberRequested: (state,action) => {
@@ -139,10 +141,6 @@ const memberSlice = createSlice({
             let selectedMember = state.list.find(member => member.id === action.payload.id)
             selectedMember.avatarLoading = false
         },
-        memberBackImageLoaded: (state, action) => {
-            let selectedMember = state.list.find(member => member.id === action.payload.id)
-            selectedMember.backImageLoading = false
-        },
         imageChanged:(state, action) => {
             let selectedMember = state.list.find(item => item.id === action.payload.id)
             if(action.payload.newAvatar) {
@@ -166,15 +164,31 @@ const memberSlice = createSlice({
                 selectedMember.member.backImage = selectedMember.member.oldBackImage
                 selectedMember.backImageLoading = true
             }
+        },
+        setMemberQuotite: (state, action) => {
+            state.memberQuotite = action.payload.quotite
+        },
+        changeMemberQuotite: (state, action) => {
+            const oldQuotite = state.memberQuotite
+            let newQuotite = 0
+            if(action.payload.label === 'increment') {
+                newQuotite = oldQuotite + 1000
+            }else {
+                newQuotite = oldQuotite - 1000
+            }
+            state.memberQuotite = newQuotite
+        },
+        memberStateUpdated: (state, action) => {
+            state.updating = action.payload.updating
         }
     }
 })
 
 const {memberRequested, memberRequestFailed, userAssociationsReceived,
     updateOne, memberInfosReceived,
-    allMembersReceived, memberCotisationPayed,
-    membersCotisationReceived, showCotisationDetails, imageChanged, imageChangingCanceled, memberBackImageLoaded,
-    showMonthDetail, selectYear, initTimeData, memberDeleted, imageLoaded, memberAvatarLoaded} = memberSlice.actions
+    allMembersReceived, memberCotisationPayed, changeMemberQuotite,setMemberQuotite,
+    membersCotisationReceived, showCotisationDetails, imageChanged, imageChangingCanceled,
+    showMonthDetail, selectYear, initTimeData, memberDeleted, imageLoaded, memberStateUpdated} = memberSlice.actions
 export default memberSlice.reducer
 
 const url = '/members'
@@ -316,13 +330,7 @@ export const associationImageLoaded = (association) => dispatch => {
     dispatch(imageLoaded(association))
 }
 
-export const selectedMemberAvatarLoaded = (member) => dispatch =>{
-    dispatch(memberAvatarLoaded(member))
-}
 
-export const selectedMemberBackImageLoaded = (member) => dispatch =>{
-    dispatch(memberBackImageLoaded(member))
-}
 
 export const changeMemberImage = (data) => dispatch => {
     dispatch(imageChanged(data))
@@ -330,4 +338,16 @@ export const changeMemberImage = (data) => dispatch => {
 
 export const cancelChangingImage = (data) => dispatch => {
     dispatch(imageChangingCanceled(data))
+}
+
+export const getMemberQuotiteSet = (quotite) => dispatch => {
+    dispatch(setMemberQuotite(quotite))
+}
+
+export const getChangeMemberQuotite = (label) => dispatch => {
+    dispatch(changeMemberQuotite(label))
+}
+
+export const getMemberStateUpdate = (updating) => dispatch => {
+    dispatch(memberStateUpdated(updating))
 }

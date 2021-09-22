@@ -7,10 +7,12 @@ import MemberCotisationScreen from "../screens/MemberCotisationScreen";
 import ListCotisationScreen from "../screens/ListCotisationScreen";
 import PayementCotisationScreen from "../screens/PayementCotisationScreen";
 import NavigHeaderButton from "../components/NavigHeaderButton";
+import useInfo from "../hooks/useInfo";
 
 const CotisationNavig = createStackNavigator()
 
 function CotisationNavigation(props) {
+    const {getMemberInfoPerso} = useInfo()
 
     return (
         <CotisationNavig.Navigator screenOptions={() => ({
@@ -39,7 +41,7 @@ function CotisationNavigation(props) {
                                     }}/>
 
             <CotisationNavig.Screen name='MemberCotisationScreen' component={MemberCotisationScreen} options={({route, navigation}) => ({
-                title: 'Cotisations de '+route.params?.username || +route.params.nom,
+                title: 'Cotisations '+ getMemberInfoPerso(route.params),
             })}/>
         </CotisationNavig.Navigator>
     );
