@@ -1,5 +1,5 @@
 import React from 'react';
-import {createStackNavigator} from "@react-navigation/stack";
+import {createStackNavigator, TransitionPresets} from "@react-navigation/stack";
 import UserCompteScreen from "../screens/UserCompteScreen";
 import StarterScreen from "../screens/StarterScreen";
 import ListAssociationScreen from "../screens/ListAssociationScreen";
@@ -32,6 +32,7 @@ function StarterNavigator() {
         <StarterNavig.Navigator screenOptions={() => ({
             headerStyle: {backgroundColor: defaultStyles.colors.rougeBordeau},
             headerTintColor: defaultStyles.colors.white,
+            ...TransitionPresets.SlideFromRightIOS
         })}>
             <StarterNavig.Screen name='StarterScreen' component={StarterScreen} options={({navigation}) => ({
                 title: 'Accueil',

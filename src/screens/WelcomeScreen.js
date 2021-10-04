@@ -39,12 +39,14 @@ function WelcomeScreen({navigation}) {
             <View
                 style={styles.buttons}>
                 <AppButton
+                    iconName='lock-open-outline'
                     style={{backgroundColor: colors.bleuFbi}}
                     onPress={() => navigation.navigate(routes.LOGIN)}
                     title='Se connecter'
                 />
 
                 <AppButton
+                    iconName='email'
                     labelStyle={{color: colors.dark}}
                     onPress={() => navigation.navigate(routes.REGISTER)}
                     style={{

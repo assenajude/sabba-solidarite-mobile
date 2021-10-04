@@ -1,5 +1,5 @@
 import React from 'react';
-import {createStackNavigator} from "@react-navigation/stack";
+import {createStackNavigator, TransitionPresets} from "@react-navigation/stack";
 import EtatCotisationScreen from "../screens/EtatCotisationScreen";
 import defaultStyles from "../utilities/styles";
 import NewCotisationScreen from "../screens/NewCotisationScreen";
@@ -17,7 +17,8 @@ function CotisationNavigation(props) {
     return (
         <CotisationNavig.Navigator screenOptions={() => ({
             headerStyle: {backgroundColor: defaultStyles.colors.rougeBordeau},
-            headerTintColor: defaultStyles.colors.white
+            headerTintColor: defaultStyles.colors.white,
+            ...TransitionPresets.SlideFromRightIOS
         })}>
             <CotisationNavig.Screen name='EtatCotisationScreen' component={EtatCotisationScreen}
                                     options={() => ({

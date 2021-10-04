@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {createStackNavigator} from '@react-navigation/stack'
+import {createStackNavigator, TransitionPresets} from '@react-navigation/stack'
 import DashboardScreen from "../screens/DashboardScreen";
 import AppLabelWithIcon from "../components/AppLabelWithIcon";
 import AssociationModal from "../components/association/AssociationModal";
@@ -39,7 +39,8 @@ function AssociationNavigator(props) {
         <>
         <AssocNavig.Navigator screenOptions={() => ({
             headerStyle: {backgroundColor: defaultStyles.colors.rougeBordeau},
-            headerTintColor: defaultStyles.colors.white
+            headerTintColor: defaultStyles.colors.white,
+            ...TransitionPresets.SlideFromRightIOS
         })}>
             <AssocNavig.Screen
                 name='DashboardScreen'

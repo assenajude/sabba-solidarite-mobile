@@ -1,5 +1,5 @@
 import React from 'react';
-import {createStackNavigator} from "@react-navigation/stack";
+import {createStackNavigator, TransitionPresets} from "@react-navigation/stack";
 
 import WelcomeScreen from "../screens/WelcomeScreen";
 import LoginScreen from "../screens/LoginScreen";
@@ -19,6 +19,7 @@ function AuthNavigator(props) {
             screenOptions={() => ({
                 headerStyle: {backgroundColor: defaultStyles.colors.rougeBordeau},
                 headerTintColor: defaultStyles.colors.white,
+                ...TransitionPresets.SlideFromRightIOS
             })}>
             <AuthNavig.Screen name='Welcome' component={WelcomeScreen} options={{headerTitle:'Bienvenue', headerTitleAlign: 'center'}}/>
             <AuthNavig.Screen

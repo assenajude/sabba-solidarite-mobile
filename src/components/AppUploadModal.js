@@ -1,18 +1,19 @@
 import React from 'react';
-import {Modal, StyleSheet, View, TouchableOpacity} from "react-native";
+import { StyleSheet, View, TouchableOpacity} from "react-native";
 import {ProgressBar} from "react-native-paper";
 import defaultStyles from '../utilities/styles'
 import LottieView from "lottie-react-native";
 import {MaterialCommunityIcons} from "@expo/vector-icons"
-function AppUploadModal({progress, uploadModalVisible, closeModal}) {
+function AppUploadModal({progress, closeModal, uploadModalVisible}) {
+    if(!uploadModalVisible) return null;
     return (
-        <Modal visible={uploadModalVisible} transparent>
+        <>
             <View style={styles.container}>
 
             </View>
             <View style={styles.animation}>
                 <LottieView
-                    style={{width: 150}}
+                    style={{width: 100}}
                     source={require('../../assets/animations/loading')}
                     autoPlay={true} loop={true} />
                 <View>
@@ -25,7 +26,7 @@ function AppUploadModal({progress, uploadModalVisible, closeModal}) {
                     <MaterialCommunityIcons  name='close' size={25} color={defaultStyles.colors.rougeBordeau} />
                 </TouchableOpacity>
             </View>
-        </Modal>
+        </>
     );
 }
 
@@ -38,15 +39,17 @@ const styles = StyleSheet.create({
         height:'auto',
         width: '90%',
         backgroundColor: defaultStyles.colors.white,
-        top: '30%',
+        top: '50%',
+        zIndex: 10,
         paddingBottom: 20
     },
     container: {
         width: '100%',
         height: '100%',
         backgroundColor: defaultStyles.colors.dark,
-        top: 50,
         opacity: 0.2,
+        position: 'absolute',
+        zIndex: 5
     },
     closeButton: {
         position: 'absolute',

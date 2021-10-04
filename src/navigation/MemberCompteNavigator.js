@@ -1,5 +1,5 @@
 import React from 'react';
-import {createStackNavigator} from "@react-navigation/stack";
+import {createStackNavigator, TransitionPresets} from "@react-navigation/stack";
 import MemberCompteScreen from "../screens/MemberCompteScreen";
 import defaultStyles from "../utilities/styles";
 import NavigHeaderButton from "../components/NavigHeaderButton";
@@ -13,6 +13,7 @@ function MemberCompteNavigator(props) {
         <MemberCompteNavig.Navigator screenOptions={({navigation}) => ({
             headerStyle: {backgroundColor: defaultStyles.colors.rougeBordeau},
             headerTintColor: defaultStyles.colors.white,
+            ...TransitionPresets.SlideFromRightIOS
 
         })}>
             <MemberCompteNavig.Screen name='Compte' component={MemberCompteScreen} options={({navigation}) => ({

@@ -1,5 +1,5 @@
 import React from 'react';
-import {createStackNavigator} from "@react-navigation/stack";
+import {createStackNavigator, TransitionPresets} from "@react-navigation/stack";
 import MembersListScreen from "../screens/MembersListScreen";
 import defaultStyles from "../utilities/styles";
 import MemberDetails from "../screens/MemberDetails";
@@ -14,7 +14,8 @@ function MembersNavigator(props) {
     return (
         <MemberNavig.Navigator screenOptions={() => ({
             headerStyle: {backgroundColor: defaultStyles.colors.rougeBordeau},
-            headerTintColor: defaultStyles.colors.white
+            headerTintColor: defaultStyles.colors.white,
+            ...TransitionPresets.SlideFromRightIOS
         })}>
             <MemberNavig.Screen name='List' component={MembersListScreen} options={() => ({
                 title: 'Liste des membres',

@@ -8,7 +8,7 @@ function AppSimpleLabelWithValue({label, labelValue, valueStyle}) {
             <AppText style={{fontWeight: 'bold'}}>{label}</AppText>
             <View style={{
                 justifyContent: 'flex-start',
-                width: 150,
+                width: 170,
             }}>
                 <AppText style={valueStyle}>{labelValue}</AppText>
             </View>

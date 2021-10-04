@@ -1,4 +1,4 @@
-import {createStackNavigator} from '@react-navigation/stack'
+import {createStackNavigator, TransitionPresets} from '@react-navigation/stack'
 
 const MainNavig = createStackNavigator()
 
@@ -9,7 +9,9 @@ import StarterNavigator from "./StarterNavigator";
 
 function MainNavigator(props) {
     return (
-        <MainNavig.Navigator>
+        <MainNavig.Navigator screenOptions={{
+            ...TransitionPresets.SlideFromRightIOS
+        }}>
             <MainNavig.Screen name='Auth' component={AuthNavigator} options={{
                 headerShown: false
             }}/>

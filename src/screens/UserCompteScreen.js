@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {View, ScrollView, StyleSheet,BackHandler, TouchableOpacity, TouchableWithoutFeedback, Alert, Image} from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
+import {List} from 'react-native-paper'
 import AppText from "../components/AppText";
 import AppAvatar from "../components/AppAvatar";
 import {useDispatch, useSelector, useStore} from "react-redux";
@@ -17,11 +18,8 @@ import useUploadImage from "../hooks/useUploadImage";
 import {getUserData, getUserImagesEdit} from "../store/slices/authSlice";
 import AppUploadModal from "../components/AppUploadModal";
 import AppShowImage from "../components/AppShowImage";
-import AppIconWithLabelButton from "../components/AppIconWithLabelButton";
 import AppImageValidator from "../components/AppImageValidator";
 import AppActivityIndicator from "../components/AppActivityIndicator";
-import AppIconButton from "../components/AppIconButton";
-import AppButton from "../components/AppButton";
 
 
 function UserCompteScreen({navigation, route}) {
@@ -55,7 +53,6 @@ function UserCompteScreen({navigation, route}) {
     const [editingVerso, setEditingVerso] = useState(false)
     const [changingVerso, setChangingVerso] = useState(false)
     const [showInfos, setShowInfos] = useState(false)
-    const [showParams, setShowParams] = useState(false)
 
     const onChangeAvatar = (image) => {
         setChangingAvatar(false)
@@ -329,17 +326,15 @@ function UserCompteScreen({navigation, route}) {
             <View style={{marginVertical: 10}}>
                 <ListItemSeparator/>
             </View>
-            <View style={styles.moreContainer}>
-                <TouchableOpacity onPress={() => setShowInfos(!showInfos)} style={styles.moreContent}>
-                    <AppText>Informations personnelles</AppText>
-                    <AppIconButton
-                        iconColor={defaultStyles.colors.dark}
-                        containerStyle={{
-                            backgroundColor: defaultStyles.colors.lightGrey
-                        }}
-                        onPress={() => setShowInfos(!showInfos)}
-                        iconName={showInfos?'chevron-down':'chevron-right'}/>
-                </TouchableOpacity>
+            <List.Accordion
+                title="Infos personnelles"
+                left={props => <List.Icon {...props} icon="account" />}>
+                <List.Item
+                    onPress={() => setShowInfos(!showInfos)}
+                    title="Consulter"
+                    left={(props) =><List.Icon {...props} icon='account-details'/>}
+                    right={(props) =><List.Icon {...props} icon={showInfos?'chevron-up' : 'chevron-down'}/>}
+                />
                 {showInfos && <View>
                     <AppSimpleLabelWithValue label='Nom' labelValue={currentUser.nom?currentUser.nom:'renseignez votre nom'}/>
                     <AppSimpleLabelWithValue label='Prenom' labelValue={currentUser.prenom?currentUser.prenom:'renseignez votre prenom'}/>
@@ -347,54 +342,27 @@ function UserCompteScreen({navigation, route}) {
                     <AppSimpleLabelWithValue label='Profession' labelValue={currentUser.profession?currentUser.profession:'renseignez votre profession ou formation'}/>
                     <AppSimpleLabelWithValue label='Emploi' labelValue={currentUser.emploi?currentUser.emploi:'renseignez votre emploi'}/>
                     <AppSimpleLabelWithValue label='Adresse' labelValue={currentUser.adresse?currentUser.adresse:'renseignez votre adresse'}/>
-                    {/*<AppIconWithLabelButton
-                        buttonContainerStyle={{
-                            marginTop: 10
-                        }}
-                        label='Edit Infos'
-                        onPress={() => navigation.navigate(routes.EDIT_USER_COMPTE, selectedUser)}
-                        iconName='account-edit'/>*/}
-                        <AppButton
-                            mode='text'
-                            style={{
-                                alignSelf: 'flex-start'
-                            }}
-                            onPress={() => navigation.navigate(routes.EDIT_USER_COMPTE, selectedUser)}
-                            title='Edit infos'
-                            iconName='account-edit'
-                        />
                 </View>}
-
-            </View>
-            <View style={styles.moreContainer}>
-                <TouchableOpacity onPress={() => setShowParams(!showParams)} style={styles.moreContent}>
-                    <AppText>Gerer les parametres</AppText>
-                    <AppIconButton
-                        iconColor={defaultStyles.colors.dark}
-                        containerStyle={{
-                            backgroundColor: defaultStyles.colors.lightGrey
-                        }}
-                        onPress={() => setShowParams(!showParams)}
-                        iconName={showParams?'chevron-down':'chevron-right'}/>
-                </TouchableOpacity>
-                {showParams && <View style={{
-                    alignItems: 'flex-start',
-                    marginTop: 20
-                }}>
-                    <AppButton
-                        onPress={() => navigation.navigate('Transaction')}
-                        mode='text'
-                        iconName='wallet-outline'
-                        title='Transactions'
-                    />
-                        <AppButton
-                            mode='text'
-                            iconName='account-settings'
-                            onPress={() => navigation.navigate(routes.PARAMS)}
-                            title='Paramètres'
-                        />
-                </View>}
-            </View>
+                <List.Item
+                    onPress={() => navigation.navigate(routes.EDIT_USER_COMPTE, selectedUser)}
+                    title="Editer"
+                    left={(props) =><List.Icon {...props} icon='account-edit'/>}
+                />
+            </List.Accordion>
+            <List.Accordion
+                title="Cestion des paramètres"
+                left={props => <List.Icon {...props} icon="cog" />}>
+                <List.Item
+                    onPress={() => navigation.navigate('Transaction')}
+                    title="Transaction"
+                    left={(props) =><List.Icon {...props} icon='wallet-outline'/>}
+                />
+                <List.Item
+                    onPress={() => navigation.navigate(routes.PARAMS)}
+                    title="Changer vos identifiants"
+                    left={(props) =><List.Icon {...props} icon='account-cog'/>}
+                />
+            </List.Accordion>
         </ScrollView>
             <EditFundModal
                 fundResult={(result) => {
@@ -530,10 +498,5 @@ const styles = StyleSheet.create({
         marginVertical: 20,
         marginHorizontal: 20
     },
-    moreContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-    }
 })
 export default UserCompteScreen;

@@ -187,7 +187,6 @@ function MemberCompteScreen({navigation}) {
 
 
     useEffect(() => {
-        getMemberTransactions()
         const unsubscribe = navigation.addListener('focus',() => getMemberData())
         if(getConnectedMember()) {
             setConnectedMember(currentMember)

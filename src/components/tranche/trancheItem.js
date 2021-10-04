@@ -65,7 +65,7 @@ function TrancheItem({tranche={},engagementPaying,
                 <AppSimpleLabelWithValue label='Déjà payé' labelValue={formatFonds(tranche.solde)}/>
                 <AppSimpleLabelWithValue label='Reste à payer' labelValue={formatFonds(tranche.montant - tranche.solde)}/>
                 </View>
-             {isAuthorized && <View>
+             {isAuthorized && tranche.solde !== tranche.montant && <View>
                  <AppTextInput
                      style={{marginVertical: 10,width: 200, alignSelf: 'center'}}
                      label='montant à payer'

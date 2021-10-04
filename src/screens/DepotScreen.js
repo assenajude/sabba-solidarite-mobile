@@ -11,6 +11,8 @@ import AppErrorOrEmptyScreen from "../components/AppErrorOrEmptyScreen";
 import AppAddNewButton from "../components/AppAddNewButton";
 import AppActivityIndicator from "../components/AppActivityIndicator";
 import {reseauData} from "../utilities/reseau.data";
+import AppText from "../components/AppText";
+import AppButton from "../components/AppButton";
 
 function DepotScreen({navigation, route}) {
     const currentParams = route.params
@@ -42,7 +44,17 @@ function DepotScreen({navigation, route}) {
         <>
             <AppActivityIndicator visible={isLoading}/>
              {depotList.length === 0 && error === null && <AppErrorOrEmptyScreen message='Aucun depôt effectué.'/> }
-            {error !== null && <AppErrorOrEmptyScreen message="Nous n'avons pas pu avoir accès au server une erreur est apparue."/>}
+            {error !== null && <View style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <AppText>Nous n'avons pas pu avoir accès au server.</AppText>
+                <AppButton
+                    title="Réessayer"
+                    onPress={getInitTransaction}/>
+            </View>
+            }
            {depotList.length>0 && error === null && <FlatList
                data={depotList}
                keyExtractor={item => item.id.toString()}

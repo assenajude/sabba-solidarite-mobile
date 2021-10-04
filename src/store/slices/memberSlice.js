@@ -17,7 +17,7 @@ const memberSlice = createSlice({
         months: [],
         userAssociations: [],
         memberQuotite: 0,
-        updating: false
+        updating: true
     },
     reducers: {
         memberRequested: (state,action) => {

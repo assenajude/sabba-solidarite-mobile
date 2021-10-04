@@ -1,5 +1,5 @@
 import React from 'react';
-import {createStackNavigator} from "@react-navigation/stack";
+import {createStackNavigator, TransitionPresets} from "@react-navigation/stack";
 import EtatEngagementScreen from "../screens/EtatEngagementScreen";
 import defaultStyles from "../utilities/styles";
 import ListEngagementScreen from "../screens/ListEngagementScreen";
@@ -19,7 +19,8 @@ function EngagementNavigator(props) {
     return (
         <EngageNavig.Navigator screenOptions={() =>({
             headerStyle: {backgroundColor: defaultStyles.colors.rougeBordeau},
-            headerTintColor: defaultStyles.colors.white
+            headerTintColor: defaultStyles.colors.white,
+            ...TransitionPresets.SlideFromRightIOS
         })}>
             <EngageNavig.Screen name='EtatEngagement' component={EtatEngagementScreen} options={() => ({
                 title: 'Etat des engagements',
